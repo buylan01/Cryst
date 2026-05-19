@@ -104,7 +104,7 @@ fun FileRow(
 
 @Composable
 fun UpwardItem(
-    cps: com.prolan.catu.ui.screen.home.PanelStates
+    cps: PanelStates
 ) {
     Surface(
         onClick = {
