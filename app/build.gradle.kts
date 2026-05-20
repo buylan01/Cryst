@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.prolan.catu"
+    namespace = "com.buylan.cryst"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,12 +12,12 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.prolan.catu"
+        applicationId = "com.buylan.cryst"
         minSdk = 31
         //noinspection OldTargetApi
         targetSdk = 36
-        versionCode = 5
-        versionName = "0.0.5"
+        versionCode = 1
+        versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

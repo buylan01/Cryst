@@ -24,5 +24,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Catu"
+rootProject.name = "Cryst"
 include(":app")
