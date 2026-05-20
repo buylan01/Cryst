@@ -60,7 +60,6 @@ dependencies {
     implementation(libs.language.textmate)
     implementation(libs.image.viewer)
     implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.ui.compose.material3)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

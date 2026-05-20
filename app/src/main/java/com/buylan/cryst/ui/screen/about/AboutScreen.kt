@@ -85,11 +85,6 @@ fun AboutLibrariesScreen(onBackPressed: () -> Unit) {
             website = "https://www.apache.org/licenses/LICENSE-2.0.txt"
         ),
         Library(
-            name = "AndroidX Media3 UI",
-            license = "Apache 2.0",
-            website = "https://www.apache.org/licenses/LICENSE-2.0.txt"
-        ),
-        Library(
             name = "AndroidX Media3 UI Compose Material3",
             license = "Apache 2.0",
             website = "https://www.apache.org/licenses/LICENSE-2.0.txt"
