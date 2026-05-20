@@ -3,6 +3,7 @@ package com.buylan.cryst.ui.screen.home.dialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,16 +44,14 @@ fun PackageDetail(
     targetFile: File
 ) {
     val pm = context.packageManager
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        text = {
-            Column(
-                modifier = Modifier.fillMaxWidth(0.85f)
-            ) {
-                val apkInfo = try { pm.getPackageArchiveInfo(targetFile.path, 0) } catch (_: Exception) { null }
-
-                if (apkInfo != null) {
-
+    val apkInfo = try { pm.getPackageArchiveInfo(targetFile.path, 0) } catch (_: Exception) { null }
+    apkInfo?.let {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                ) {
                     apkInfo.applicationInfo!!.apply {
                         sourceDir = targetFile.absolutePath
                         publicSourceDir = targetFile.absolutePath
@@ -65,7 +64,8 @@ fun PackageDetail(
                         false
                     }
 
-                    val pkgInfo = if (installed) pm.getPackageInfo(apkInfo.packageName, 0) else null
+                    val pkgInfo =
+                        if (installed) pm.getPackageInfo(apkInfo.packageName, 0) else null
 
                     val packageInfo = PackageData(
                         label = apkInfo.applicationInfo!!.loadLabel(pm).toString(),
@@ -75,7 +75,7 @@ fun PackageDetail(
                         packageName = apkInfo.packageName,
                         icon = apkInfo.applicationInfo!!.loadIcon(pm),
                         sourceDir = if (installed) pkgInfo!!.applicationInfo!!.sourceDir else null,
-                        dataDir = if (installed)pkgInfo!!.applicationInfo!!.dataDir else null
+                        dataDir = if (installed) pkgInfo!!.applicationInfo!!.dataDir else null
                     )
 
                     Row(
@@ -117,7 +117,10 @@ fun PackageDetail(
                     Column {
                         @Composable
                         fun InfoItem(title: String, summary: String) {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
                                 Text(title)
                                 Text(
                                     text = summary,
@@ -144,28 +147,25 @@ fun PackageDetail(
                             InfoItem("UID", packageInfo.uid.toString())
                         }
                     }
-                } else {
-                    Text("无法获取安装包信息", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleMedium)
                 }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    //I should complete it
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        //I should complete it
+                    }
+                ) {
+                    Text(stringResource(R.string.unpack))
                 }
-            ) {
-                Text(stringResource(R.string.unpack))
-            }
-            Button(
-                onClick = {
-                    install(context, targetFile)
+                Button(
+                    onClick = {
+                        install(context, targetFile)
+                    }
+                ) {
+                    Text(stringResource(R.string.install))
                 }
-            ) {
-                Text(stringResource(R.string.install))
-            }
-        },
-        dismissButton = {
+            },
+            dismissButton = {
 //            TextButton(
 //                onClick = {
 //
@@ -173,8 +173,9 @@ fun PackageDetail(
 //            ) {
 //                Text(stringResource(R.string.tools))
 //            }
-        }
-    )
+            }
+        )
+    } ?: Toast.makeText(context, "无法获取安装包信息", Toast.LENGTH_SHORT).show()
 }
 
 data class PackageData(
