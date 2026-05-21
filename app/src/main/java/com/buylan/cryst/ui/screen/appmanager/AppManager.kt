@@ -90,6 +90,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
 import com.buylan.cryst.R
+import com.buylan.cryst.activity.MainActivity
 import com.buylan.cryst.util.ExtractPath
 import com.buylan.cryst.util.copyFile
 import com.buylan.cryst.util.formatFileSize
@@ -388,14 +389,21 @@ fun ApplicationManager(){
                                     if (!target.exists()) {
                                         target.mkdir()
                                     }
+                                    val file = File("$ExtractPath/${appName}_${app.versionName}.apk")
                                     val copy = copyFile(
                                         file = File(app.applicationInfo!!.sourceDir),
-                                        targetFile = File("$ExtractPath/${appName}_${app.versionName}.apk")
+                                        targetFile = file
                                     )
                                     withContext(Dispatchers.Main) {
                                         Toast.makeText(context, if (copy) "提取成功, 文件被保存在$ExtractPath" else "提取失败",
                                             Toast.LENGTH_SHORT).show()
                                     }
+                                    val intent = Intent(context, MainActivity::class.java).apply {
+                                        putExtra("path", file.path)
+                                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP// or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                    }
+                                    context.startActivity(intent)
+                                    (context as ComponentActivity).finish()
                                 }
                             }
                         ) {

@@ -11,12 +11,17 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.screen.home.MainScreen
+import com.buylan.cryst.ui.screen.home.model.MainViewModel
 import com.buylan.cryst.ui.theme.CatuTheme
 import io.github.rosemoe.sora.langs.textmate.registry.FileProviderRegistry
 import io.github.rosemoe.sora.langs.textmate.registry.GrammarRegistry
 import io.github.rosemoe.sora.langs.textmate.registry.provider.AssetsFileResolver
+import kotlin.io.path.Path
 
 class MainActivity : ComponentActivity() {
+
+    var initPath: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -26,6 +31,12 @@ class MainActivity : ComponentActivity() {
             val appViewModel: AppViewModel = viewModel(
                 viewModelStoreOwner = applicationContext as ViewModelStoreOwner
             )
+
+            val mainViewModel :MainViewModel = viewModel()
+
+            if (!initPath.isNullOrEmpty()) {
+                mainViewModel.currentPanelState().path = Path(initPath!!)
+            }
 
             val isDark = appViewModel.isDarkMode(isSystemInDarkTheme())
 
@@ -38,6 +49,7 @@ class MainActivity : ComponentActivity() {
             CatuTheme(isDark) {
                 MainScreen(
                     context = this,
+                    viewModel = mainViewModel,
                     appViewModel = appViewModel
                 )
             }
@@ -47,5 +59,11 @@ class MainActivity : ComponentActivity() {
             AssetsFileResolver(applicationContext.assets)
         )
         GrammarRegistry.getInstance().loadGrammars("languages.json")
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        initPath = intent.getStringExtra("path").also { println(it) }
     }
 }
