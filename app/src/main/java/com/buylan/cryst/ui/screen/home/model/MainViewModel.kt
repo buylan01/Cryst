@@ -18,6 +18,7 @@ import com.buylan.cryst.util.RootPath
 import com.buylan.cryst.util.accessFiles
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
+import com.buylan.cryst.util.shareFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -32,14 +33,18 @@ import kotlin.io.path.name
 class MainViewModel : ViewModel() {
     var currentPanel by mutableStateOf(PanelPosition.L)
         private set
+
     fun setPanel(panel: PanelPosition) {
         currentPanel = panel
     }
+
     var currentPath by mutableStateOf(Path(RootPath))
         private set
+
     fun setPath(path: Path) {
         currentPath = path
     }
+
     var showPathDialog by mutableStateOf(false)
     var showAboutDialog by mutableStateOf(false)
     var showSort by mutableStateOf(false)
@@ -92,6 +97,7 @@ class MainViewModel : ViewModel() {
             }
         }
     }
+
     fun handleFileClick(context: Context, file: File, type: FileType? = null) {
         if (file.isDirectory) {
             currentPanelState().path = file.toPath()
@@ -142,43 +148,51 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun onToolAction(action: ToolAction, file: File) {
+    fun onToolAction(context: Context, action: ToolAction, file: File) {
         toolsDialog = null
         when (action) {
             ToolAction.Move -> {
                 moveDialog = ExtraDialogState(file, uncurrentPanelState().path)
             }
+
             ToolAction.Copy -> {
                 copyDialog = ExtraDialogState(file, uncurrentPanelState().path)
             }
+
             ToolAction.Rename -> {
                 renameDialog = CommonDialogState(file)
             }
+
             ToolAction.Delete -> {
                 deleteDialog = CommonDialogState(file)
             }
+
             ToolAction.Properties -> {
                 propertiesDialog = CommonDialogState(file)
             }
+
             ToolAction.OpenWith -> {
                 openWithDialog = CommonDialogState(file)
             }
-            else -> {
+
+            ToolAction.Share -> {
+                context.shareFile(file)
+            }
+
+            ToolAction.Compress -> {
 
             }
         }
     }
 }
 
-enum class ToolAction { Move, Copy, Rename, Delete, Properties, OpenWith, Compress }
+enum class ToolAction { Move, Copy, Rename, Delete, Properties, OpenWith, Compress, Share }
 enum class SortType(
     val label: Int
 ) {
-    NAME(R.string.name),
-    SIZE(R.string.size),
-    TIME(R.string.time),
-    TYPE(R.string.type)
+    NAME(R.string.name), SIZE(R.string.size), TIME(R.string.time), TYPE(R.string.type)
 }
+
 enum class PanelPosition { L, R }
 data class CommonDialogState(val file: File)
 data class ExtraDialogState(val file: File, val path: Path)
@@ -202,7 +216,9 @@ enum class FileType(
 sealed class FileOperaUiState {
     object Idle : FileOperaUiState()
     object InProgress : FileOperaUiState()
-    data class Progress(val current: Int, val total: Int, val percentage: Int, val failed: Int) : FileOperaUiState()
+    data class Progress(val current: Int, val total: Int, val percentage: Int, val failed: Int) :
+        FileOperaUiState()
+
     data class Success(val all: Boolean) : FileOperaUiState()
     data class Error(val message: String) : FileOperaUiState()
 }

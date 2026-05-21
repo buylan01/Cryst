@@ -7,6 +7,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.model.AppViewModel
@@ -33,6 +34,9 @@ class MainActivity : ComponentActivity() {
             )
 
             val mainViewModel :MainViewModel = viewModel()
+
+            mainViewModel.leftPanelState.listState = rememberLazyListState()
+            mainViewModel.rightPanelState.listState = rememberLazyListState()
 
             if (!initPath.isNullOrEmpty()) {
                 mainViewModel.currentPanelState().path = Path(initPath!!)

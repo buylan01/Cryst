@@ -1,5 +1,6 @@
 package com.buylan.cryst.ui.screen.home
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,4 +15,5 @@ class PanelStates {
 
     var files by mutableStateOf(emptyList<File>())
     var sortType by mutableStateOf(SortType.NAME)
+    lateinit var listState: LazyListState
 }

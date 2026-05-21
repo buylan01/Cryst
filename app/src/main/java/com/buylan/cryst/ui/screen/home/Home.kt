@@ -411,7 +411,7 @@ fun MainScreen(
                 }
 
                 val animatedColorLeft by animateColorAsState(
-                    targetValue = if (currentPanel == PanelPosition.L) MaterialTheme.colorScheme.surface else colorWhite,
+                    targetValue = if (currentPanel == PanelPosition.L) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainer,
                     animationSpec = tween(150)
                 )
 
@@ -455,7 +455,7 @@ fun MainScreen(
                 }
 
                 val animatedColorRight by animateColorAsState(
-                    targetValue = if (currentPanel == PanelPosition.R) MaterialTheme.colorScheme.surface else colorWhite,
+                    targetValue = if (currentPanel == PanelPosition.R) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainer,
                     animationSpec = tween(150)
                 )
 
@@ -692,7 +692,7 @@ fun MainScreen(
         ToolDialog(
             state.file, currentPanel,
             onDismiss = { viewModel.toolsDialog = null },
-            onToolAction = { viewModel.onToolAction(it, state.file) },
+            onToolAction = { viewModel.onToolAction(context,it, state.file) },
         )
     }
 

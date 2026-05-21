@@ -135,10 +135,7 @@ fun ToolDialog(
                     ToolItem(
                         text = stringResource(R.string.share),
                         icon = Icons.Default.Share,
-                        onClick = {
-                            context.shareFile(file)
-                            onDismiss()
-                        },
+                        onClick = { onToolAction(ToolAction.Share) },
                         enabled = !file.isDirectory
                     )
                 }
