@@ -8,8 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.buylan.cryst.Application
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.screen.home.MainScreen
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
@@ -27,9 +27,7 @@ class MainActivity : ComponentActivity() {
         window.isNavigationBarContrastEnforced = false
 
         setContent {
-            val appViewModel: AppViewModel = viewModel(
-                viewModelStoreOwner = applicationContext as ViewModelStoreOwner
-            )
+            val appViewModel = (applicationContext as Application).appViewModel
 
             val mainViewModel :MainViewModel = viewModel()
 

@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.buylan.cryst.Application
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.screen.terminal.TerminalScreen
 import com.buylan.cryst.ui.theme.CatuTheme
@@ -21,9 +22,7 @@ class TerminalActivity : ComponentActivity() {
         val filePath = intent.getStringExtra("filePath") ?: ""
 
         setContent {
-            val appViewModel: AppViewModel = viewModel(
-                viewModelStoreOwner = applicationContext as ViewModelStoreOwner
-            )
+            val appViewModel = (applicationContext as Application).appViewModel
 
             val isDark = appViewModel.isDarkMode(isSystemInDarkTheme())
 

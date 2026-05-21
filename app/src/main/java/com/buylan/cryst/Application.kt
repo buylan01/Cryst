@@ -3,15 +3,14 @@ package com.buylan.cryst
 import android.app.Application
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import com.buylan.cryst.model.AppViewModel
 
-class Application : Application(), ViewModelStoreOwner {
-    private val appViewModelStore by lazy { ViewModelStore() }
+class Application : Application() {
+    lateinit var appViewModel: AppViewModel
+        private set
 
-    override val viewModelStore: ViewModelStore
-        get() = appViewModelStore
-
-    override fun onTerminate() {
-        super.onTerminate()
-        appViewModelStore.clear()
+    override fun onCreate() {
+        super.onCreate()
+        appViewModel = AppViewModel(this)
     }
 }

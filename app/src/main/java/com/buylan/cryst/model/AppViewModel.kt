@@ -1,22 +1,66 @@
 package com.buylan.cryst.model
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.buylan.cryst.R
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
-class AppViewModel : ViewModel() {
+private val Application.dataStore by preferencesDataStore(name = "settings")
+
+class AppViewModel(application: Application) : AndroidViewModel(application) {
+
     var darkMode: DarkMode by mutableStateOf(DarkMode.System)
+        private set
+
+    init {
+        viewModelScope.launch {
+            darkMode = getSavedDarkMode()
+        }
+    }
+
     fun setDarkTheme(theme: DarkMode) {
         darkMode = theme
+        viewModelScope.launch {
+            saveDarkMode(theme)
+        }
     }
-    fun isDarkMode(isSystemDarkMode: Boolean = false) : Boolean {
+
+    fun isDarkMode(isSystemDarkMode: Boolean = false): Boolean {
         return when (darkMode) {
             DarkMode.System -> isSystemDarkMode
             DarkMode.Light  -> false
             DarkMode.Dark   -> true
         }
+    }
+
+    private suspend fun saveDarkMode(theme: DarkMode) {
+        getApplication<Application>().dataStore.edit { prefs ->
+            prefs[DARK_MODE_KEY] = theme.name
+        }
+    }
+
+    private suspend fun getSavedDarkMode(): DarkMode {
+        val pref = getApplication<Application>().dataStore.data
+            .map { it[DARK_MODE_KEY] ?: DarkMode.System.name }
+            .first()
+        return try {
+            DarkMode.valueOf(pref)
+        } catch (_: IllegalArgumentException) {
+            DarkMode.System
+        }
+    }
+
+    companion object {
+        private val DARK_MODE_KEY = stringPreferencesKey("dark_mode")
     }
 }
 
