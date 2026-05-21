@@ -16,7 +16,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -87,7 +86,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -100,13 +98,13 @@ import com.buylan.cryst.activity.LicensesActivity
 import com.buylan.cryst.activity.SettingsActivity
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.model.DarkMode
-import com.buylan.cryst.ui.screen.home.dialog.PackageDetail
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
 import com.buylan.cryst.ui.screen.home.dialog.CopyDialog
 import com.buylan.cryst.ui.screen.home.dialog.CreateDialog
 import com.buylan.cryst.ui.screen.home.dialog.DeleteDialog
 import com.buylan.cryst.ui.screen.home.dialog.MoveDialog
 import com.buylan.cryst.ui.screen.home.dialog.OpenWithDialog
+import com.buylan.cryst.ui.screen.home.dialog.PackageDetail
 import com.buylan.cryst.ui.screen.home.dialog.PropertiesDialog
 import com.buylan.cryst.ui.screen.home.dialog.RenameDialog
 import com.buylan.cryst.ui.screen.home.dialog.SearchDialog
@@ -139,7 +137,6 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
     val currentPanel = viewModel.currentPanel
     val currentPath = viewModel.currentPath
-    val colorWhite = if (appViewModel.isDarkMode(isSystemInDarkTheme())) Color.Black else Color.White
     val leftLazyState = rememberLazyListState()
     val rightLazyState = rememberLazyListState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
