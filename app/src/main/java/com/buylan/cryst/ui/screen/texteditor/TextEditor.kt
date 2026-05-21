@@ -78,16 +78,28 @@ fun TextEditor(
                 )
             }
             editor.colorScheme = TextMateColorScheme.create(ThemeRegistry.getInstance())
-            val languageScopeName = "source.cpp" // 您目标语言的作用域名称
-            val language = TextMateLanguage.create(
-                languageScopeName, false
-            )
+
+            val languageScopeName = when(file.extension.lowercase()) {
+                "cpp" -> "source.cpp"
+                "xml" -> "text.xml"
+                "json" -> "source.json"
+                "bat" -> "source.batchfile"
+                "html" -> "text.html.derivative"
+                else -> { null }
+            }
+
+            languageScopeName?.let {
+                val language = TextMateLanguage.create(
+                    languageScopeName, false
+                )
+                editor.setEditorLanguage(language)
+            }
+
             LaunchedEffect(key1 = state.content) {
                 state.editor?.apply {
                     setText(state.content)
                 }
             }
-            editor.setEditorLanguage(language)
             AndroidView(
                 factory = { editor },
                 modifier = Modifier.fillMaxSize(),

@@ -14,9 +14,7 @@ import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.screen.home.MainScreen
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
 import com.buylan.cryst.ui.theme.CatuTheme
-import io.github.rosemoe.sora.langs.textmate.registry.FileProviderRegistry
-import io.github.rosemoe.sora.langs.textmate.registry.GrammarRegistry
-import io.github.rosemoe.sora.langs.textmate.registry.provider.AssetsFileResolver
+import com.buylan.cryst.util.textEditorStartup
 import kotlin.io.path.Path
 
 class MainActivity : ComponentActivity() {
@@ -59,10 +57,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        FileProviderRegistry.getInstance().addFileProvider(
-            AssetsFileResolver(applicationContext.assets)
-        )
-        GrammarRegistry.getInstance().loadGrammars("languages.json")
+        textEditorStartup(applicationContext, true)
     }
 
     override fun onResume() {

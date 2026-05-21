@@ -11,6 +11,24 @@
       "name": "cpp",
       "scopeName": "source.cpp",
       "languageConfiguration": "textmate/cpp/language-configuration.json"
+     },
+    {
+      "grammar": "textmate/html/syntaxes/html.tmLanguage.json",
+      "name": "html",
+      "scopeName": "text.html.derivative",
+      "languageConfiguration": "textmate/html/language-configuration.json"
+     },
+    {
+      "grammar": "textmate/bat/syntaxes/bat.tmLanguage.json",
+      "name": "bat",
+      "scopeName": "source.batchfile",
+      "languageConfiguration": "textmate/bat/language-configuration.json"
+     },
+    {
+      "grammar": "textmate/json/syntaxes/json.tmLanguage.json",
+      "name": "json",
+      "scopeName": "source.json",
+      "languageConfiguration": "textmate/json/language-configuration.json"
      }
   ]
 }
