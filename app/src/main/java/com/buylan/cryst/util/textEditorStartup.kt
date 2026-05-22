@@ -12,24 +12,28 @@ fun textEditorStartup(context: Context, isThemeDark: Boolean) {
 
     //edited form sora editor
 
-    FileProviderRegistry.getInstance().addFileProvider(
-        AssetsFileResolver(context.assets)
-    )
+    try {
+        FileProviderRegistry.getInstance().addFileProvider(
+            AssetsFileResolver(context.assets)
+        )
 
-    val themeRegistry = ThemeRegistry.getInstance()
-    val name = "default" // 主题名称
-    val themeAssetsPath = "textmate/$name.json"
-    themeRegistry.loadTheme(
-        ThemeModel(
-            IThemeSource.fromInputStream(
-                FileProviderRegistry.getInstance().tryGetInputStream(themeAssetsPath),
-                themeAssetsPath,
-                null
-            ),
-            name
-        ).apply {
-            isDark = isThemeDark
-        }
-    )
-    GrammarRegistry.getInstance().loadGrammars("languages.json")
+        val themeRegistry = ThemeRegistry.getInstance()
+        val name = "2026-light" // 主题名称
+        val themeAssetsPath = "textmate/theme/$name.json"
+        themeRegistry.loadTheme(
+            ThemeModel(
+                IThemeSource.fromInputStream(
+                    FileProviderRegistry.getInstance().tryGetInputStream(themeAssetsPath),
+                    themeAssetsPath,
+                    null
+                ),
+                name
+            ).apply {
+                isDark = isThemeDark
+            }
+        )
+        GrammarRegistry.getInstance().loadGrammars("languages.json")
+    } catch (e: Exception) {
+        println(e)
+    }
 }

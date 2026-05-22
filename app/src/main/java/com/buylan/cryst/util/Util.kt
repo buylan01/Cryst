@@ -50,7 +50,7 @@ fun accessFiles(path: Path, sortType: SortType): List<File> {
 
 fun getFileType(file: File): FileType {
     return if (file.isDirectory) FileType.FOLDER else when (file.extension.lowercase()) {
-        "txt", "xml", "prop", "conf", "json", "smali" -> FileType.TEXT
+        "txt", "xml", "prop", "conf", "json", "smali", "cpp", "html" -> FileType.TEXT
         "jpg", "jpeg", "png", "gif", "webp" -> FileType.IMAGE
         "mp3", "wav", "ogg", "flac" -> FileType.AUDIO
         "mp4" -> FileType.VIDEO

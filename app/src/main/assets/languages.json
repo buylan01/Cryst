@@ -15,7 +15,7 @@
     {
       "grammar": "textmate/html/syntaxes/html.tmLanguage.json",
       "name": "html",
-      "scopeName": "text.html.derivative",
+      "scopeName": "text.html.basic",
       "languageConfiguration": "textmate/html/language-configuration.json"
      },
     {

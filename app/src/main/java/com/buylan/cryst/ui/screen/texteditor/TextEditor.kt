@@ -84,7 +84,7 @@ fun TextEditor(
                 "xml" -> "text.xml"
                 "json" -> "source.json"
                 "bat" -> "source.batchfile"
-                "html" -> "text.html.derivative"
+                "html" -> "text.html.basic"
                 else -> { null }
             }
 
