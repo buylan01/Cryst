@@ -41,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
 import com.buylan.cryst.activity.AppListActivity
-import com.buylan.cryst.activity.TerminalActivity
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.model.DarkMode
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
@@ -200,19 +199,6 @@ fun ModalDrawer(
                 onClick = {
                     context.startActivity(Intent(context, AppListActivity::class.java))
                 }
-            )
-            NavigationDrawerItem(
-                label = { Text(stringResource(R.string.terminal)) },
-                selected = false,
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Terminal,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    context.startActivity(Intent(context, TerminalActivity::class.java))
-                },
             )
             Spacer(Modifier.height(12.dp))
         }

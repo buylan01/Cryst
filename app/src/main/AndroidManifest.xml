@@ -45,10 +45,6 @@
             android:name=".activity.TextEditorActivity"
             android:exported="true" />
         <activity
-            android:name=".activity.TerminalActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustNothing"/>
-        <activity
             android:name=".activity.FontActivity"
             android:exported="true" />
         <activity
