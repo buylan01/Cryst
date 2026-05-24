@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.FileRow
 import com.buylan.cryst.util.getFileType
+import com.buylan.cryst.vfs.LocalFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -153,8 +154,8 @@ fun SearchDialog(
                     ) {
                         items(found) { file ->
                             FileRow(
-                                file = file,
-                                type = getFileType(file),
+                                file = LocalFile(file),
+                                type = getFileType(LocalFile(file)),
                                 onFileClick = {
                                     onFileClick(file)
                                 },

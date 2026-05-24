@@ -31,12 +31,13 @@ import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.PanelPosition
 import com.buylan.cryst.ui.screen.home.model.ToolAction
 import com.buylan.cryst.util.shareFile
+import com.buylan.cryst.vfs.VirtualFile
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToolDialog(
-    file: File,
+    file: VirtualFile,
     position: PanelPosition,
     onDismiss: () -> Unit,
     onToolAction: (action: ToolAction) -> Unit

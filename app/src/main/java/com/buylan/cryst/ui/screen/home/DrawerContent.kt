@@ -46,6 +46,7 @@ import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.model.DarkMode
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
 import com.buylan.cryst.util.RootPath
+import com.buylan.cryst.vfs.LocalFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -175,7 +176,7 @@ fun ModalDrawer(
                 },
                 onClick = {
                     scope.launch {
-                        viewModel.currentPanelState().path = Path(RootPath)
+                        viewModel.currentPanelState().path = LocalFile(RootPath)
                         drawerState.close()
                     }
                 }

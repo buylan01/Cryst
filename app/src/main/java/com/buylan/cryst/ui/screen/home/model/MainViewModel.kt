@@ -3,6 +3,7 @@ package com.buylan.cryst.ui.screen.home.model
 import android.content.Context
 import android.content.Intent
 import android.os.Environment
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,11 +20,15 @@ import com.buylan.cryst.util.accessFiles
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.util.shareFile
+import com.buylan.cryst.vfs.ArchiveFile
+import com.buylan.cryst.vfs.LocalFile
+import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -38,10 +43,10 @@ class MainViewModel : ViewModel() {
         currentPanel = panel
     }
 
-    var currentPath by mutableStateOf(Path(RootPath))
+    var currentPath by mutableStateOf<VirtualFile>(LocalFile(RootPath))
         private set
 
-    fun setPath(path: Path) {
+    fun setPath(path: VirtualFile) {
         currentPath = path
     }
 
@@ -70,16 +75,16 @@ class MainViewModel : ViewModel() {
     fun navigateBack() {
         val state = currentPanelState()
         if (!currentPath.isRootPath()) {
-            state.path = state.path.parent
+            state.path = state.path.parent!!
             currentPath = state.path
         }
     }
     fun refreshPanel(panelState: PanelStates) {
         viewModelScope.launch {
             panelState.files = withContext(Dispatchers.IO) {
-                if (!panelState.path.isDirectory()) {
+                if (!panelState.path.isDirectory) {
                     panelState.highLightFiles = setOf(panelState.path.name)
-                    panelState.path = panelState.path.parent
+                    panelState.path = panelState.path.parent!!
                 }
                 accessFiles(panelState.path, panelState.sortType)
             }
@@ -98,9 +103,9 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun handleFileClick(context: Context, file: File, type: FileType? = null) {
+    fun handleFileClick(context: Context, file: VirtualFile, type: FileType? = null) {
         if (file.isDirectory) {
-            currentPanelState().path = file.toPath()
+            currentPanelState().path = file
         } else {
             when (type ?: getFileType(file)) {
                 FileType.TEXT -> {
@@ -110,6 +115,15 @@ class MainViewModel : ViewModel() {
                             TextEditorActivity::class.java
                         ).putExtra("filePath", file.path)
                     )
+                }
+
+                FileType.ARCHIVE -> {
+                    try {
+                        val zipFile = ZipFile(file.absolutePath)
+                        currentPanelState().path = ArchiveFile(zipFile, zipFilePath = File(file.absolutePath))
+                    } catch (e: Exception) {
+                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 FileType.IMAGE -> context.startActivity(
@@ -148,7 +162,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun onToolAction(context: Context, action: ToolAction, file: File) {
+    fun onToolAction(context: Context, action: ToolAction, file: VirtualFile) {
         toolsDialog = null
         when (action) {
             ToolAction.Move -> {
@@ -194,9 +208,9 @@ enum class SortType(
 }
 
 enum class PanelPosition { L, R }
-data class CommonDialogState(val file: File)
-data class ExtraDialogState(val file: File, val path: Path)
-data class PathDialogState(val path: Path)
+data class CommonDialogState(val file: VirtualFile)
+data class ExtraDialogState(val file: VirtualFile, val path: VirtualFile)
+data class PathDialogState(val path: VirtualFile)
 enum class FileType(
     val label: Int,
     val icon: Int

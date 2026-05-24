@@ -15,6 +15,7 @@ import com.buylan.cryst.ui.screen.home.MainScreen
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
 import com.buylan.cryst.ui.theme.CatuTheme
 import com.buylan.cryst.util.textEditorStartup
+import com.buylan.cryst.vfs.LocalFile
 import kotlin.io.path.Path
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity() {
             mainViewModel.rightPanelState.listState = rememberLazyListState()
 
             if (!initPath.isNullOrEmpty()) {
-                mainViewModel.currentPanelState().path = Path(initPath!!)
+                mainViewModel.currentPanelState().path = LocalFile(initPath!!)
             }
 
             val isDark = appViewModel.isDarkMode(isSystemInDarkTheme())

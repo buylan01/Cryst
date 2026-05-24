@@ -116,6 +116,8 @@ import com.buylan.cryst.ui.screen.home.model.PanelPosition
 import com.buylan.cryst.ui.screen.home.model.PathDialogState
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
+import com.buylan.cryst.vfs.LocalFile
+import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -178,7 +180,7 @@ fun MainScreen(
                     title = {
                         Column {
                             Text(
-                                text = currentPath.pathString,
+                                text = currentPath.pathDisplay,
                                 maxLines = 1,
                                 overflow = TextOverflow.StartEllipsis,
                                 softWrap = false,
@@ -400,7 +402,7 @@ fun MainScreen(
                     }
                 }
 
-                fun handleFileLongClick(file: File) {
+                fun handleFileLongClick(file: VirtualFile) {
                     viewModel.toolsDialog =
                         CommonDialogState(
                             file
@@ -537,7 +539,7 @@ fun MainScreen(
         }
     }
 
-    fun handleRefresh(path: Path, highlights: Set<String> = emptySet()) {
+    fun handleRefresh(path: VirtualFile, highlights: Set<String> = emptySet()) {
         if (leftPanelState.path == path) {
             viewModel.leftPanelState.highLightFiles = highlights
             viewModel.refreshPanel(leftPanelState)
@@ -642,7 +644,7 @@ fun MainScreen(
     }
 
     if (viewModel.showPathDialog) {
-        val textFieldState = rememberTextFieldState(initialText = viewModel.currentPanelState().path.pathString)
+        val textFieldState = rememberTextFieldState(initialText = viewModel.currentPanelState().path.absolutePath)
         AlertDialog(
             onDismissRequest = { viewModel.showPathDialog = false },
             title = { Text(stringResource(R.string.path)) },
@@ -662,7 +664,7 @@ fun MainScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.currentPanelState().path = Path(textFieldState.text.toString())
+                        viewModel.currentPanelState().path = LocalFile(textFieldState.text.toString())
                         viewModel.showPathDialog = false
                     }
                 ) {
@@ -693,59 +695,59 @@ fun MainScreen(
         )
     }
 
-    viewModel.deleteDialog?.let { state ->
-        DeleteDialog(
-            targetFile = state.file,
-            onDismiss = { viewModel.deleteDialog = null },
-            onRefresh = { handleRefresh(state.file.toPath().parent) })
-    }
-    viewModel.copyDialog?.let { state ->
-        CopyDialog(
-            source = state.file,
-            target = state.path.toFile(),
-            onDismiss = { viewModel.copyDialog = null },
-            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
-        )
-    }
-    viewModel.moveDialog?.let { state ->
-        MoveDialog(
-            source = state.file,
-            target = state.path.toFile(),
-            onDismiss = { viewModel.moveDialog = null },
-            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
-        )
-    }
-    viewModel.createDialog?.let { state ->
-        CreateDialog(onDismiss = { viewModel.createDialog = null }, state.path) { file ->
-            handleRefresh(state.path, setOf(file))
-        }
-    }
-    if (viewModel.showSort) {
-        SortOrderDialog(
-            onDismiss = { viewModel.showSort = false },
-            viewModel.currentPanelState(),
-            currentPanel
-        )
-    }
-    viewModel.searchDialog?.let { state ->
-        SearchDialog(onDismiss = { viewModel.searchDialog = null }, state.path) { file ->
-            viewModel.currentPanelState().path = file.toPath()
-            viewModel.searchDialog = null
-        }
-    }
-    viewModel.apkDialog?.let { state ->
-        PackageDetail(onDismiss = { viewModel.apkDialog = null }, context, state.file)
-    }
-    viewModel.audioDialog?.let { state ->
-        AudioPlayer(onDismiss = { viewModel.audioDialog = null }, state.file)
-    }
-    viewModel.renameDialog?.let { state ->
-        RenameDialog(state.file, { viewModel.renameDialog = null }) {
-            handleRefresh(state.file.toPath().parent)
-        }
-    }
-    viewModel.propertiesDialog?.let { state ->
-        PropertiesDialog(state.file) { viewModel.propertiesDialog = null }
-    }
+//    viewModel.deleteDialog?.let { state ->
+//        DeleteDialog(
+//            targetFile = state.file,
+//            onDismiss = { viewModel.deleteDialog = null },
+//            onRefresh = { handleRefresh(state.file.parent!!) })
+//    }
+//    viewModel.copyDialog?.let { state ->
+//        CopyDialog(
+//            source = state.file,
+//            target = state.path.toFile(),
+//            onDismiss = { viewModel.copyDialog = null },
+//            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
+//        )
+//    }
+//    viewModel.moveDialog?.let { state ->
+//        MoveDialog(
+//            source = state.file,
+//            target = state.path.toFile(),
+//            onDismiss = { viewModel.moveDialog = null },
+//            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
+//        )
+//    }
+//    viewModel.createDialog?.let { state ->
+//        CreateDialog(onDismiss = { viewModel.createDialog = null }, state.path) { file ->
+//            handleRefresh(state.path, setOf(file))
+//        }
+//    }
+//    if (viewModel.showSort) {
+//        SortOrderDialog(
+//            onDismiss = { viewModel.showSort = false },
+//            viewModel.currentPanelState(),
+//            currentPanel
+//        )
+//    }
+//    viewModel.searchDialog?.let { state ->
+//        SearchDialog(onDismiss = { viewModel.searchDialog = null }, state.path) { file ->
+//            viewModel.currentPanelState().path = file.toPath()
+//            viewModel.searchDialog = null
+//        }
+//    }
+//    viewModel.apkDialog?.let { state ->
+//        PackageDetail(onDismiss = { viewModel.apkDialog = null }, context, state.file)
+//    }
+//    viewModel.audioDialog?.let { state ->
+//        AudioPlayer(onDismiss = { viewModel.audioDialog = null }, state.file)
+//    }
+//    viewModel.renameDialog?.let { state ->
+//        RenameDialog(state.file, { viewModel.renameDialog = null }) {
+//            handleRefresh(state.file.toPath().parent)
+//        }
+//    }
+//    viewModel.propertiesDialog?.let { state ->
+//        PropertiesDialog(state.file) { viewModel.propertiesDialog = null }
+//    }
 }
 

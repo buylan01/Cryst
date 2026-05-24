@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.util.isRootPath
+import com.buylan.cryst.vfs.VirtualFile
 import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.Path
@@ -32,7 +33,7 @@ import kotlin.io.path.Path
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileRow(
-    file: File,
+    file: VirtualFile,
     type: com.buylan.cryst.ui.screen.home.model.FileType,
     highLight: Boolean = false,
     selected: Boolean = false,
@@ -82,7 +83,7 @@ fun FileRow(
                 style = MaterialTheme.typography.titleSmall,
                 color = if (!highLight) Color.Unspecified else MaterialTheme.colorScheme.primary
             )
-            if (file.isFile) {
+            if (!file.isDirectory) {
                 Text(
                     text = formatFileSize(file.length()),
                     style = MaterialTheme.typography.bodySmall
@@ -112,7 +113,7 @@ fun UpwardItem(
 //                cps.isInZip = false
 //                cps.zipFile = null
 //            }
-            if (!cps.path.isRootPath()) cps.path = cps.path.parent
+            if (!cps.path.isRootPath()) cps.path = cps.path.parent!!
         },
         color = Color.Transparent
     ) {

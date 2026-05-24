@@ -10,6 +10,8 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.ui.screen.home.model.SortType
+import com.buylan.cryst.vfs.LocalFile
+import com.buylan.cryst.vfs.VirtualFile
 import java.io.File
 import java.io.IOException
 import java.net.URLConnection
@@ -27,12 +29,12 @@ const val RootPath = "/storage/emulated/0"
 const val ExtractPath = "${RootPath}/Catu/Extract"
 val invalidChars = listOf('/', '\\', ':', '*', '?', '"', '<', '>', '|')
 
-fun accessFiles(path: Path, sortType: SortType): List<File> {
+fun accessFiles(path: VirtualFile, sortType: SortType): List<VirtualFile> {
     try {
-        val files = path.toFile().listFiles()?.toList()!!
+        val files = path.listFiles()?.toList()!!
 
         return files.sortedWith(
-            compareBy<File> { !it.isDirectory }
+            compareBy<VirtualFile> { !it.isDirectory }
                 .then(
                     when (sortType) {
                         SortType.NAME -> compareBy { it.name.lowercase() }
@@ -48,7 +50,7 @@ fun accessFiles(path: Path, sortType: SortType): List<File> {
     }
 }
 
-fun getFileType(file: File): FileType {
+fun getFileType(file: VirtualFile): FileType {
     return if (file.isDirectory) FileType.FOLDER else when (file.extension.lowercase()) {
         "txt", "xml", "prop", "conf", "json", "smali", "cpp", "html" -> FileType.TEXT
         "jpg", "jpeg", "png", "gif", "webp" -> FileType.IMAGE
@@ -145,18 +147,18 @@ fun createFolder(directory: Path, folderName: String): Boolean {
     }
 }
 
-fun getMimeType(file: File): String {
+fun getMimeType(file: VirtualFile): String {
     val extension = MimeTypeMap.getFileExtensionFromUrl(file.path)
     val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
     return mimeType ?: URLConnection.guessContentTypeFromName(file.name) ?: "*/*"
 }
 
-fun Context.shareFile(file: File) {
+fun Context.shareFile(file: VirtualFile) {
     val mimeType = getMimeType(file)
     val uri = FileProvider.getUriForFile(
         this,
         "${applicationContext.packageName}.fileProvider",
-        file
+        File(file.absolutePath)
     )
 
     Intent(Intent.ACTION_SEND).apply {
@@ -199,6 +201,6 @@ fun install(context: Context, file: File) {
     }
 }
 
-fun Path.isRootPath(): Boolean {
-    return pathString == "/storage/emulated/0"
+fun VirtualFile.isRootPath(): Boolean {
+    return absolutePath == "/storage/emulated/0"
 }

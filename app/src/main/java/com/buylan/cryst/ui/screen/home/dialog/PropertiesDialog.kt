@@ -17,6 +17,7 @@ import com.buylan.cryst.R
 import com.buylan.cryst.util.formatFileDate
 import com.buylan.cryst.util.getFileSize
 import com.buylan.cryst.util.getFileType
+import com.buylan.cryst.vfs.LocalFile
 import java.io.File
 
 @Composable
@@ -62,7 +63,7 @@ fun PropertiesDialog(
 
                 PropertyRow(label = R.string.name, value = file.name)
                 PropertyRow(label = R.string.path, value = file.parent ?: "无")
-                PropertyRow(label = R.string.type, value = stringResource(getFileType(file).label))
+                PropertyRow(label = R.string.type, value = stringResource(getFileType(LocalFile(file)).label))
                 PropertyRow(label = R.string.size, value = fileSize)
                 PropertyRow(label = R.string.time, value = formattedDate)
             }

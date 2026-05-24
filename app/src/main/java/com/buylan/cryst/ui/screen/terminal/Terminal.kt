@@ -119,7 +119,7 @@ fun Terminal(
                     )
 
                     view.setTerminalViewClient(object : TerminalViewClient {
-                        override fun onScale(scale: Float): Float = 1.0f
+                        override fun onScale(scale: Float): Float = scale
                         override fun onSingleTapUp(e: MotionEvent?) {
                             view.requestFocus()
                             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)

@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.terminal.emulator)
     implementation(libs.aboutlibraries.core)
     implementation(libs.aboutlibraries.compose.m3)
+    implementation(libs.commons.compress)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
