@@ -16,6 +16,7 @@ media3Exoplayer = "1.10.1"
 media3UiComposeMaterial3 = "1.10.1"
 scale = "1.1.1-beta.3"
 termux = "v0.118.3"
+aboutLibraries = "14.2.0"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
@@ -43,9 +44,13 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 language-textmate = { module = "io.github.rosemoe:language-textmate" }
 rosemoe-editor = { module = "io.github.rosemoe:editor" }
 terminal-view = { module = "com.github.termux.termux-app:terminal-view", version.ref = "termux" }
+#noinspection Aligned16KB
 terminal-emulator = { module = "com.github.termux.termux-app:terminal-emulator", version.ref = "termux" }
+aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+aboutlibraries-android = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutLibraries" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
