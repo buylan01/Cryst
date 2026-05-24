@@ -15,6 +15,8 @@ lifecycleViewmodelCompose = "2.10.0"
 media3Exoplayer = "1.10.1"
 media3UiComposeMaterial3 = "1.10.1"
 scale = "1.1.1-beta.3"
+terminalEmulator = "v0.118.0"
+terminalView = "v0.118.0"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
@@ -41,6 +43,8 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 language-textmate = { module = "io.github.rosemoe:language-textmate" }
 rosemoe-editor = { module = "io.github.rosemoe:editor" }
+terminal-view = { module = "com.github.termux.termux-app:terminal-view", version.ref = "terminalView" }
+terminal-emulator = { module = "com.github.termux.termux-app:terminal-emulator", version.ref = "terminalEmulator" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

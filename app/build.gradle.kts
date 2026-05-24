@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui.compose.material3)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.terminal.view)
+    implementation(libs.terminal.emulator)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

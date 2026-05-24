@@ -1,0 +1,189 @@
+package com.buylan.cryst.ui.screen.terminal
+
+import android.content.Context
+import android.content.Context.INPUT_METHOD_SERVICE
+import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.viewinterop.AndroidView
+import com.buylan.cryst.R
+import com.termux.terminal.TerminalSession
+import com.termux.view.TerminalView
+import com.termux.view.TerminalViewClient
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Terminal(
+    context: Context
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.terminal), maxLines = 1, softWrap = false, overflow = TextOverflow.StartEllipsis) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        (context as ComponentActivity).finish()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {  }) {
+                        Icon(imageVector = Icons.Default.MoreVert, null)
+                    }
+                }
+            )
+        },
+        contentWindowInsets = WindowInsets(0,0,0,0)
+    ) { contentPadding ->
+        Box(
+            modifier = Modifier.padding(contentPadding),
+            contentAlignment = Alignment.Center
+        ) {
+            AndroidView(
+                factory = { ctx ->
+                    val imm =
+                        ctx.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    val view = TerminalView(ctx, null)
+                    val sessionClient =
+                        object : com.termux.terminal.TerminalSessionClient {
+                            override fun onTextChanged(session: TerminalSession) {
+                                view.onScreenUpdated()
+                            }
+
+                            override fun onTitleChanged(session: TerminalSession) {}
+                            override fun onSessionFinished(session: TerminalSession) {}
+                            override fun onCopyTextToClipboard(
+                                session: TerminalSession?,
+                                text: String?
+                            ) {
+                            }
+
+                            override fun onPasteTextFromClipboard(session: TerminalSession?) {}
+                            override fun onBell(session: TerminalSession) {}
+                            override fun onColorsChanged(session: TerminalSession) {
+                            }
+                            override fun onTerminalCursorStateChange(state: Boolean) {}
+                            override fun getTerminalCursorStyle(): Int? {
+                                return null
+                            }
+
+                            override fun logError(tag: String, message: String) {}
+                            override fun logWarn(tag: String, message: String) {}
+                            override fun logInfo(tag: String, message: String) {}
+                            override fun logDebug(tag: String, message: String) {}
+                            override fun logVerbose(tag: String, message: String) {}
+                            override fun logStackTraceWithMessage(
+                                tag: String,
+                                message: String,
+                                e: Exception
+                            ) {
+                            }
+
+                            override fun logStackTrace(tag: String, e: Exception) {}
+                        }
+
+                    val envs = mutableListOf<String>()
+
+                    val session = TerminalSession(
+                        "/system/bin/sh",
+                        "/bin",
+                        null,
+                        envs.toTypedArray(),
+                        2000,
+                        sessionClient
+                    )
+
+                    view.setTerminalViewClient(object : TerminalViewClient {
+                        override fun onScale(scale: Float): Float = 1.0f
+                        override fun onSingleTapUp(e: MotionEvent?) {
+                            view.requestFocus()
+                            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+                        }
+
+                        override fun shouldBackButtonBeMappedToEscape(): Boolean = false
+                        override fun shouldUseCtrlSpaceWorkaround(): Boolean = false
+                        override fun isTerminalViewSelected(): Boolean = true
+                        override fun copyModeChanged(copyMode: Boolean) {}
+                        override fun onKeyDown(
+                            keyCode: Int,
+                            e: KeyEvent?,
+                            session: TerminalSession?
+                        ): Boolean {
+                            return false
+                        }
+
+                        override fun onKeyUp(keyCode: Int, e: KeyEvent?): Boolean {
+                            return false
+                        }
+
+                        override fun onLongPress(event: MotionEvent?): Boolean = false
+                        override fun readControlKey(): Boolean = false
+                        override fun readAltKey(): Boolean = false
+                        override fun readShiftKey(): Boolean = false
+                        override fun readFnKey(): Boolean = false
+                        override fun onCodePoint(
+                            codePoint: Int,
+                            ctrlDown: Boolean,
+                            session: TerminalSession?
+                        ): Boolean {
+                            return false
+                        }
+
+                        override fun shouldEnforceCharBasedInput(): Boolean = false
+                        override fun onEmulatorSet() {}
+                        override fun logError(tag: String?, message: String?) {}
+                        override fun logWarn(tag: String?, message: String?) {}
+                        override fun logInfo(tag: String?, message: String?) {}
+                        override fun logDebug(tag: String?, message: String?) {}
+                        override fun logVerbose(tag: String?, message: String?) {}
+                        override fun logStackTraceWithMessage(
+                            tag: String?,
+                            message: String?,
+                            e: Exception?
+                        ) {
+                        }
+
+                        override fun logStackTrace(tag: String?, e: Exception?) {}
+                    })
+                    view.setTextSize(48)
+                    view.isFocusableInTouchMode = true
+                    view.attachSession(session)
+                    view
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding()
+            )
+        }
+    }
+}
