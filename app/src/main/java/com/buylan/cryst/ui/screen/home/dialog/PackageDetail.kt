@@ -35,13 +35,14 @@ import coil.compose.AsyncImage
 import com.buylan.cryst.R
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.util.install
+import com.buylan.cryst.vfs.VirtualFile
 import java.io.File
 
 @Composable
 fun PackageDetail(
     onDismiss: () -> Unit,
     context: Context,
-    targetFile: File
+    targetFile: VirtualFile
 ) {
     val pm = context.packageManager
     val apkInfo = try { pm.getPackageArchiveInfo(targetFile.path, 0) } catch (_: Exception) { null }

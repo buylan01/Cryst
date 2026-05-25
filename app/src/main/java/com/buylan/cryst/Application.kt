@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.buylan.cryst.model.AppViewModel
+import java.io.File
 
 class Application : Application() {
     lateinit var appViewModel: AppViewModel
@@ -12,5 +13,14 @@ class Application : Application() {
     override fun onCreate() {
         super.onCreate()
         appViewModel = AppViewModel(this)
+        clearArchiveCache()
     }
+
+    private fun clearArchiveCache() {
+        try {
+            val dir = File(cacheDir, "archive_cache")
+            if (dir.exists()) dir.deleteRecursively()
+        } catch (_: Exception) {}
+    }
+
 }

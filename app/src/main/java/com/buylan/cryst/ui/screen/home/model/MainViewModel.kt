@@ -30,10 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.File
-import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.isDirectory
-import kotlin.io.path.name
 
 class MainViewModel : ViewModel() {
     var currentPanel by mutableStateOf(PanelPosition.L)
@@ -107,20 +103,37 @@ class MainViewModel : ViewModel() {
         if (file.isDirectory) {
             currentPanelState().path = file
         } else {
-            when (type ?: getFileType(file)) {
+            fun extractToTempAndGetPath(f: VirtualFile): VirtualFile {
+                if (f is ArchiveFile) {
+                    val tmpDir = File(File(context.cacheDir.absolutePath + "archive_cache"), f.entranceFile.hashCode().toString())
+                    if (!tmpDir.exists()) tmpDir.mkdirs()
+                    val targetFile = File(tmpDir, f.name)
+                    ZipFile(f.entranceFile.absolutePath).getInputStream(f.entry).use { input ->
+                        targetFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    return LocalFile(targetFile.absolutePath, parent = f)
+                }
+                return LocalFile(f.absolutePath)
+            }
+
+            val actualType = type ?: getFileType(file)
+            val actualFile = extractToTempAndGetPath(file)
+
+            when (actualType) {
                 FileType.TEXT -> {
                     context.startActivity(
                         Intent(
                             context,
                             TextEditorActivity::class.java
-                        ).putExtra("filePath", file.path)
+                        ).putExtra("filePath", actualFile.path)
                     )
                 }
 
                 FileType.ARCHIVE -> {
                     try {
-                        val zipFile = ZipFile(file.absolutePath)
-                        currentPanelState().path = ArchiveFile(zipFile, zipFilePath = File(file.absolutePath))
+                        currentPanelState().path = ArchiveFile(entranceFile = actualFile)
                     } catch (e: Exception) {
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                     }
@@ -130,33 +143,33 @@ class MainViewModel : ViewModel() {
                     Intent(
                         context,
                         ImageActivity::class.java
-                    ).putExtra("filePath", file.path)
+                    ).putExtra("filePath", actualFile.path)
                 )
 
                 FileType.INSTALLABLE -> {
-                    apkDialog = CommonDialogState(file)
+                    apkDialog = CommonDialogState(actualFile)
                 }
 
                 FileType.FONT -> context.startActivity(
                     Intent(
                         context,
                         FontActivity::class.java
-                    ).putExtra("filePath", file.path)
+                    ).putExtra("filePath", actualFile.path)
                 )
 
                 FileType.VIDEO -> context.startActivity(
                     Intent(
                         context,
                         VideoActivity::class.java
-                    ).putExtra("filePath", file.path)
+                    ).putExtra("filePath", actualFile.path)
                 )
 
                 FileType.AUDIO -> {
-                    audioDialog = CommonDialogState(file)
+                    audioDialog = CommonDialogState(actualFile)
                 }
 
                 else -> {
-                    openWithDialog = CommonDialogState(file)
+                    openWithDialog = CommonDialogState(actualFile)
                 }
             }
         }

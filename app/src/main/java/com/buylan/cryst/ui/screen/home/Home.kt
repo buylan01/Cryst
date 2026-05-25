@@ -695,59 +695,59 @@ fun MainScreen(
         )
     }
 
-//    viewModel.deleteDialog?.let { state ->
-//        DeleteDialog(
-//            targetFile = state.file,
-//            onDismiss = { viewModel.deleteDialog = null },
-//            onRefresh = { handleRefresh(state.file.parent!!) })
-//    }
-//    viewModel.copyDialog?.let { state ->
-//        CopyDialog(
-//            source = state.file,
-//            target = state.path.toFile(),
-//            onDismiss = { viewModel.copyDialog = null },
-//            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
-//        )
-//    }
-//    viewModel.moveDialog?.let { state ->
-//        MoveDialog(
-//            source = state.file,
-//            target = state.path.toFile(),
-//            onDismiss = { viewModel.moveDialog = null },
-//            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
-//        )
-//    }
-//    viewModel.createDialog?.let { state ->
-//        CreateDialog(onDismiss = { viewModel.createDialog = null }, state.path) { file ->
-//            handleRefresh(state.path, setOf(file))
-//        }
-//    }
-//    if (viewModel.showSort) {
-//        SortOrderDialog(
-//            onDismiss = { viewModel.showSort = false },
-//            viewModel.currentPanelState(),
-//            currentPanel
-//        )
-//    }
-//    viewModel.searchDialog?.let { state ->
-//        SearchDialog(onDismiss = { viewModel.searchDialog = null }, state.path) { file ->
-//            viewModel.currentPanelState().path = file.toPath()
-//            viewModel.searchDialog = null
-//        }
-//    }
-//    viewModel.apkDialog?.let { state ->
-//        PackageDetail(onDismiss = { viewModel.apkDialog = null }, context, state.file)
-//    }
-//    viewModel.audioDialog?.let { state ->
-//        AudioPlayer(onDismiss = { viewModel.audioDialog = null }, state.file)
-//    }
-//    viewModel.renameDialog?.let { state ->
-//        RenameDialog(state.file, { viewModel.renameDialog = null }) {
-//            handleRefresh(state.file.toPath().parent)
-//        }
-//    }
-//    viewModel.propertiesDialog?.let { state ->
-//        PropertiesDialog(state.file) { viewModel.propertiesDialog = null }
-//    }
+    viewModel.deleteDialog?.let { state ->
+        DeleteDialog(
+            targetFile = state.file,
+            onDismiss = { viewModel.deleteDialog = null },
+            onRefresh = { handleRefresh(state.file.parent!!) })
+    }
+    viewModel.copyDialog?.let { state ->
+        CopyDialog(
+            source = state.file,
+            target = state.path,
+            onDismiss = { viewModel.copyDialog = null },
+            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
+        )
+    }
+    viewModel.moveDialog?.let { state ->
+        MoveDialog(
+            source = state.file,
+            target = state.path,
+            onDismiss = { viewModel.moveDialog = null },
+            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
+        )
+    }
+    viewModel.createDialog?.let { state ->
+        CreateDialog(onDismiss = { viewModel.createDialog = null }, state.path) { file ->
+            handleRefresh(state.path, setOf(file))
+        }
+    }
+    if (viewModel.showSort) {
+        SortOrderDialog(
+            onDismiss = { viewModel.showSort = false },
+            viewModel.currentPanelState(),
+            currentPanel
+        )
+    }
+    viewModel.searchDialog?.let { state ->
+        SearchDialog(onDismiss = { viewModel.searchDialog = null }, state.path) { file ->
+            viewModel.currentPanelState().path = file
+            viewModel.searchDialog = null
+        }
+    }
+    viewModel.apkDialog?.let { state ->
+        PackageDetail(onDismiss = { viewModel.apkDialog = null }, context, state.file)
+    }
+    viewModel.audioDialog?.let { state ->
+        AudioPlayer(onDismiss = { viewModel.audioDialog = null }, state.file)
+    }
+    viewModel.renameDialog?.let { state ->
+        RenameDialog(state.file, { viewModel.renameDialog = null }) {
+            handleRefresh(LocalFile(state.file.parent!!.absolutePath))
+        }
+    }
+    viewModel.propertiesDialog?.let { state ->
+        PropertiesDialog(state.file) { viewModel.propertiesDialog = null }
+    }
 }
 

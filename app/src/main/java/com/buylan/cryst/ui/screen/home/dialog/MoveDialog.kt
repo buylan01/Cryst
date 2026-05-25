@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.FileOperaUiState
 import com.buylan.cryst.util.moveFile
+import com.buylan.cryst.vfs.LocalFile
+import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -25,8 +27,8 @@ import java.io.File
 
 @Composable
 fun MoveDialog(
-    source: File,
-    target: File,
+    source: VirtualFile,
+    target: VirtualFile,
     onDismiss: () -> Unit,
     onRefresh: () -> Unit
 ) {
@@ -60,7 +62,7 @@ fun MoveDialog(
                 onClick = {
                     scope.launch(Dispatchers.IO) {
                         _uiState.emit(FileOperaUiState.InProgress)
-                        val result = moveFile(source, File("$target/${source.name}"))
+                        val result = moveFile(source, LocalFile("$target/${source.name}"))
                         if (result) {
                             onDismiss()
                             onRefresh()

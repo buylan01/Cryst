@@ -34,6 +34,7 @@ import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.FileRow
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.vfs.LocalFile
+import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -47,11 +48,11 @@ import java.nio.file.attribute.BasicFileAttributes
 @Composable
 fun SearchDialog(
     onDismiss: () -> Unit,
-    targetPath: Path,
-    onFileClick: (File) -> Unit
+    targetPath: VirtualFile,
+    onFileClick: (VirtualFile) -> Unit
 ) {
     var searchFileName by remember { mutableStateOf("") }
-    val found = remember { mutableStateListOf<File>() }
+    val found = remember { mutableStateListOf<VirtualFile>() }
     var processedFiles by remember { mutableIntStateOf(0) }
     var isSearching by remember { mutableStateOf(false) }
     var includeSub by remember { mutableStateOf(true) }
@@ -60,47 +61,47 @@ fun SearchDialog(
         withContext(Dispatchers.IO) {
             if (isSearching) {
                 if (includeSub) {
-                    Files.walkFileTree(targetPath, object : SimpleFileVisitor<Path>() {
-                        override fun preVisitDirectory(
-                            dir: Path,
-                            attrs: BasicFileAttributes
-                        ): FileVisitResult {
-                            return try {
-                                FileVisitResult.CONTINUE
-                            } catch (_: AccessDeniedException) {
-                                FileVisitResult.SKIP_SUBTREE
-                            } catch (_: SecurityException) {
-                                FileVisitResult.SKIP_SUBTREE
-                            }
-                        }
-
-                        override fun visitFile(
-                            file: Path,
-                            attrs: BasicFileAttributes
-                        ): FileVisitResult {
-                            processedFiles++
-                            if (file.fileName.toString().contains(searchFileName, true)) {
-                                found.add(file.toFile())
-                            }
-                            return FileVisitResult.CONTINUE
-                        }
-
-                        override fun visitFileFailed(
-                            file: Path,
-                            exc: IOException
-                        ): FileVisitResult {
-                            return FileVisitResult.SKIP_SUBTREE
-                        }
-                    })
+//                    Files.walkFileTree(targetPath, object : SimpleFileVisitor<Path>() {
+//                        override fun preVisitDirectory(
+//                            dir: Path,
+//                            attrs: BasicFileAttributes
+//                        ): FileVisitResult {
+//                            return try {
+//                                FileVisitResult.CONTINUE
+//                            } catch (_: AccessDeniedException) {
+//                                FileVisitResult.SKIP_SUBTREE
+//                            } catch (_: SecurityException) {
+//                                FileVisitResult.SKIP_SUBTREE
+//                            }
+//                        }
+//
+//                        override fun visitFile(
+//                            file: Path,
+//                            attrs: BasicFileAttributes
+//                        ): FileVisitResult {
+//                            processedFiles++
+//                            if (file.fileName.toString().contains(searchFileName, true)) {
+//                                found.add(file.toFile())
+//                            }
+//                            return FileVisitResult.CONTINUE
+//                        }
+//
+//                        override fun visitFileFailed(
+//                            file: Path,
+//                            exc: IOException
+//                        ): FileVisitResult {
+//                            return FileVisitResult.SKIP_SUBTREE
+//                        }
+//                    })
                 } else {
-                    Files.list(targetPath).use { stream ->
-                        stream.forEach { path ->
-                            processedFiles++
-                            if (path.fileName.toString().contains(searchFileName, true)) {
-                                found.add(path.toFile())
-                            }
-                        }
-                    }
+//                    Files.list(targetPath).use { stream ->
+//                        stream.forEach { path ->
+//                            processedFiles++
+//                            if (path.fileName.toString().contains(searchFileName, true)) {
+//                                found.add(path.toFile())
+//                            }
+//                        }
+//                    }
                 }
                 isSearching = false
             }
@@ -154,8 +155,8 @@ fun SearchDialog(
                     ) {
                         items(found) { file ->
                             FileRow(
-                                file = LocalFile(file),
-                                type = getFileType(LocalFile(file)),
+                                file = file,
+                                type = getFileType(file),
                                 onFileClick = {
                                     onFileClick(file)
                                 },

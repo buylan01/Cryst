@@ -73,7 +73,7 @@ fun formatFileSize(sizeInBytes: Long): String {
     }
 }
 
-fun getFileSize(file: File): String {
+fun getFileSize(file: VirtualFile): String {
     return if (file.isDirectory) {
         "未知"
     } else {
@@ -96,23 +96,23 @@ fun formatSizeDetail(size: Long): String {
     )
 }
 
-fun formatFileDate(file: File): String {
+fun formatFileDate(file: VirtualFile): String {
     val date = Date(file.lastModified())
     val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     return formatter.format(date)
 }
 
 
-fun createFile(directory: Path, fileName: String): Boolean {
+fun createFile(directory: VirtualFile, fileName: String): Boolean {
     try {
-        val file = directory.resolve(fileName).toFile()
+        val file = directory.resolve(fileName)
         return file.createNewFile()
     } catch (_: IOException) {
         return false
     }
 }
 
-fun renameFile(file: File, targetFile: File): Boolean {
+fun renameFile(file: VirtualFile, targetFile: VirtualFile): Boolean {
     return try {
         file.renameTo(targetFile)
     } catch (_: IOException) {
@@ -129,7 +129,7 @@ fun copyFile(file: File, targetFile: File): Boolean {
     }
 }
 
-fun moveFile(file: File, targetFile: File): Boolean {
+fun moveFile(file: VirtualFile, targetFile: VirtualFile): Boolean {
     try {
         Files.move(Path(file.path), Path(targetFile.path))
         return true
@@ -138,9 +138,9 @@ fun moveFile(file: File, targetFile: File): Boolean {
     }
 }
 
-fun createFolder(directory: Path, folderName: String): Boolean {
+fun createFolder(directory: VirtualFile, folderName: String): Boolean {
     try {
-        val folder = directory.resolve(folderName).toFile()
+        val folder = directory.resolve(folderName)
         return folder.mkdir()
     } catch (_: IOException) {
         return false
@@ -170,7 +170,7 @@ fun Context.shareFile(file: VirtualFile) {
     }
 }
 
-fun install(context: Context, file: File) {
+fun install(context: Context, file: VirtualFile) {
     val intent = Intent(Intent.ACTION_VIEW).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -178,7 +178,7 @@ fun install(context: Context, file: File) {
         val uri = FileProvider.getUriForFile(
             context,
             "${context.packageName}.fileProvider",
-            file
+            File(file.absolutePath)
         )
 
         setDataAndType(uri, "application/vnd.android.package-archive")

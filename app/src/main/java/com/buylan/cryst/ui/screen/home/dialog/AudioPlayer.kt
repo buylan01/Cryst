@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.delay
 import java.io.File
 
@@ -44,7 +45,7 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 fun AudioPlayer(
     onDismiss: () -> Unit,
-    targetFile: File
+    targetFile: VirtualFile
 ) {
     BasicAlertDialog(
         onDismissRequest = { onDismiss() },
@@ -52,7 +53,7 @@ fun AudioPlayer(
             val context = LocalContext.current
             val exoPlayer = remember {
                 ExoPlayer.Builder(context).build().apply {
-                    val mediaItem = MediaItem.fromUri(Uri.fromFile(targetFile))
+                    val mediaItem = MediaItem.fromUri(Uri.fromFile(File(targetFile.absolutePath)))
                     setMediaItem(mediaItem)
                     prepare()
                 }

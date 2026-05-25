@@ -20,11 +20,13 @@ import androidx.compose.ui.res.stringResource
 import com.buylan.cryst.R
 import com.buylan.cryst.util.invalidChars
 import com.buylan.cryst.util.renameFile
+import com.buylan.cryst.vfs.LocalFile
+import com.buylan.cryst.vfs.VirtualFile
 import java.io.File
 
 @Composable
 fun RenameDialog(
-    file: File,
+    file: VirtualFile,
     onDismiss: () -> Unit,
     onRefresh: () -> Unit
 ) {
@@ -76,7 +78,7 @@ fun RenameDialog(
                 onClick = {
                     val renamer = renameFile(
                         file,
-                        File("${file.parent}/${textFieldState.text}")
+                        LocalFile("${file.parent}/${textFieldState.text}")
                     )
                     if (!renamer) renameFail = true else {
                         onRefresh()
