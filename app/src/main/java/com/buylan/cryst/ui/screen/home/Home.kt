@@ -111,6 +111,7 @@ import com.buylan.cryst.ui.screen.home.dialog.SearchDialog
 import com.buylan.cryst.ui.screen.home.dialog.SortOrderDialog
 import com.buylan.cryst.ui.screen.home.dialog.ToolDialog
 import com.buylan.cryst.ui.screen.home.model.CommonDialogState
+import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
 import com.buylan.cryst.ui.screen.home.model.PanelPosition
 import com.buylan.cryst.ui.screen.home.model.PathDialogState
@@ -736,7 +737,11 @@ fun MainScreen(
         }
     }
     viewModel.apkDialog?.let { state ->
-        PackageDetail(onDismiss = { viewModel.apkDialog = null }, context, state.file)
+        PackageDetail(
+            context = context,
+            targetFile = state.file,
+            onDismiss = { viewModel.apkDialog = null },
+            unpack = { viewModel.handleFileClick(context, state.file, type = FileType.ARCHIVE) })
     }
     viewModel.audioDialog?.let { state ->
         AudioPlayer(onDismiss = { viewModel.audioDialog = null }, state.file)

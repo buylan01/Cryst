@@ -40,9 +40,10 @@ import java.io.File
 
 @Composable
 fun PackageDetail(
-    onDismiss: () -> Unit,
     context: Context,
-    targetFile: VirtualFile
+    targetFile: VirtualFile,
+    onDismiss: () -> Unit,
+    unpack: () -> Unit
 ) {
     val pm = context.packageManager
     val apkInfo = try { pm.getPackageArchiveInfo(targetFile.path, 0) } catch (_: Exception) { null }
@@ -153,7 +154,8 @@ fun PackageDetail(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        //I should complete it
+                        unpack()
+                        onDismiss()
                     }
                 ) {
                     Text(stringResource(R.string.unpack))
