@@ -31,6 +31,7 @@ import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.PanelPosition
 import com.buylan.cryst.ui.screen.home.model.ToolAction
 import com.buylan.cryst.util.shareFile
+import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.VirtualFile
 import java.io.File
 
@@ -94,7 +95,8 @@ fun ToolDialog(
                     ToolItem(
                         text = stringResource(R.string.delete),
                         icon = Icons.Default.Delete,
-                        onClick = { onToolAction(ToolAction.Delete) }
+                        onClick = { onToolAction(ToolAction.Delete) },
+                        enabled = file !is ArchiveFile
                     )
 
                     ToolItem(
@@ -118,19 +120,22 @@ fun ToolDialog(
                         else
                             stringResource(R.string.move_to_right),
                         icon = Icons.AutoMirrored.Filled.DriveFileMove,
-                        onClick = { onToolAction(ToolAction.Move) }
+                        onClick = { onToolAction(ToolAction.Move) },
+                        enabled = file !is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.rename),
                         icon = Icons.Default.DriveFileRenameOutline,
-                        onClick = { onToolAction(ToolAction.Rename) }
+                        onClick = { onToolAction(ToolAction.Rename) },
+                        enabled = file !is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.compress),
                         icon = Icons.Default.Archive,
-                        onClick = { onToolAction(ToolAction.Compress) }
+                        onClick = { onToolAction(ToolAction.Compress) },
+                        enabled = file !is ArchiveFile
                     )
 
                     ToolItem(

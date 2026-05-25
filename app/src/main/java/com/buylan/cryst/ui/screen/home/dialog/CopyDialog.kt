@@ -48,7 +48,7 @@ fun CopyDialog(
         text = {
             Column {
                 when (uiState) {
-                    is FileOperaUiState.Idle -> Text("是否复制 ${source.name} 到 $target ?")
+                    is FileOperaUiState.Idle -> Text("是否复制 ${source.name} 到 ${target.absolutePath} ?")
                     is FileOperaUiState.InProgress -> LinearProgressIndicator()
                     is FileOperaUiState.Progress -> {
                         val prog = uiState as FileOperaUiState.Progress
@@ -62,10 +62,13 @@ fun CopyDialog(
                         )
                     }
 
-                    is FileOperaUiState.Success -> Text(
-                        "复制成功",
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    is FileOperaUiState.Success -> {
+                        val isAll = (uiState as FileOperaUiState.Success).all
+                        Text(
+                            if(isAll) "复制成功" else "部分或全部复制失败",
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
                     is FileOperaUiState.Error -> Text(
                         (uiState as FileOperaUiState.Error).message,

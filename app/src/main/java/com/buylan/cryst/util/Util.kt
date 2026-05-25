@@ -62,7 +62,7 @@ fun getActualFile(context: Context, f: VirtualFile): VirtualFile {
                 input.copyTo(output)
             }
         }
-        return LocalFile(targetFile.absolutePath, parent = f)
+        return LocalFile(f,targetFile.absolutePath)
     }
     return LocalFile(f.absolutePath)
 }

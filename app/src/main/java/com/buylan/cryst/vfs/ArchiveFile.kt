@@ -69,13 +69,9 @@ class ArchiveFile(
         }
     }
 
-    override fun readBytes(): ByteArray? =
-        if (!isDirectory && entry != null) ZipFile(entranceFile.toFile()).getInputStream(entry).readBytes() else null
-
+    override fun readBytes(): ByteArray? = if (!isDirectory && entry != null) ZipFile(entranceFile.toFile()).getInputStream(entry).readBytes() else null
     override fun length(): Long = entry?.size ?: 0L
-
     override fun lastModified(): Long = entry?.lastModifiedTime?.toMillis() ?: 0L
-
     override fun resolve(fileName: String): VirtualFile {
         val zipFile = ZipFile(entranceFile.absolutePath)
         if (!isDirectory) throw UnsupportedOperationException("Not a directory")
@@ -87,11 +83,40 @@ class ArchiveFile(
         val entry = zipFile.getEntry(childPath)
         return ArchiveFile(entranceFile, entry, this)
     }
-
-
     override fun createNewFile(): Boolean = false
-
     override fun mkdir(): Boolean = false
-
     override fun renameTo(targetFile: VirtualFile): Boolean = false
+    override fun exists(): Boolean = true
+    override fun walkTopDown(): List<VirtualFile> {
+        val result = mutableListOf<VirtualFile>()
+        result.add(this)
+        if (isDirectory) {
+            val children = listFiles() ?: emptyList()
+            for (child in children) {
+                result.addAll(child.walkTopDown())
+            }
+        }
+        return result
+    }
+
+    override fun relativeTo(source: VirtualFile): String {
+        val sourcePath = (source as? ArchiveFile)?.absolutePath ?: source.path
+        val prefix = if (sourcePath.endsWith("/")) sourcePath else "$sourcePath/"
+        return if (this.absolutePath.startsWith(prefix)) {
+            this.absolutePath.removePrefix(prefix)
+        } else {
+            this.absolutePath
+        }
+    }
+
+    override fun mkdirs() {
+        TODO("Not yet implemented")
+    }
+
+    override fun copyTo(target: LocalFile, overwrite: Boolean) {
+        if (this.isDirectory) throw UnsupportedOperationException("Cannot copy directories from archive.")
+        if (!overwrite && target.exists()) throw IOException("Target exists: $target")
+        val bytes = this.readBytes() ?: throw IOException("Failed to read archive entry: $absolutePath")
+        target.toFile().outputStream().use { it.write(bytes) }
+    }
 }

@@ -20,4 +20,9 @@ interface VirtualFile {
     fun renameTo(targetFile: VirtualFile): Boolean
     fun mkdir(): Boolean
     fun toFile(): File = File(this.absolutePath)
+    fun exists(): Boolean
+    fun walkTopDown(): List<VirtualFile>
+    fun relativeTo(source: VirtualFile): String
+    fun mkdirs()
+    fun copyTo(target: LocalFile, overwrite: Boolean)
 }
