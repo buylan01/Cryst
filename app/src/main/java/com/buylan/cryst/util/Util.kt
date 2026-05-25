@@ -10,8 +10,10 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.ui.screen.home.model.SortType
+import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
+import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.File
 import java.io.IOException
 import java.net.URLConnection
@@ -48,6 +50,21 @@ fun accessFiles(path: VirtualFile, sortType: SortType): List<VirtualFile> {
         e.printStackTrace()
         return emptyList()
     }
+}
+
+fun getActualFile(context: Context, f: VirtualFile): VirtualFile {
+    if (f is ArchiveFile) {
+        val tmpDir = File(File(context.cacheDir.absolutePath + "/archive_cache"), f.entranceFile.hashCode().toString())
+        if (!tmpDir.exists()) tmpDir.mkdirs()
+        val targetFile = File(tmpDir, f.name)
+        ZipFile(f.entranceFile.absolutePath).getInputStream(f.entry).use { input ->
+            targetFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        return LocalFile(targetFile.absolutePath, parent = f)
+    }
+    return LocalFile(f.absolutePath)
 }
 
 fun getFileType(file: VirtualFile): FileType {

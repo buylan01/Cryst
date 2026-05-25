@@ -17,6 +17,7 @@ import com.buylan.cryst.activity.VideoActivity
 import com.buylan.cryst.ui.screen.home.PanelStates
 import com.buylan.cryst.util.RootPath
 import com.buylan.cryst.util.accessFiles
+import com.buylan.cryst.util.getActualFile
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.util.shareFile
@@ -103,23 +104,8 @@ class MainViewModel : ViewModel() {
         if (file.isDirectory) {
             currentPanelState().path = file
         } else {
-            fun extractToTempAndGetPath(f: VirtualFile): VirtualFile {
-                if (f is ArchiveFile) {
-                    val tmpDir = File(File(context.cacheDir.absolutePath + "archive_cache"), f.entranceFile.hashCode().toString())
-                    if (!tmpDir.exists()) tmpDir.mkdirs()
-                    val targetFile = File(tmpDir, f.name)
-                    ZipFile(f.entranceFile.absolutePath).getInputStream(f.entry).use { input ->
-                        targetFile.outputStream().use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                    return LocalFile(targetFile.absolutePath, parent = f)
-                }
-                return LocalFile(f.absolutePath)
-            }
-
             val actualType = type ?: getFileType(file)
-            val actualFile = extractToTempAndGetPath(file)
+            val actualFile = getActualFile(context, file)
 
             when (actualType) {
                 FileType.TEXT -> {
