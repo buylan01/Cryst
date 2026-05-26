@@ -541,11 +541,11 @@ fun MainScreen(
     }
 
     fun handleRefresh(path: VirtualFile, highlights: Set<String> = emptySet()) {
-        if (leftPanelState.path == path) {
+        if (leftPanelState.path.absolutePath == path.absolutePath) {
             viewModel.leftPanelState.highLightFiles = highlights
             viewModel.refreshPanel(leftPanelState)
         }
-        if (rightPanelState.path == path) {
+        if (rightPanelState.path.absolutePath == path.absolutePath) {
             viewModel.rightPanelState.highLightFiles = highlights
             viewModel.refreshPanel(rightPanelState)
         }
@@ -700,7 +700,10 @@ fun MainScreen(
         DeleteDialog(
             targetFile = state.file,
             onDismiss = { viewModel.deleteDialog = null },
-            onRefresh = { handleRefresh(state.file.parent!!) })
+            onRefresh = {
+                println(state.file.parent!!.absolutePath)
+                handleRefresh(state.file.parent ?: state.file)
+            })
     }
     viewModel.copyDialog?.let { state ->
         CopyDialog(

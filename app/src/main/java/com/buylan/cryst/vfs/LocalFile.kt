@@ -5,8 +5,7 @@ import java.io.File
 
 class LocalFile(
     private val delegate: File,
-    override val parent: VirtualFile? = delegate.parentFile?.takeIf { it != delegate }
-        ?.let { LocalFile(it) }
+    override val parent: VirtualFile? = delegate.parentFile?.takeIf { it != delegate }?.let { LocalFile(it) }
 ) : VirtualFile {
     constructor(parent: String?, child: String) : this(parent?.let { File(it, child) } ?: File(child))
     constructor(parent: VirtualFile? = null, path: String) : this(File(path), parent = parent)

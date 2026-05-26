@@ -83,7 +83,7 @@ fun DeleteDialog(
         },
         confirmButton = {
             Button(
-                onClick = { viewModel.startDelete(File(targetFile.absolutePath)) },
+                onClick = { viewModel.startDelete(targetFile.toFile()) },
                 enabled = uiState is FileOperaUiState.Idle || uiState is FileOperaUiState.Error
             ) { Text(stringResource(R.string.confirm)) }
         },
