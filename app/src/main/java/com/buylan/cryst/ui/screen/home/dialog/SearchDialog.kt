@@ -37,6 +37,7 @@ import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okio.Path.Companion.toPath
 import java.io.File
 import java.io.IOException
 import java.nio.file.FileVisitResult
@@ -44,6 +45,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
+import kotlin.io.path.name
 
 @Composable
 fun SearchDialog(
@@ -60,48 +62,17 @@ fun SearchDialog(
     LaunchedEffect(isSearching) {
         withContext(Dispatchers.IO) {
             if (isSearching) {
-                if (includeSub) {
-//                    Files.walkFileTree(targetPath, object : SimpleFileVisitor<Path>() {
-//                        override fun preVisitDirectory(
-//                            dir: Path,
-//                            attrs: BasicFileAttributes
-//                        ): FileVisitResult {
-//                            return try {
-//                                FileVisitResult.CONTINUE
-//                            } catch (_: AccessDeniedException) {
-//                                FileVisitResult.SKIP_SUBTREE
-//                            } catch (_: SecurityException) {
-//                                FileVisitResult.SKIP_SUBTREE
-//                            }
-//                        }
-//
-//                        override fun visitFile(
-//                            file: Path,
-//                            attrs: BasicFileAttributes
-//                        ): FileVisitResult {
-//                            processedFiles++
-//                            if (file.fileName.toString().contains(searchFileName, true)) {
-//                                found.add(file.toFile())
-//                            }
-//                            return FileVisitResult.CONTINUE
-//                        }
-//
-//                        override fun visitFileFailed(
-//                            file: Path,
-//                            exc: IOException
-//                        ): FileVisitResult {
-//                            return FileVisitResult.SKIP_SUBTREE
-//                        }
-//                    })
+                val candidates = if (includeSub) {
+                    targetPath.walkTopDown().filter { !it.isDirectory }
                 } else {
-//                    Files.list(targetPath).use { stream ->
-//                        stream.forEach { path ->
-//                            processedFiles++
-//                            if (path.fileName.toString().contains(searchFileName, true)) {
-//                                found.add(path.toFile())
-//                            }
-//                        }
-//                    }
+                    targetPath.listFiles()?.filter { !it.isDirectory } ?: emptyList()
+                }
+
+                candidates.forEach { file ->
+                    processedFiles++
+                    if (file.name.contains(searchFileName, true)) {
+                        found.add(file)
+                    }
                 }
                 isSearching = false
             }

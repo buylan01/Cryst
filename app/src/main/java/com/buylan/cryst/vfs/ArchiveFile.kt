@@ -89,11 +89,13 @@ class ArchiveFile(
     override fun exists(): Boolean = true
     override fun walkTopDown(): List<VirtualFile> {
         val result = mutableListOf<VirtualFile>()
+        val zipFile = ZipFile(entranceFile.absolutePath)
         result.add(this)
         if (isDirectory) {
-            val children = listFiles() ?: emptyList()
-            for (child in children) {
-                result.addAll(child.walkTopDown())
+            val entries = zipFile.entries.asSequence().toList()
+            for (child in entries) {
+                if (!child.name.startsWith(name) || entryName == child.name) continue
+                result.add(ArchiveFile(entranceFile, child, this))
             }
         }
         return result
