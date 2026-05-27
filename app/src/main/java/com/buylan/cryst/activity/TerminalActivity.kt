@@ -8,7 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import com.buylan.cryst.ui.screen.terminal.Terminal
-import com.buylan.cryst.ui.theme.CatuTheme
+import com.buylan.cryst.ui.theme.CrystTheme
 
 class TerminalActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -27,7 +27,7 @@ class TerminalActivity : ComponentActivity() {
                 detectDarkMode = { true }
             ))
 
-            CatuTheme(true) {
+            CrystTheme(true) {
                 Terminal(this)
             }
         }

@@ -12,7 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.Application
 import com.buylan.cryst.ui.screen.home.MainScreen
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
-import com.buylan.cryst.ui.theme.CatuTheme
+import com.buylan.cryst.ui.theme.CrystTheme
 import com.buylan.cryst.util.textEditorStartup
 import com.buylan.cryst.vfs.LocalFile
 
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                 detectDarkMode = { isDark }
             ))
 
-            CatuTheme(isDark) {
+            CrystTheme(isDark) {
                 MainScreen(
                     context = this,
                     viewModel = mainViewModel,

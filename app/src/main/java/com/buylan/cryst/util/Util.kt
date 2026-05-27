@@ -26,7 +26,7 @@ import kotlin.math.log10
 import kotlin.math.pow
 
 const val RootPath = "/storage/emulated/0"
-const val ExtractPath = "${RootPath}/Catu/Extract"
+const val ExtractPath = "${RootPath}/Cryst/package"
 val invalidChars = listOf('/', '\\', ':', '*', '?', '"', '<', '>', '|')
 
 fun accessFiles(path: VirtualFile, sortType: SortType): List<VirtualFile> {

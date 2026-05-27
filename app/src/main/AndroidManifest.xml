@@ -18,11 +18,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Catu">
+        android:theme="@style/Theme.Cryst">
         <activity
             android:name=".activity.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Catu">
+            android:theme="@style/Theme.Cryst">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

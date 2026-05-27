@@ -9,7 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.buylan.cryst.Application
 import com.buylan.cryst.ui.screen.settings.SettingsScreen
-import com.buylan.cryst.ui.theme.CatuTheme
+import com.buylan.cryst.ui.theme.CrystTheme
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +26,7 @@ class SettingsActivity : ComponentActivity() {
                 detectDarkMode = { isDark }
             ))
 
-            CatuTheme(isDark) {
+            CrystTheme(isDark) {
                 SettingsScreen { finish() }
             }
         }

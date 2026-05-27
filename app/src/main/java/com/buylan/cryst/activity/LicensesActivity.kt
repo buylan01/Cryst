@@ -9,7 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.buylan.cryst.Application
 import com.buylan.cryst.ui.screen.about.AboutLibrariesScreen
-import com.buylan.cryst.ui.theme.CatuTheme
+import com.buylan.cryst.ui.theme.CrystTheme
 
 class LicensesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +26,7 @@ class LicensesActivity : ComponentActivity() {
                 detectDarkMode = { isDark }
             ))
 
-            CatuTheme(isDark) {
+            CrystTheme(isDark) {
                 AboutLibrariesScreen(onBackPressed = { finish() })
             }
         }

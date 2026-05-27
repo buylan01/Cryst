@@ -10,7 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.buylan.cryst.Application
 import com.buylan.cryst.ui.screen.texteditor.TextEditor
-import com.buylan.cryst.ui.theme.CatuTheme
+import com.buylan.cryst.ui.theme.CrystTheme
 
 class TextEditorActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +34,7 @@ class TextEditorActivity : ComponentActivity() {
                 detectDarkMode = { isDark }
             ))
 
-            CatuTheme(isDark) {
+            CrystTheme(isDark) {
                 TextEditor(this, filePath, isDark) { this.finish() }
             }
         }

@@ -10,7 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.buylan.cryst.Application
 import com.buylan.cryst.ui.screen.imageviewer.ImageViewer
-import com.buylan.cryst.ui.theme.CatuTheme
+import com.buylan.cryst.ui.theme.CrystTheme
 
 class ImageActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +35,7 @@ class ImageActivity : ComponentActivity() {
                 detectDarkMode = { isDark }
             ))
 
-            CatuTheme(isDark) {
+            CrystTheme(isDark) {
                 ImageViewer(this, filePath)
             }
         }

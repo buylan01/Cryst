@@ -16,6 +16,7 @@ class ArchiveFile(
     override val path = absolutePath
     override val pathDisplay: String = entranceFile.name + "/" + path
     override val extension: String = name.substringAfterLast(".")
+    private val delegate = ZipFile.builder().setFile(entranceFile.absolutePath).get()
 
     override fun listFiles(): List<VirtualFile>? {
         if (!isDirectory) return null
@@ -26,10 +27,8 @@ class ArchiveFile(
             else -> absolutePath
         }
 
-        val zipFile = ZipFile(entranceFile.absolutePath)
-
         try {
-            val entries = zipFile.entries.asSequence().toList()
+            val entries = delegate.entries.asSequence().toList()
             val childDirNames = mutableSetOf<String>()
             val childFiles = mutableListOf<Pair<ZipArchiveEntry, String>>() // entry, filename
 
@@ -69,18 +68,17 @@ class ArchiveFile(
         }
     }
 
-    override fun readBytes(): ByteArray? = if (!isDirectory && entry != null) ZipFile(entranceFile.toFile()).getInputStream(entry).readBytes() else null
+    override fun readBytes(): ByteArray? = if (!isDirectory && entry != null) delegate.getInputStream(entry).readBytes() else null
     override fun length(): Long = entry?.size ?: 0L
     override fun lastModified(): Long = entry?.lastModifiedTime?.toMillis() ?: 0L
     override fun resolve(fileName: String): VirtualFile {
-        val zipFile = ZipFile(entranceFile.absolutePath)
         if (!isDirectory) throw UnsupportedOperationException("Not a directory")
         val childPath = when {
             absolutePath.isEmpty() -> fileName
             !absolutePath.endsWith("/") -> "$absolutePath/$fileName"
             else -> absolutePath + fileName
         }
-        val entry = zipFile.getEntry(childPath)
+        val entry = delegate.getEntry(childPath)
         return ArchiveFile(entranceFile, entry, this)
     }
     override fun createNewFile(): Boolean = false
@@ -89,10 +87,9 @@ class ArchiveFile(
     override fun exists(): Boolean = true
     override fun walkTopDown(): List<VirtualFile> {
         val result = mutableListOf<VirtualFile>()
-        val zipFile = ZipFile(entranceFile.absolutePath)
         result.add(this)
         if (isDirectory) {
-            val entries = zipFile.entries.asSequence().toList()
+            val entries = delegate.entries.asSequence().toList()
             for (child in entries) {
                 if (!child.name.startsWith(name) || entryName == child.name) continue
                 result.add(ArchiveFile(entranceFile, child, this))
@@ -112,7 +109,7 @@ class ArchiveFile(
     }
 
     override fun mkdirs() {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("Archive is read-only")
     }
 
     override fun copyTo(target: LocalFile, overwrite: Boolean) {
