@@ -26,7 +26,6 @@ import com.buylan.cryst.R
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.VirtualFile
-import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.Path
 

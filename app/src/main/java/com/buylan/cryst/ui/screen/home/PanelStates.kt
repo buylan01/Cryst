@@ -9,7 +9,6 @@ import com.buylan.cryst.util.RootPath
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import java.io.File
-import kotlin.io.path.Path
 
 class PanelStates {
     var path by mutableStateOf<VirtualFile>(LocalFile(File(RootPath)))

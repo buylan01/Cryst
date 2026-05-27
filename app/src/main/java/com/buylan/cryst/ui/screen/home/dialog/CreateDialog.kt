@@ -21,7 +21,6 @@ import com.buylan.cryst.util.createFile
 import com.buylan.cryst.util.createFolder
 import com.buylan.cryst.util.invalidChars
 import com.buylan.cryst.vfs.VirtualFile
-import java.nio.file.Path
 
 @Composable
 fun CreateDialog(

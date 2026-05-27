@@ -17,9 +17,7 @@ import com.buylan.cryst.R
 import com.buylan.cryst.util.formatFileDate
 import com.buylan.cryst.util.getFileSize
 import com.buylan.cryst.util.getFileType
-import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
-import java.io.File
 
 @Composable
 fun PropertiesDialog(

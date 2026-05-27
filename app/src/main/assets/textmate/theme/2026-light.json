@@ -1,5 +1,4 @@
 {
-	"$schema": "vscode://schemas/color-theme",
 	"name": "2026 Light",
 	"include": "./light_modern.json",
 	"type": "light",

@@ -6,9 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
-import com.buylan.cryst.Application
 import com.buylan.cryst.ui.screen.terminal.Terminal
 import com.buylan.cryst.ui.theme.CatuTheme
 
@@ -18,9 +16,9 @@ class TerminalActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         window.isNavigationBarContrastEnforced = false
         setContent {
-            val appViewModel = (applicationContext as Application).appViewModel
+            //val appViewModel = (applicationContext as Application).appViewModel
 
-            val isDark = appViewModel.isDarkMode(isSystemInDarkTheme())
+            //val isDark = appViewModel.isDarkMode(isSystemInDarkTheme())
 
             enableEdgeToEdge(
                 statusBarStyle = SystemBarStyle.auto(

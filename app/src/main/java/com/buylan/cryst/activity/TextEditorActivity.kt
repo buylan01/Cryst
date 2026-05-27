@@ -8,10 +8,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.Application
-import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.screen.texteditor.TextEditor
 import com.buylan.cryst.ui.theme.CatuTheme
 

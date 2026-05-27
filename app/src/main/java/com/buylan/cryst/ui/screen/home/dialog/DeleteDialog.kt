@@ -20,7 +20,6 @@ import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.DeleteFileViewModel
 import com.buylan.cryst.ui.screen.home.model.FileOperaUiState
 import com.buylan.cryst.vfs.VirtualFile
-import java.io.File
 
 @Composable
 fun DeleteDialog(

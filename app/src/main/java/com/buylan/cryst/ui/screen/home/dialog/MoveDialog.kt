@@ -23,7 +23,6 @@ import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 
 @Composable
 fun MoveDialog(
@@ -33,8 +32,8 @@ fun MoveDialog(
     onRefresh: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val _uiState = MutableStateFlow<FileOperaUiState>(FileOperaUiState.Idle)
-    val uiState by _uiState.collectAsState()
+    val uiStateFlow = MutableStateFlow<FileOperaUiState>(FileOperaUiState.Idle)
+    val uiState by uiStateFlow.collectAsState()
     AlertDialog(
         modifier = Modifier.width(560.dp),
         onDismissRequest = { onDismiss() },
@@ -61,13 +60,13 @@ fun MoveDialog(
             Button(
                 onClick = {
                     scope.launch(Dispatchers.IO) {
-                        _uiState.emit(FileOperaUiState.InProgress)
+                        uiStateFlow.emit(FileOperaUiState.InProgress)
                         val result = moveFile(source, LocalFile("$target/${source.name}"))
                         if (result) {
                             onDismiss()
                             onRefresh()
                         } else {
-                            _uiState.emit(FileOperaUiState.Error("Unknown"))
+                            uiStateFlow.emit(FileOperaUiState.Error("Unknown"))
                         }
 
                     }

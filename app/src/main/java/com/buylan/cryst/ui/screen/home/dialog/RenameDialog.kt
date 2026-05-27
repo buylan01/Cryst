@@ -22,7 +22,6 @@ import com.buylan.cryst.util.invalidChars
 import com.buylan.cryst.util.renameFile
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
-import java.io.File
 
 @Composable
 fun RenameDialog(

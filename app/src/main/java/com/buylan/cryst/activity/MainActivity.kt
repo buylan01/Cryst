@@ -10,13 +10,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.Application
-import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.screen.home.MainScreen
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
 import com.buylan.cryst.ui.theme.CatuTheme
 import com.buylan.cryst.util.textEditorStartup
 import com.buylan.cryst.vfs.LocalFile
-import kotlin.io.path.Path
 
 class MainActivity : ComponentActivity() {
 

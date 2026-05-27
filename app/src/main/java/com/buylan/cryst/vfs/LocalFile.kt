@@ -1,6 +1,5 @@
 package com.buylan.cryst.vfs
 
-import android.annotation.SuppressLint
 import java.io.File
 
 class LocalFile(

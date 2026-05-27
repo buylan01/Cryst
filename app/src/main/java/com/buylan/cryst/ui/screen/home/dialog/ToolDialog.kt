@@ -24,16 +24,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.PanelPosition
 import com.buylan.cryst.ui.screen.home.model.ToolAction
-import com.buylan.cryst.util.shareFile
 import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.VirtualFile
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,9 +52,6 @@ fun ToolDialog(
                         .padding(12.dp),
                     maxItemsInEachColumn = 4
                 ) {
-
-                    val context = LocalContext.current
-
                     @Composable
                     fun ToolItem(
                         text: String,

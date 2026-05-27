@@ -33,19 +33,9 @@ import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.FileRow
 import com.buylan.cryst.util.getFileType
-import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okio.Path.Companion.toPath
-import java.io.File
-import java.io.IOException
-import java.nio.file.FileVisitResult
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.attribute.BasicFileAttributes
-import kotlin.io.path.name
 
 @Composable
 fun SearchDialog(

@@ -1,7 +1,3 @@
-import org.gradle.internal.impldep.org.bouncycastle.oer.its.etsi102941.Url
-import java.net.URI
-import java.net.URL
-
 pluginManagement {
     repositories {
         maven { setUrl("https://maven.aliyun.com/repository/google") }
