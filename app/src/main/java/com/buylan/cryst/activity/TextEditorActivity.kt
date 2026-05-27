@@ -38,7 +38,7 @@ class TextEditorActivity : ComponentActivity() {
             ))
 
             CatuTheme(isDark) {
-                TextEditor(this, filePath) { this.finish() }
+                TextEditor(this, filePath, isDark) { this.finish() }
             }
         }
     }

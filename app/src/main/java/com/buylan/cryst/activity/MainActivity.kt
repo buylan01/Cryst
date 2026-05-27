@@ -54,9 +54,10 @@ class MainActivity : ComponentActivity() {
                     appViewModel = appViewModel
                 )
             }
+
+            textEditorStartup(applicationContext, isDark)
         }
 
-        textEditorStartup(applicationContext, true)
     }
 
     override fun onResume() {

@@ -9,31 +9,31 @@ import io.github.rosemoe.sora.langs.textmate.registry.provider.AssetsFileResolve
 import org.eclipse.tm4e.core.registry.IThemeSource
 
 fun textEditorStartup(context: Context, isThemeDark: Boolean) {
-
-    //edited form sora editor
-
     try {
         FileProviderRegistry.getInstance().addFileProvider(
             AssetsFileResolver(context.assets)
         )
-
-        val themeRegistry = ThemeRegistry.getInstance()
-        val name = "2026-light" // 主题名称
-        val themeAssetsPath = "textmate/theme/$name.json"
-        themeRegistry.loadTheme(
-            ThemeModel(
-                IThemeSource.fromInputStream(
-                    FileProviderRegistry.getInstance().tryGetInputStream(themeAssetsPath),
-                    themeAssetsPath,
-                    null
-                ),
-                name
-            ).apply {
-                isDark = isThemeDark
-            }
-        )
         GrammarRegistry.getInstance().loadGrammars("languages.json")
+
+        setEditorTheme(isThemeDark)
     } catch (e: Exception) {
         println(e)
     }
+}
+
+fun setEditorTheme(isDarkTheme: Boolean) {
+    val name = if (!isDarkTheme) "2026-light" else "2026-dark"
+    val themeAssetsPath = "textmate/theme/$name.json"
+    ThemeRegistry.getInstance().loadTheme(
+        ThemeModel(
+            IThemeSource.fromInputStream(
+                FileProviderRegistry.getInstance().tryGetInputStream(themeAssetsPath),
+                themeAssetsPath,
+                null
+            ),
+            name
+        ).apply {
+            isDark = isDarkTheme
+        }
+    )
 }

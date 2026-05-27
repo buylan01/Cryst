@@ -1,6 +1,7 @@
 package com.buylan.cryst.ui.screen.texteditor
 
 import android.content.Context
+import android.graphics.Color
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -18,15 +20,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.buylan.cryst.util.setEditorTheme
 import io.github.rosemoe.sora.langs.textmate.TextMateColorScheme
 import io.github.rosemoe.sora.langs.textmate.TextMateLanguage
 import io.github.rosemoe.sora.langs.textmate.registry.ThemeRegistry
 import io.github.rosemoe.sora.text.Content
 import io.github.rosemoe.sora.widget.CodeEditor
+import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
+import io.github.rosemoe.sora.widget.style.SelectionHandleStyle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,10 +44,12 @@ import java.io.File
 fun TextEditor(
     context: Context,
     filePath: String,
-    viewModel: MainViewModel = viewModel(),
+    isDark: Boolean,
+    viewModel: EditorViewModel = viewModel(),
     onBack: () -> Unit
 ) {
     val file = remember { File(filePath) }
+    val materialColor = MaterialTheme.colorScheme
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -58,11 +70,9 @@ fun TextEditor(
                 },
                 actions = {
 
-                },
-                colors = TopAppBarDefaults.topAppBarColors()
+                }, colors = TopAppBarDefaults.topAppBarColors()
             )
-        }
-    ) { padding ->
+        }) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -72,27 +82,8 @@ fun TextEditor(
             val state = viewModel.editorState
             val editor = remember {
                 setCodeEditorFactory(
-                    context = context,
-                    state = state,
-                    filePath = filePath
+                    context = context, state = state, filePath = filePath
                 )
-            }
-            editor.colorScheme = TextMateColorScheme.create(ThemeRegistry.getInstance())
-
-            val languageScopeName = when(file.extension.lowercase()) {
-                "cpp" -> "source.cpp"
-                "xml" -> "text.xml"
-                "json" -> "source.json"
-                "bat" -> "source.batchfile"
-                "html" -> "text.html.basic"
-                else -> { null }
-            }
-
-            languageScopeName?.let {
-                val language = TextMateLanguage.create(
-                    languageScopeName, false
-                )
-                editor.setEditorLanguage(language)
             }
 
             LaunchedEffect(key1 = state.content) {
@@ -100,13 +91,15 @@ fun TextEditor(
                     setText(state.content)
                 }
             }
-            AndroidView(
-                factory = { editor },
-                modifier = Modifier.fillMaxSize(),
-                onRelease = {
-                    it.release()
-                }
-            )
+            LaunchedEffect(isDark) {
+                setEditorTheme(isDark)
+                state.editor?.colorScheme =
+                    TextMateColorScheme.create(ThemeRegistry.getInstance())
+            }
+
+            AndroidView(factory = { editor }, modifier = Modifier.fillMaxSize(), onRelease = {
+                it.release()
+            })
         }
     }
 }
@@ -122,15 +115,26 @@ private fun setCodeEditorFactory(
     filePath: String
 ): CodeEditor {
     val editor = CodeEditor(context)
+    val languageScopeName = when(File(filePath).extension.lowercase()) {
+        "cpp" -> "source.cpp"
+        "xml" -> "text.xml"
+        "json" -> "source.json"
+        "bat" -> "source.batchfile"
+        "html" -> "text.html.basic"
+        else -> { null }
+    }
+
+    languageScopeName?.let {
+        val language = TextMateLanguage.create(
+            languageScopeName, false
+        )
+        editor.setEditorLanguage(language)
+    }
     editor.apply {
         setText(state.content)
+        isStickyTextSelection = true
+        //colorScheme = TextMateColorScheme.create(ThemeRegistry.getInstance())
     }
     state.editor = editor
     return editor
-}
-
-class MainViewModel : ViewModel() {
-    val editorState by mutableStateOf(
-        CodeEditorState()
-    )
 }
