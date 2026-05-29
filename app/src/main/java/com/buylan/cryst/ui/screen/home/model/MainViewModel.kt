@@ -39,12 +39,6 @@ class MainViewModel : ViewModel() {
     }
 
     var currentPath by mutableStateOf<VirtualFile>(LocalFile(RootPath))
-        private set
-
-    fun setPath(path: VirtualFile) {
-        currentPath = path
-    }
-
     var showPathDialog by mutableStateOf(false)
     var showAboutDialog by mutableStateOf(false)
     var showSort by mutableStateOf(false)
@@ -57,6 +51,7 @@ class MainViewModel : ViewModel() {
     var audioDialog: CommonDialogState? by mutableStateOf(null)
     var propertiesDialog: CommonDialogState? by mutableStateOf(null)
     var openWithDialog: CommonDialogState? by mutableStateOf(null)
+    var compressDialog: CommonDialogState? by mutableStateOf(null)
     var toolsDialog: CommonDialogState? by mutableStateOf(null)
     var copyDialog: ExtraDialogState? by mutableStateOf(null)
     var moveDialog: ExtraDialogState? by mutableStateOf(null)
@@ -71,7 +66,7 @@ class MainViewModel : ViewModel() {
         val state = currentPanelState()
         if (!currentPath.isRootPath()) {
             state.path = state.path.parent!!
-            currentPath = state.path
+            state.highLightFiles = emptySet()
         }
     }
     fun refreshPanel(panelState: PanelStates) {
@@ -99,8 +94,10 @@ class MainViewModel : ViewModel() {
     }
 
     fun handleFileClick(context: Context, file: VirtualFile, type: FileType? = null) {
+        val currentPanel = currentPanelState()
         if (file.isDirectory) {
-            currentPanelState().path = file
+            currentPanel.path = file
+            currentPanel.highLightFiles = emptySet()
         } else {
             val actualType = type ?: getFileType(file)
             val actualFile = getActualFile(context, file)
@@ -117,7 +114,7 @@ class MainViewModel : ViewModel() {
 
                 FileType.ARCHIVE -> {
                     try {
-                        currentPanelState().path = ArchiveFile(entranceFile = actualFile)
+                        currentPanel.path = ArchiveFile(entranceFile = actualFile)
                     } catch (e: Exception) {
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                     }
@@ -130,7 +127,7 @@ class MainViewModel : ViewModel() {
                     ).putExtra("filePath", actualFile.path)
                 )
 
-                FileType.INSTALLABLE -> {
+                FileType.APK -> {
                     apkDialog = CommonDialogState(actualFile)
                 }
 
@@ -191,7 +188,7 @@ class MainViewModel : ViewModel() {
             }
 
             ToolAction.Compress -> {
-
+                compressDialog = CommonDialogState(file)
             }
         }
     }
@@ -219,7 +216,7 @@ enum class FileType(
     IMAGE(R.string.image, R.drawable.ic_image),
     VIDEO(R.string.video, R.drawable.ic_video_file),
     ARCHIVE(R.string.archive, R.drawable.ic_folder_zip),
-    INSTALLABLE(R.string.installable, R.drawable.ic_apk_document),
+    APK(R.string.installable, R.drawable.ic_apk_document),
     SCRIPT(R.string.script, R.drawable.ic_terminal_2),
     FONT(R.string.font, R.drawable.ic_font_download)
 }

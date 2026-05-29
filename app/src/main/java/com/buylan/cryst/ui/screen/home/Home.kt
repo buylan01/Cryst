@@ -87,6 +87,7 @@ import com.buylan.cryst.activity.SettingsActivity
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.model.DarkMode
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
+import com.buylan.cryst.ui.screen.home.dialog.CompressDialog
 import com.buylan.cryst.ui.screen.home.dialog.CopyDialog
 import com.buylan.cryst.ui.screen.home.dialog.CreateDialog
 import com.buylan.cryst.ui.screen.home.dialog.DeleteDialog
@@ -372,7 +373,7 @@ fun MainScreen(
                     snapshotFlow { viewModel.currentPanelState().path }
                         .distinctUntilChanged()
                         .collect { path ->
-                            viewModel.setPath(path)
+                            viewModel.currentPath = path
                         }
                 }
 
@@ -422,9 +423,7 @@ fun MainScreen(
                         state = leftLazyState
                     ) {
                         item {
-                            UpwardItem(
-                                leftPanelState
-                            )
+                            UpwardItem { viewModel.navigateBack() }
                         }
                         items(files) { file ->
                             FileRow(
@@ -462,9 +461,7 @@ fun MainScreen(
                         state = rightLazyState
                     ) {
                         item {
-                            UpwardItem(
-                                rightPanelState
-                            )
+                            UpwardItem { viewModel.navigateBack() }
                         }
                         items(files) { file ->
                             FileRow(
@@ -708,6 +705,11 @@ fun MainScreen(
     viewModel.createDialog?.let { state ->
         CreateDialog(onDismiss = { viewModel.createDialog = null }, state.path) { file ->
             handleRefresh(state.path, setOf(file))
+        }
+    }
+    viewModel.compressDialog?.let { state ->
+        CompressDialog(state.file, { viewModel.compressDialog = null })  { file ->
+            handleRefresh(file.parent!!, setOf(file.name))
         }
     }
     if (viewModel.showSort) {

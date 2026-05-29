@@ -13,8 +13,15 @@ import com.buylan.cryst.ui.screen.home.model.SortType
 import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.apache.commons.compress.archivers.zip.ZipFile
+import org.apache.commons.compress.utils.IOUtils
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URLConnection
 import java.nio.file.Files
@@ -67,13 +74,13 @@ fun getActualFile(context: Context, f: VirtualFile): VirtualFile {
 
 fun getFileType(file: VirtualFile): FileType {
     return if (file.isDirectory) FileType.FOLDER else when (file.extension.lowercase()) {
-        "txt", "xml", "prop", "conf", "json", "smali", "cpp", "html" -> FileType.TEXT
+        "txt", "xml", "prop", "conf", "json", "smali", "cpp", "html", "bat", "log" -> FileType.TEXT
         "jpg", "jpeg", "png", "gif", "webp" -> FileType.IMAGE
         "mp3", "wav", "ogg", "flac" -> FileType.AUDIO
         "mp4" -> FileType.VIDEO
         "sh", "rc" -> FileType.SCRIPT
         "ttf", "otf" -> FileType.FONT
-        "apk" -> FileType.INSTALLABLE
+        "apk" -> FileType.APK
         "zip", "rar", "7z" -> FileType.ARCHIVE
         else -> FileType.FILE
     }
@@ -218,4 +225,34 @@ fun install(context: Context, file: VirtualFile) {
 
 fun VirtualFile.isRootPath(): Boolean {
     return absolutePath == "/storage/emulated/0"
+}
+
+fun createZip(files: List<File>, outputZipFile: File): File {
+    ZipArchiveOutputStream(outputZipFile).use { zipOut ->
+        files.forEach { file ->
+            val entry = ZipArchiveEntry(file, file.name)
+            zipOut.putArchiveEntry(entry)
+            FileInputStream(file).use { fis ->
+                IOUtils.copy(fis, zipOut)
+            }
+            zipOut.closeArchiveEntry()
+        }
+    }
+    return outputZipFile
+}
+
+fun createTar(files: List<File>, outputTarFile: File): File {
+    FileOutputStream(outputTarFile).use { fos ->
+        TarArchiveOutputStream(fos).use { zipOut ->
+            files.forEach { file ->
+                val entry = TarArchiveEntry(file, file.name)
+                zipOut.putArchiveEntry(entry)
+                FileInputStream(file).use { fis ->
+                    IOUtils.copy(fis, zipOut)
+                }
+                zipOut.closeArchiveEntry()
+            }
+        }
+    }
+    return outputTarFile
 }

@@ -104,16 +104,10 @@ fun FileRow(
 
 @Composable
 fun UpwardItem(
-    cps: PanelStates
+    onClick: () -> Unit
 ) {
     Surface(
-        onClick = {
-//            if (parseZipPath(cps.path.pathString).isEmpty() && cps.isInZip) {
-//                cps.isInZip = false
-//                cps.zipFile = null
-//            }
-            if (!cps.path.isRootPath()) cps.path = cps.path.parent!!
-        },
+        onClick = onClick,
         color = Color.Transparent
     ) {
         Row(
