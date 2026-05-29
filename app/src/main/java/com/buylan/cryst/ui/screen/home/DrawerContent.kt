@@ -13,14 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BrightnessAuto
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Terminal
-import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -37,6 +29,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
@@ -107,16 +100,12 @@ fun ModalDrawer(
                         }
                     ) {
                         Icon(
-                            imageVector = when(appViewModel.darkMode) {
-                                DarkMode.System -> Icons.Default.BrightnessAuto
-                                DarkMode.Light  -> Icons.Default.LightMode
-                                DarkMode.Dark   -> Icons.Default.DarkMode
-                            },
+                            painter = painterResource(appViewModel.darkMode.icon),
                             contentDescription = null
                         )
                     }
                     Icon(
-                        imageVector = Icons.Default.Info,
+                        painter =  painterResource(R.drawable.ic_info),
                         contentDescription = null
                     )
                 },
@@ -169,7 +158,7 @@ fun ModalDrawer(
                 selected = true,
                 icon = {
                     Icon(
-                        imageVector = Icons.Default.Storage,
+                        painter = painterResource(R.drawable.ic_storage),
                         contentDescription = null
                     )
                 },
@@ -193,7 +182,7 @@ fun ModalDrawer(
                 selected = false,
                 icon = {
                     Icon(
-                        imageVector = Icons.Default.Unarchive,
+                        painter = painterResource(R.drawable.ic_apps),
                         contentDescription = null
                     )
                 },
@@ -206,7 +195,7 @@ fun ModalDrawer(
                 selected = false,
                 icon = {
                     Icon(
-                        imageVector = Icons.Default.Terminal,
+                        painter = painterResource(R.drawable.ic_terminal_2),
                         contentDescription = null
                     )
                 },

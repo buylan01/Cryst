@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.FormatColorFill
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,10 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.material3.Player
+import com.buylan.cryst.R
 import java.io.File
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "OpaqueUnitKey")
@@ -86,7 +85,7 @@ fun VideoViewer(
                     navigationIcon = {
                         IconButton(onClick = { activity.finish() }) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                painter = painterResource(R.drawable.ic_arrow_back),
                                 contentDescription = "返回"
                             )
                         }
@@ -99,7 +98,7 @@ fun VideoViewer(
                             }
                         ) {
                             Icon(
-                                imageVector = Icons.Default.FormatColorFill,
+                                painter = painterResource(R.drawable.ic_invert_colors),
                                 contentDescription = null
                             )
                         }

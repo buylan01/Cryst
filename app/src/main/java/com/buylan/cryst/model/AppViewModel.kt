@@ -65,9 +65,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 }
 
 enum class DarkMode(
-    val label: Int
+    val label: Int,
+    val icon: Int
 ) {
-    System(R.string.system),
-    Light(R.string.light),
-    Dark(R.string.dark)
+    System(R.string.system, R.drawable.ic_night_sight_auto),
+    Light(R.string.light, R.drawable.ic_light_mode),
+    Dark(R.string.dark, R.drawable.ic_dark_mode)
 }

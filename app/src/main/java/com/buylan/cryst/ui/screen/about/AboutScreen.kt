@@ -3,8 +3,6 @@ package com.buylan.cryst.ui.screen.about
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import com.buylan.cryst.R
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
@@ -31,7 +30,7 @@ fun AboutLibrariesScreen(onBackPressed: () -> Unit) {
                 title = { Text("开源库声明") },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
-                        Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "返回")
+                        Icon(painter = painterResource(R.drawable.ic_arrow_back), contentDescription = "返回")
                     }
                 },
                 scrollBehavior = scrollBehavior

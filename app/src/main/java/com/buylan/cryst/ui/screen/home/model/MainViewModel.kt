@@ -212,16 +212,16 @@ enum class FileType(
     val label: Int,
     val icon: Int
 ) {
-    FOLDER(R.string.folder, R.drawable.file_folder),
-    FILE(R.string.file, R.drawable.file_file),
-    TEXT(R.string.text, R.drawable.file_text),
-    AUDIO(R.string.audio, R.drawable.file_audio),
-    IMAGE(R.string.image, R.drawable.file_image),
-    VIDEO(R.string.video, R.drawable.file_video),
-    ARCHIVE(R.string.archive, R.drawable.file_zip),
-    INSTALLABLE(R.string.installable, R.drawable.file_apk),
-    SCRIPT(R.string.script, R.drawable.file_text),
-    FONT(R.string.font, R.drawable.file_font)
+    FOLDER(R.string.folder, R.drawable.ic_folder),
+    FILE(R.string.file, R.drawable.ic_draft),
+    TEXT(R.string.text, R.drawable.ic_description),
+    AUDIO(R.string.audio, R.drawable.ic_audio_file),
+    IMAGE(R.string.image, R.drawable.ic_image),
+    VIDEO(R.string.video, R.drawable.ic_video_file),
+    ARCHIVE(R.string.archive, R.drawable.ic_folder_zip),
+    INSTALLABLE(R.string.installable, R.drawable.ic_apk_document),
+    SCRIPT(R.string.script, R.drawable.ic_terminal_2),
+    FONT(R.string.font, R.drawable.ic_font_download)
 }
 
 sealed class FileOperaUiState {

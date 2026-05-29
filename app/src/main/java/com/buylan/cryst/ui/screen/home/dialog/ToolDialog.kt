@@ -4,15 +4,6 @@ import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DriveFileMove
-import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DriveFileRenameOutline
-import androidx.compose.material.icons.filled.FileCopy
-import androidx.compose.material.icons.filled.FileOpen
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,7 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
@@ -55,7 +46,7 @@ fun ToolDialog(
                     @Composable
                     fun ToolItem(
                         text: String,
-                        icon: ImageVector,
+                        icon: Int,
                         onClick: () -> Unit,
                         enabled: Boolean = true
                     ) {
@@ -69,7 +60,7 @@ fun ToolDialog(
                             )
                         ) {
                             Icon(
-                                imageVector = icon,
+                                painter = painterResource(icon),
                                 contentDescription = null
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -82,13 +73,13 @@ fun ToolDialog(
                             stringResource(R.string.copy_to_left)
                         else
                             stringResource(R.string.copy_to_right),
-                        icon = Icons.Default.FileCopy,
+                        icon = R.drawable.ic_file_copy,
                         onClick = { onToolAction(ToolAction.Copy) }
                     )
 
                     ToolItem(
                         text = stringResource(R.string.delete),
-                        icon = Icons.Default.Delete,
+                        icon = R.drawable.ic_delete,
                         onClick = { onToolAction(ToolAction.Delete) },
                         enabled = file !is ArchiveFile
                     )
@@ -96,13 +87,13 @@ fun ToolDialog(
                     ToolItem(
                         text = stringResource(R.string.open_with),
                         enabled = !file.isDirectory,
-                        icon = Icons.Default.FileOpen,
+                        icon = R.drawable.ic_open_with,
                         onClick = { onToolAction(ToolAction.OpenWith) }
                     )
 
                     ToolItem(
                         text = stringResource(R.string.info),
-                        icon = Icons.Default.Info,
+                        icon = R.drawable.ic_info,
                         onClick = {
                             onToolAction(ToolAction.Properties)
                         }
@@ -113,28 +104,28 @@ fun ToolDialog(
                             stringResource(R.string.move_to_left)
                         else
                             stringResource(R.string.move_to_right),
-                        icon = Icons.AutoMirrored.Filled.DriveFileMove,
+                        icon = R.drawable.ic_content_cut,
                         onClick = { onToolAction(ToolAction.Move) },
                         enabled = file !is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.rename),
-                        icon = Icons.Default.DriveFileRenameOutline,
+                        icon = R.drawable.ic_edit,
                         onClick = { onToolAction(ToolAction.Rename) },
                         enabled = file !is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.compress),
-                        icon = Icons.Default.Archive,
+                        icon = R.drawable.ic_archive,
                         onClick = { onToolAction(ToolAction.Compress) },
                         enabled = file !is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.share),
-                        icon = Icons.Default.Share,
+                        icon = R.drawable.ic_share,
                         onClick = { onToolAction(ToolAction.Share) },
                         enabled = !file.isDirectory
                     )

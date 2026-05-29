@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -59,10 +59,10 @@ fun FileRow(
         Icon(
             painter = painterResource(type.icon),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier
                 .border(
-                    width = 1.dp,
+                    width = 1.5.dp,
                     shape = MaterialTheme.shapes.small,
                     color = MaterialTheme.colorScheme.primaryContainer
                 )
@@ -94,7 +94,7 @@ fun FileRow(
 
         if (Files.isSymbolicLink(Path(file.path))) {
             Icon(
-                painter = painterResource(R.drawable.file_link),
+                painter = painterResource(R.drawable.ic_link),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.outline
             )
@@ -123,12 +123,12 @@ fun UpwardItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowUpward,
+                painter = painterResource(R.drawable.ic_arrow_upward),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .border(
-                        width = 1.dp,
+                        width = 1.5.dp,
                         shape = MaterialTheme.shapes.small,
                         color = MaterialTheme.colorScheme.primaryContainer
                     )

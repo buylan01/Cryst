@@ -7,12 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Repeat
-import androidx.compose.material.icons.filled.RepeatOn
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,9 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import com.buylan.cryst.R
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.delay
 import java.io.File
@@ -139,8 +135,8 @@ fun AudioPlayer(
                                     if (isLooping) ExoPlayer.REPEAT_MODE_ONE else ExoPlayer.REPEAT_MODE_OFF
                             }) {
                                 Icon(
-                                    imageVector = if (isLooping) Icons.Default.RepeatOn else Icons.Default.Repeat,
-                                    contentDescription = if (isLooping) "关闭循环" else "开启循环"
+                                    painter = painterResource(if (isLooping) R.drawable.ic_repeat_on else R.drawable.ic_repeat),
+                                    contentDescription = null
                                 )
                             }
 
@@ -158,7 +154,7 @@ fun AudioPlayer(
                                 }
                             ) {
                                 Icon(
-                                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                    painter = painterResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow),
                                     contentDescription = null,
                                 )
                             }
@@ -169,7 +165,7 @@ fun AudioPlayer(
                                 }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Close,
+                                    painter = painterResource(R.drawable.ic_close),
                                     contentDescription = null,
                                 )
                             }

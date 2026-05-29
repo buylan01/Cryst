@@ -37,14 +37,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -81,6 +73,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -172,7 +165,7 @@ fun ApplicationManager(){
                         onClick = { (context as ComponentActivity).finish() }
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            painter = painterResource(R.drawable.ic_arrow_back),
                             contentDescription = null
                         )
                     }
@@ -192,7 +185,7 @@ fun ApplicationManager(){
                         }
                     ) {
                         Icon(
-                            imageVector = if (searchActive) Icons.Default.Close else Icons.Default.Search,
+                            painter = painterResource(if (searchActive) R.drawable.ic_close else R.drawable.ic_search),
                             contentDescription = null
                         )
                     }
@@ -203,7 +196,7 @@ fun ApplicationManager(){
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.MoreVert,
+                            painter = painterResource(R.drawable.ic_more_vert),
                             contentDescription = null
                         )
                     }
@@ -421,7 +414,7 @@ fun ApplicationManager(){
                                     )
                                 }
                             ) {
-                                Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                                Icon(painter = painterResource(R.drawable.ic_delete), contentDescription = null)
                             }
                             IconButton(
                                 onClick = {
@@ -433,7 +426,7 @@ fun ApplicationManager(){
                                     )
                                 }
                             ) {
-                                Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                                Icon(painter = painterResource(R.drawable.ic_info), contentDescription = null)
                             }
                             IconButton(
                                 onClick = {
@@ -444,7 +437,7 @@ fun ApplicationManager(){
                                     }
                                 }
                             ) {
-                                Icon(imageVector = Icons.AutoMirrored.Default.OpenInNew, contentDescription = null)
+                                Icon(painter = painterResource(R.drawable.ic_open_in_new), contentDescription = null)
                             }
                         }
                     }

@@ -36,20 +36,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.CompareArrows
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomAppBar
@@ -84,10 +70,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -202,7 +190,7 @@ fun MainScreen(
                             }
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Menu,
+                                painter = painterResource(R.drawable.ic_menu),
                                 contentDescription = null
                             )
                         }
@@ -216,7 +204,7 @@ fun MainScreen(
                                 }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.MoreVert,
+                                    painter = painterResource(R.drawable.ic_more_vert),
                                     contentDescription = null
                                 )
                             }
@@ -228,7 +216,7 @@ fun MainScreen(
                                     text = { Text(stringResource(R.string.refresh)) },
                                     leadingIcon = {
                                         Icon(
-                                            imageVector = Icons.Default.Refresh,
+                                            painter = painterResource(R.drawable.ic_refresh),
                                             contentDescription = null
                                         )
                                     },
@@ -241,7 +229,7 @@ fun MainScreen(
                                     text = { Text(stringResource(R.string.search)) },
                                     leadingIcon = {
                                         Icon(
-                                            imageVector = Icons.Default.Search,
+                                            painter = painterResource(R.drawable.ic_search),
                                             contentDescription = null
                                         )
                                     },
@@ -258,7 +246,7 @@ fun MainScreen(
                                     text = { Text(stringResource(R.string.sort)) },
                                     leadingIcon = {
                                         Icon(
-                                            imageVector = Icons.AutoMirrored.Default.Sort,
+                                            painter = painterResource(R.drawable.ic_sort),
                                             contentDescription = null
                                         )
                                     },
@@ -272,7 +260,7 @@ fun MainScreen(
                                     text = { Text(stringResource(R.string.settings)) },
                                     leadingIcon = {
                                         Icon(
-                                            imageVector = Icons.Default.Settings,
+                                            painter = painterResource(R.drawable.ic_settings),
                                             contentDescription = null
                                         )
                                     },
@@ -289,7 +277,7 @@ fun MainScreen(
                                     text = { Text(stringResource(R.string.style)) },
                                     leadingIcon = {
                                         Icon(
-                                            imageVector = Icons.Default.Style,
+                                            painter = painterResource(R.drawable.ic_style),
                                             contentDescription = null
                                         )
                                     },
@@ -301,7 +289,7 @@ fun MainScreen(
                                     text = { Text(stringResource(R.string.exit)) },
                                     leadingIcon = {
                                         Icon(
-                                            imageVector = Icons.AutoMirrored.Default.ExitToApp,
+                                            painter = painterResource(R.drawable.ic_exit_to_app),
                                             contentDescription = null
                                         )
                                     },
@@ -321,13 +309,13 @@ fun MainScreen(
                         ) {
                             IconButton(onClick = { /* do something */ }) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                                    painter = painterResource(R.drawable.ic_apps),
                                     contentDescription = null
                                 )
                             }
                             IconButton(onClick = { viewModel.refreshPanel(viewModel.currentPanelState()) }) {
                                 Icon(
-                                    imageVector = Icons.Default.Refresh,
+                                    painter = painterResource(R.drawable.ic_refresh),
                                     contentDescription = null,
                                 )
                             }
@@ -337,7 +325,7 @@ fun MainScreen(
                                 )
                             }) {
                                 Icon(
-                                    imageVector = Icons.Default.Add,
+                                    painter = painterResource(R.drawable.ic_add),
                                     contentDescription = null,
                                 )
                             }
@@ -351,13 +339,13 @@ fun MainScreen(
                                 }
                             }) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Default.CompareArrows,
+                                    painter = painterResource(R.drawable.ic_arrows_outward),
                                     contentDescription = null,
                                 )
                             }
                             IconButton(onClick = { viewModel.navigateBack() }) {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowUpward,
+                                    painter = painterResource(R.drawable.ic_arrow_upward),
                                     contentDescription = null,
                                 )
                             }
@@ -407,7 +395,7 @@ fun MainScreen(
                 }
 
                 val animatedColorLeft by animateColorAsState(
-                    targetValue = if (currentPanel == PanelPosition.L) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainer,
+                    targetValue = if (currentPanel == PanelPosition.L) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
                     animationSpec = tween(150)
                 )
 
@@ -451,7 +439,7 @@ fun MainScreen(
                 }
 
                 val animatedColorRight by animateColorAsState(
-                    targetValue = if (currentPanel == PanelPosition.R) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainer,
+                    targetValue = if (currentPanel == PanelPosition.R) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
                     animationSpec = tween(150)
                 )
 
@@ -596,14 +584,14 @@ fun MainScreen(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape)
-                                    .background(color = colorResource(android.R.color.system_accent1_200)),
+                                    .background(color = MaterialTheme.colorScheme.primaryContainer),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Folder,
+                                    painter = painterResource(R.drawable.ic_folder),
                                     contentDescription = null,
-                                    tint = colorResource(android.R.color.system_accent1_10),
-                                    modifier = Modifier.size(32.dp)
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
 
