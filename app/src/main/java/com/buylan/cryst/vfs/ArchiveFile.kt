@@ -3,6 +3,7 @@ package com.buylan.cryst.vfs
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.IOException
+import java.lang.ref.SoftReference
 
 class ArchiveFile(
     val entranceFile: VirtualFile,
@@ -10,13 +11,32 @@ class ArchiveFile(
     override val parent: VirtualFile? = entranceFile.parent,
     val entryName: String? = null
 ) : VirtualFile {
+
+    companion object {
+        private val zipFileCache = mutableMapOf<String, SoftReference<ZipFile>>()
+        @Synchronized
+        private fun getZipFile(entranceFilePath: String): ZipFile {
+            val softRef = zipFileCache[entranceFilePath]
+            val existing = softRef?.get()
+            if (existing != null) {
+                return existing
+            }
+            // 创建新实例
+            val newZip = ZipFile.builder()
+                .setFile(java.io.File(entranceFilePath))
+                .get()
+            zipFileCache[entranceFilePath] = SoftReference(newZip)
+            return newZip
+        }
+    }
+
+    val delegate: ZipFile by lazy { getZipFile(entranceFile.absolutePath) }
     override val absolutePath = entryName ?: entry?.name ?: ""
     override val name: String = absolutePath.trimEnd('/').split('/').lastOrNull() ?: ""
     override val isDirectory = entry?.isDirectory ?: true
     override val path = absolutePath
     override val pathDisplay: String = entranceFile.name + "/" + path
     override val extension: String = name.substringAfterLast(".")
-    val delegate = ZipFile.builder().setFile(entranceFile.absolutePath).get()!!
 
     override fun listFiles(): List<VirtualFile>? {
         if (!isDirectory) return null
@@ -28,7 +48,7 @@ class ArchiveFile(
         }
 
         try {
-            val entries = delegate.entries.asSequence().toList()
+            val entries = delegate.entries
             val childDirNames = mutableSetOf<String>()
             val childFiles = mutableListOf<Pair<ZipArchiveEntry, String>>() // entry, filename
 
@@ -89,7 +109,7 @@ class ArchiveFile(
         val result = mutableListOf<VirtualFile>()
         result.add(this)
         if (isDirectory) {
-            val entries = delegate.entries.asSequence().toList()
+            val entries = delegate.entries
             for (child in entries) {
                 if (!child.name.startsWith(name) || entryName == child.name) continue
                 result.add(ArchiveFile(entranceFile, child, this))
