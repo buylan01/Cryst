@@ -227,10 +227,15 @@ fun VirtualFile.isRootPath(): Boolean {
     return absolutePath == "/storage/emulated/0"
 }
 
-fun createZip(files: List<File>, outputZipFile: File): File {
+fun createZip(
+    files: List<File>,
+    outputZipFile: File,
+    baseDir: File
+): File {
     ZipArchiveOutputStream(outputZipFile).use { zipOut ->
         files.forEach { file ->
-            val entry = ZipArchiveEntry(file, file.name)
+            val relativePath = file.relativeTo(baseDir).path.replace("\\", "/")
+            val entry = ZipArchiveEntry(file, relativePath)
             zipOut.putArchiveEntry(entry)
             FileInputStream(file).use { fis ->
                 IOUtils.copy(fis, zipOut)
@@ -241,11 +246,16 @@ fun createZip(files: List<File>, outputZipFile: File): File {
     return outputZipFile
 }
 
-fun createTar(files: List<File>, outputTarFile: File): File {
+fun createTar(
+    files: List<File>,
+    outputTarFile: File,
+    baseDir: File
+): File {
     FileOutputStream(outputTarFile).use { fos ->
         TarArchiveOutputStream(fos).use { zipOut ->
             files.forEach { file ->
-                val entry = TarArchiveEntry(file, file.name)
+                val relativePath = file.relativeTo(baseDir).path.replace("\\", "/")
+                val entry = TarArchiveEntry(file, relativePath)
                 zipOut.putArchiveEntry(entry)
                 FileInputStream(file).use { fis ->
                     IOUtils.copy(fis, zipOut)

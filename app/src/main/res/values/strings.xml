@@ -53,4 +53,5 @@
     <string name="dark_mode">DarkMode</string>
     <string name="install">Install</string>
     <string name="unpack">Unpack</string>
+    <string name="format">Format</string>
 </resources>

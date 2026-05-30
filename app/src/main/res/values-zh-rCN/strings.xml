@@ -53,4 +53,5 @@
     <string name="dark_mode">暗色模式</string>
     <string name="install">安装</string>
     <string name="unpack">解包</string>
+    <string name="format">Format</string>
 </resources>

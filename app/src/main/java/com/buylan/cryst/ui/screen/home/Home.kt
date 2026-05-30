@@ -86,6 +86,7 @@ import com.buylan.cryst.activity.LicensesActivity
 import com.buylan.cryst.activity.SettingsActivity
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.model.DarkMode
+import com.buylan.cryst.ui.component.Segment
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
 import com.buylan.cryst.ui.screen.home.dialog.CompressDialog
 import com.buylan.cryst.ui.screen.home.dialog.CopyDialog
@@ -487,21 +488,24 @@ fun MainScreen(
             sheetState = sheetState
         ) {
             var showDarkModeMenu by remember { mutableStateOf(false) }
-            Row(modifier = Modifier
-                .padding(24.dp)
-                .clip(shape = MaterialTheme.shapes.extraLarge)
-                .background(color = MaterialTheme.colorScheme.surfaceContainer)
-                .clickable(onClick = { showDarkModeMenu = true })
-                .fillMaxWidth()
-                .height(64.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(stringResource(R.string.dark_mode), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(16.dp))
-                Row(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(modifier = Modifier, text = stringResource(appViewModel.darkMode.label))
+            Segment(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .clip(shape = MaterialTheme.shapes.extraLarge)
+                    .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                    .height(64.dp),
+                onClick = { showDarkModeMenu = true },
+                title = {
+                    Text(
+                        stringResource(R.string.dark_mode),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(appViewModel.darkMode.label)
+                    )
                     DropdownMenu(
                         expanded = showDarkModeMenu,
                         onDismissRequest = { showDarkModeMenu = false }
@@ -517,7 +521,7 @@ fun MainScreen(
                         }
                     }
                 }
-            }
+            )
         }
     }
 
