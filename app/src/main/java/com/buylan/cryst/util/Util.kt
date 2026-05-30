@@ -62,7 +62,7 @@ fun getActualFile(context: Context, f: VirtualFile): VirtualFile {
         val tmpDir = File(File(context.cacheDir.absolutePath + "/archive_cache"), f.entranceFile.hashCode().toString())
         if (!tmpDir.exists()) tmpDir.mkdirs()
         val targetFile = File(tmpDir, f.name)
-        ZipFile(f.entranceFile.absolutePath).getInputStream(f.entry).use { input ->
+        f.delegate.getInputStream(f.entry).use { input ->
             targetFile.outputStream().use { output ->
                 input.copyTo(output)
             }
@@ -238,7 +238,7 @@ fun createZip(
             val entry = ZipArchiveEntry(file, relativePath)
             zipOut.putArchiveEntry(entry)
             FileInputStream(file).use { fis ->
-                IOUtils.copy(fis, zipOut)
+                fis.copyTo(zipOut)
             }
             zipOut.closeArchiveEntry()
         }
@@ -258,7 +258,7 @@ fun createTar(
                 val entry = TarArchiveEntry(file, relativePath)
                 zipOut.putArchiveEntry(entry)
                 FileInputStream(file).use { fis ->
-                    IOUtils.copy(fis, zipOut)
+                    fis.copyTo(zipOut)
                 }
                 zipOut.closeArchiveEntry()
             }

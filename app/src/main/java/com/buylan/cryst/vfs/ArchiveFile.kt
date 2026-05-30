@@ -16,7 +16,7 @@ class ArchiveFile(
     override val path = absolutePath
     override val pathDisplay: String = entranceFile.name + "/" + path
     override val extension: String = name.substringAfterLast(".")
-    private val delegate = ZipFile.builder().setFile(entranceFile.absolutePath).get()
+    val delegate = ZipFile.builder().setFile(entranceFile.absolutePath).get()!!
 
     override fun listFiles(): List<VirtualFile>? {
         if (!isDirectory) return null
