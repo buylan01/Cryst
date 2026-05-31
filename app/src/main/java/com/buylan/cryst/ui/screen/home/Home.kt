@@ -70,11 +70,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInteropFilter
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -686,8 +684,7 @@ fun MainScreen(
             targetFile = state.file,
             onDismiss = { viewModel.deleteDialog = null },
             onRefresh = {
-                println(state.file.parent!!.absolutePath)
-                handleRefresh(state.file.parent ?: state.file)
+                handleRefresh(state.file.parentFile ?: state.file)
             })
     }
     viewModel.copyDialog?.let { state ->
@@ -713,7 +710,7 @@ fun MainScreen(
     }
     viewModel.compressDialog?.let { state ->
         CompressDialog(state.file, { viewModel.compressDialog = null })  { file ->
-            handleRefresh(file.parent!!, setOf(file.name))
+            handleRefresh(file.parentFile!!, setOf(file.name))
         }
     }
     if (viewModel.showSort) {
@@ -741,7 +738,7 @@ fun MainScreen(
     }
     viewModel.renameDialog?.let { state ->
         RenameDialog(state.file, { viewModel.renameDialog = null }) {
-            handleRefresh(LocalFile(state.file.parent!!.absolutePath))
+            handleRefresh(LocalFile(state.file.parent!!))
         }
     }
     viewModel.propertiesDialog?.let { state ->

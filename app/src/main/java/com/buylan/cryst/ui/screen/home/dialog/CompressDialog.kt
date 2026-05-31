@@ -25,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
-import com.buylan.cryst.model.DarkMode
 import com.buylan.cryst.ui.component.Segment
 import com.buylan.cryst.util.createTar
 import com.buylan.cryst.util.createZip
@@ -145,13 +144,13 @@ fun CompressDialog(
                                 ArchiveFormat.ZIP -> createZip(
                                     files = s,
                                     outputPath,
-                                    source.parent!!.toFile()
+                                    source.parentFile!!.toFile()
                                 )
 
                                 ArchiveFormat.TAR -> createTar(
                                     files = s,
                                     outputPath,
-                                    source.parent!!.toFile()
+                                    source.parentFile!!.toFile()
                                 )
                             }
                             loading = false

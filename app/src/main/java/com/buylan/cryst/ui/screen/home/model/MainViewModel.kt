@@ -65,7 +65,7 @@ class MainViewModel : ViewModel() {
     fun navigateBack() {
         val state = currentPanelState()
         if (!currentPath.isRootPath()) {
-            state.path = state.path.parent!!
+            state.path = state.path.parentFile!!
             state.highLightFiles = emptySet()
         }
     }
@@ -74,7 +74,7 @@ class MainViewModel : ViewModel() {
             panelState.files = withContext(Dispatchers.IO) {
                 if (!panelState.path.isDirectory) {
                     panelState.highLightFiles = setOf(panelState.path.name)
-                    panelState.path = panelState.path.parent!!
+                    panelState.path = panelState.path.parentFile!!
                 }
                 accessFiles(panelState.path, panelState.sortType)
             }

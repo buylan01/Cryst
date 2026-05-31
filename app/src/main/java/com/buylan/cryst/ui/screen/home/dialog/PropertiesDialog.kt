@@ -61,7 +61,7 @@ fun PropertiesDialog(
                 }
 
                 PropertyRow(label = R.string.name, value = file.name)
-                PropertyRow(label = R.string.path, value = file.parent!!.name ?: "无")
+                PropertyRow(label = R.string.path, value = file.parent ?: stringResource(R.string.unknown))
                 PropertyRow(label = R.string.type, value = stringResource(getFileType(file).label))
                 PropertyRow(label = R.string.size, value = fileSize)
                 PropertyRow(label = R.string.time, value = formattedDate)

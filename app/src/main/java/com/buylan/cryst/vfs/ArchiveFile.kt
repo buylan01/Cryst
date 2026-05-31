@@ -8,7 +8,7 @@ import java.lang.ref.SoftReference
 class ArchiveFile(
     val entranceFile: VirtualFile,
     val entry: ZipArchiveEntry? = null,
-    override val parent: VirtualFile? = entranceFile.parent,
+    override val parentFile: VirtualFile? = entranceFile.parentFile,
     val entryName: String? = null
 ) : VirtualFile {
 
@@ -21,7 +21,6 @@ class ArchiveFile(
             if (existing != null) {
                 return existing
             }
-            // 创建新实例
             val newZip = ZipFile.builder()
                 .setFile(java.io.File(entranceFilePath))
                 .get()
@@ -33,6 +32,7 @@ class ArchiveFile(
     val delegate: ZipFile by lazy { getZipFile(entranceFile.absolutePath) }
     override val absolutePath = entryName ?: entry?.name ?: ""
     override val name: String = absolutePath.trimEnd('/').split('/').lastOrNull() ?: ""
+    override val parent: String? = parentFile?.absolutePath
     override val isDirectory = entry?.isDirectory ?: true
     override val path = absolutePath
     override val pathDisplay: String = entranceFile.name + "/" + path

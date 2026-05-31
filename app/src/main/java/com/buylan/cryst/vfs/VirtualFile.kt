@@ -7,7 +7,8 @@ interface VirtualFile {
     val path: String
     val pathDisplay: String
     val isDirectory: Boolean
-    val parent: VirtualFile?
+    val parent: String?
+    val parentFile: VirtualFile?
     val absolutePath: String
     val extension: String
 

@@ -44,7 +44,7 @@ class CopyFileViewModel : ViewModel() {
                             if (file.isDirectory) {
                                 targetFile.mkdirs()
                             } else {
-                                targetFile.parent?.mkdirs()
+                                targetFile.parentFile?.mkdirs()
                                 file.copyTo(
                                     target = targetFile, overwrite = true
                                 )

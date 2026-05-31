@@ -4,13 +4,14 @@ import java.io.File
 
 class LocalFile(
     private val delegate: File,
-    override val parent: VirtualFile? = delegate.parentFile?.takeIf { it != delegate }?.let { LocalFile(it) }
+    override val parentFile: VirtualFile? = delegate.parentFile?.takeIf { it != delegate }?.let { LocalFile(it) }
 ) : VirtualFile {
     constructor(parent: String?, child: String) : this(parent?.let { File(it, child) } ?: File(child))
-    constructor(parent: VirtualFile? = null, path: String) : this(File(path), parent = parent)
+    constructor(parent: VirtualFile? = null, path: String) : this(File(path), parentFile = parent)
     constructor(path: String) : this(File(path))
 
     override val name: String = delegate.name
+    override val parent: String? = delegate.parent
     override val isDirectory = delegate.isDirectory
     override val absolutePath: String = delegate.absolutePath
     override var path: String = delegate.path
@@ -24,7 +25,7 @@ class LocalFile(
     override fun resolve(fileName: String): VirtualFile = LocalFile(delegate.resolve(fileName).absolutePath)
     override fun createNewFile(): Boolean = delegate.createNewFile()
     override fun mkdir(): Boolean = delegate.mkdir()
-    override fun renameTo(targetFile: VirtualFile): Boolean = delegate.renameTo(File(targetFile.absolutePath))
+    override fun renameTo(targetFile: VirtualFile): Boolean = delegate.renameTo(targetFile.toFile())
     override fun exists(): Boolean = delegate.exists()
     override fun walkTopDown(): List<VirtualFile> {
         val result = mutableListOf<VirtualFile>()

@@ -54,4 +54,5 @@
     <string name="install">Install</string>
     <string name="unpack">Unpack</string>
     <string name="format">Format</string>
+    <string name="unknown">Unknown</string>
 </resources>
