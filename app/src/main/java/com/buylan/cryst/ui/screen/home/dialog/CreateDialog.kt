@@ -26,7 +26,7 @@ import com.buylan.cryst.vfs.VirtualFile
 fun CreateDialog(
     onDismiss: () -> Unit,
     targetPath: VirtualFile,
-    onRefresh: (String) -> Unit
+    onRefresh: () -> Unit
 ) {
     var fileName by remember { mutableStateOf("") }
     var createFail by remember { mutableStateOf(false) }
@@ -35,7 +35,7 @@ fun CreateDialog(
         val creator = if (isFolder) createFolder(targetPath, name) else createFile(targetPath, name)
         if (!creator) createFail = true else {
             onDismiss()
-            onRefresh(name)
+            onRefresh()
         }
     }
 

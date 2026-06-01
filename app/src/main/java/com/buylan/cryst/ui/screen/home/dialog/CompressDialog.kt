@@ -29,7 +29,6 @@ import com.buylan.cryst.ui.component.Segment
 import com.buylan.cryst.util.createTar
 import com.buylan.cryst.util.createZip
 import com.buylan.cryst.util.invalidChars
-import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -39,12 +38,14 @@ import java.io.File
 
 @Composable
 fun CompressDialog(
-    source: VirtualFile,
+    source: List<VirtualFile>,
     onDismiss: () -> Unit,
-    onRefresh: (VirtualFile) -> Unit
+    onRefresh: () -> Unit
 ) {
 
-    var fileName by remember { mutableStateOf(source.name + ".zip") }
+    var fileName by remember { mutableStateOf(
+        if (source.size == 1) source[0].name else source[0].parent + ".zip"
+    ) }
     var createFail by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
@@ -134,27 +135,39 @@ fun CompressDialog(
                         withContext(Dispatchers.IO) {
                             loading = true
 
-                            val s =
-                                if (!source.isDirectory) listOf(source.toFile()) else source.toFile()
-                                    .walkTopDown().filter { !it.isDirectory }.toList()
+                            val allFiles = source.flatMap { item ->
+                                val ioFile = item.toFile()
+                                if (item.isDirectory) {
+                                    ioFile.walkTopDown().filter { it.isFile }.toList()
+                                } else {
+                                    listOf(ioFile)
+                                }
+                            }
 
-                            val outputPath = File(source.toFile().parent!! + "/" + fileName)
+                            val baseDir = if (source.isNotEmpty()) {
+                                val parents = source.map { it.parentFile }.toSet()
+                                if (parents.size == 1) parents.first()!!.toFile()
+                                else source.first().parentFile!!.toFile()
+                            } else {
+                                error("No source files selected")
+                            }
 
-                            val creator = when(archiveFormat) {
+                            val outputPath = File(baseDir, fileName)
+
+                            when (archiveFormat) {
                                 ArchiveFormat.ZIP -> createZip(
-                                    files = s,
+                                    files = allFiles,
                                     outputPath,
-                                    source.parentFile!!.toFile()
+                                    baseDir
                                 )
-
                                 ArchiveFormat.TAR -> createTar(
-                                    files = s,
+                                    files = allFiles,
                                     outputPath,
-                                    source.parentFile!!.toFile()
+                                    baseDir
                                 )
                             }
                             loading = false
-                            onRefresh(LocalFile(creator.absolutePath))
+                            onRefresh()
                             onDismiss()
                         }
                     }

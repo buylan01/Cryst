@@ -26,7 +26,7 @@ import com.buylan.cryst.vfs.VirtualFile
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToolDialog(
-    file: VirtualFile,
+    files: List<VirtualFile>,
     position: PanelPosition,
     onDismiss: () -> Unit,
     onToolAction: (action: ToolAction) -> Unit
@@ -81,12 +81,12 @@ fun ToolDialog(
                         text = stringResource(R.string.delete),
                         icon = R.drawable.ic_delete,
                         onClick = { onToolAction(ToolAction.Delete) },
-                        enabled = file !is ArchiveFile
+                        enabled = files.singleOrNull() !is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.open_with),
-                        enabled = !file.isDirectory,
+                        enabled = files.singleOrNull()?.isDirectory ?: false,
                         icon = R.drawable.ic_open_with,
                         onClick = { onToolAction(ToolAction.OpenWith) }
                     )
@@ -106,28 +106,28 @@ fun ToolDialog(
                             stringResource(R.string.move_to_right),
                         icon = R.drawable.ic_content_cut,
                         onClick = { onToolAction(ToolAction.Move) },
-                        enabled = file !is ArchiveFile
+                        enabled = files.singleOrNull() !is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.rename),
                         icon = R.drawable.ic_edit,
                         onClick = { onToolAction(ToolAction.Rename) },
-                        enabled = file !is ArchiveFile
+                        enabled = files.singleOrNull() is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.compress),
                         icon = R.drawable.ic_archive,
                         onClick = { onToolAction(ToolAction.Compress) },
-                        enabled = file !is ArchiveFile
+                        enabled = files.singleOrNull() !is ArchiveFile
                     )
 
                     ToolItem(
                         text = stringResource(R.string.share),
                         icon = R.drawable.ic_share,
                         onClick = { onToolAction(ToolAction.Share) },
-                        enabled = !file.isDirectory
+                        enabled = files.singleOrNull()?.isDirectory ?: false
                     )
                 }
             }

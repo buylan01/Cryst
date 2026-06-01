@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -98,11 +99,11 @@ import com.buylan.cryst.ui.screen.home.dialog.RenameDialog
 import com.buylan.cryst.ui.screen.home.dialog.SearchDialog
 import com.buylan.cryst.ui.screen.home.dialog.SortOrderDialog
 import com.buylan.cryst.ui.screen.home.dialog.ToolDialog
-import com.buylan.cryst.ui.screen.home.model.CommonDialogState
 import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
+import com.buylan.cryst.ui.screen.home.model.NormalDialogState
+import com.buylan.cryst.ui.screen.home.model.OperationDialogState
 import com.buylan.cryst.ui.screen.home.model.PanelPosition
-import com.buylan.cryst.ui.screen.home.model.PathDialogState
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.LocalFile
@@ -152,11 +153,11 @@ fun MainScreen(
                 context,
                 viewModel,
                 appViewModel,
-                drawerState,
-                scope
+                drawerState
             )
         },
-        drawerState = drawerState
+        drawerState = drawerState,
+        gesturesEnabled = true
     ) {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -235,7 +236,7 @@ fun MainScreen(
                                     },
                                     onClick = {
                                         viewModel.searchDialog =
-                                            PathDialogState(
+                                            NormalDialogState(
                                                 currentPath
                                             )
                                         expanded = false
@@ -320,7 +321,7 @@ fun MainScreen(
                                 )
                             }
                             IconButton(onClick = { viewModel.createDialog =
-                                PathDialogState(
+                                NormalDialogState(
                                     currentPath
                                 )
                             }) {
@@ -387,92 +388,74 @@ fun MainScreen(
                     }
                 }
 
-                fun handleFileLongClick(file: VirtualFile) {
-                    viewModel.toolsDialog =
-                        CommonDialogState(
-                            file
-                        )
+                fun handleFileLongClick(file: List<VirtualFile>) {
+                    viewModel.toolsDialog = OperationDialogState(file)
                 }
-
-                val animatedColorLeft by animateColorAsState(
-                    targetValue = if (currentPanel == PanelPosition.L) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
-                    animationSpec = tween(150)
-                )
 
                 val animation = (fadeIn(animationSpec = tween(220,0)) + scaleIn(
                     initialScale = 0.99f, animationSpec = tween(220,0)
                 )).togetherWith(fadeOut(animationSpec = tween(0,0)))
 
-                AnimatedContent(
-                    targetState = leftPanelState.files,
-                    modifier = Modifier.weight(1f),
-                    transitionSpec = { animation }
-                ) { files ->
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1f)
-                            .background(color = animatedColorLeft)
-                            .pointerInteropFilter { event ->
-                                if (event.action == MotionEvent.ACTION_DOWN) {
-                                    viewModel.setPanel(PanelPosition.L)
-                                }
-                                false
-                            },
-                        state = leftLazyState
-                    ) {
-                        item {
-                            UpwardItem { viewModel.navigateBack() }
-                        }
-                        items(files) { file ->
-                            FileRow(
-                                file = file,
-                                type = getFileType(file),
-                                highLight = file.name in leftPanelState.highLightFiles,
-                                onFileClick = { viewModel.handleFileClick(context, file) },
-                                onFileLongClick = { handleFileLongClick(file) },
-                            )
+                @Composable
+                fun Panel(
+                    panelState: PanelStates,
+                    lazyState: LazyListState,
+                    panelPosition: PanelPosition
+                ) {
+                    val backgroundColor by animateColorAsState(
+                        targetValue = if (panelPosition == currentPanel) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
+                        animationSpec = tween(150)
+                    )
+                    AnimatedContent(
+                        targetState = panelState.files,
+                        modifier = Modifier.weight(1f),
+                        transitionSpec = { animation }
+                    ) { files ->
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .weight(1f)
+                                .background(color = backgroundColor)
+                                .pointerInteropFilter { event ->
+                                    if (event.action == MotionEvent.ACTION_DOWN) {
+                                        viewModel.setPanel(panelPosition)
+                                    }
+                                    false
+                                },
+                            state = lazyState
+                        ) {
+                            item {
+                                UpwardItem { viewModel.navigateBack(panelState) }
+                            }
+                            items(files) { file ->
+                                FileRow(
+                                    file = file,
+                                    type = getFileType(file),
+                                    highLight = file.name in panelState.highLightFiles,
+                                    selected = file.path in panelState.selectedFiles,
+                                    onClick = {
+                                        if (panelState.selectionMode) {
+                                            panelState.toggleSelection(file)
+                                        } else {
+                                            viewModel.handleFileClick(context, file)
+                                        }
+                                    },
+                                    onLongClick = {
+                                        val selected =
+                                            panelState.files.filter { it.path in panelState.selectedFiles }
+                                        handleFileLongClick(selected.ifEmpty { listOf(file) })
+                                    },
+                                    onSwipe = {
+                                        panelState.swipeSelect(file)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
 
-                val animatedColorRight by animateColorAsState(
-                    targetValue = if (currentPanel == PanelPosition.R) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
-                    animationSpec = tween(150)
-                )
-
-                AnimatedContent(
-                    targetState = rightPanelState.files,
-                    modifier = Modifier.weight(1f),
-                    transitionSpec = { animation }
-                ) { files ->
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1f)
-                            .background(color = animatedColorRight)
-                            .pointerInteropFilter { event ->
-                                if (event.action == MotionEvent.ACTION_DOWN) {
-                                    viewModel.setPanel(PanelPosition.R)
-                                }
-                                false
-                            },
-                        state = rightLazyState
-                    ) {
-                        item {
-                            UpwardItem { viewModel.navigateBack() }
-                        }
-                        items(files) { file ->
-                            FileRow(
-                                file = file,
-                                type = getFileType(file),
-                                highLight = file.name in rightPanelState.highLightFiles,
-                                onFileClick = { viewModel.handleFileClick(context, file) },
-                                onFileLongClick = { handleFileLongClick(file) }
-                            )
-                        }
-                    }
-                }
+                Panel(viewModel.leftPanelState, leftLazyState, PanelPosition.L)
+                Panel(viewModel.rightPanelState, rightLazyState, PanelPosition.R)
             }
         }
     }
@@ -523,14 +506,16 @@ fun MainScreen(
         }
     }
 
-    fun handleRefresh(path: VirtualFile, highlights: Set<String> = emptySet()) {
-        if (leftPanelState.path.absolutePath == path.absolutePath) {
-            viewModel.leftPanelState.highLightFiles = highlights
-            viewModel.refreshPanel(leftPanelState)
-        }
-        if (rightPanelState.path.absolutePath == path.absolutePath) {
-            viewModel.rightPanelState.highLightFiles = highlights
-            viewModel.refreshPanel(rightPanelState)
+    fun handleRefresh(path: VirtualFile?, highlights: Set<String> = emptySet()) {
+        path?.let {
+            if (leftPanelState.path.absolutePath == path.absolutePath) {
+                viewModel.leftPanelState.highLightFiles = highlights
+                viewModel.refreshPanel(leftPanelState)
+            }
+            if (rightPanelState.path.absolutePath == path.absolutePath) {
+                viewModel.rightPanelState.highLightFiles = highlights
+                viewModel.refreshPanel(rightPanelState)
+            }
         }
     }
 
@@ -673,44 +658,50 @@ fun MainScreen(
 
     viewModel.toolsDialog?.let { state ->
         ToolDialog(
-            state.file, currentPanel,
+            state.files, currentPanel,
             onDismiss = { viewModel.toolsDialog = null },
-            onToolAction = { viewModel.onToolAction(context,it, state.file) },
+            onToolAction = { viewModel.onToolAction(context,it, state.files) },
         )
     }
 
     viewModel.deleteDialog?.let { state ->
         DeleteDialog(
-            targetFile = state.file,
+            targetFiles = state.files,
             onDismiss = { viewModel.deleteDialog = null },
             onRefresh = {
-                handleRefresh(state.file.parentFile ?: state.file)
-            })
+                handleRefresh(state.files.first().parentFile)
+            }
+        )
     }
     viewModel.copyDialog?.let { state ->
         CopyDialog(
-            source = state.file,
+            source = state.files,
             target = state.path,
             onDismiss = { viewModel.copyDialog = null },
-            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
+            onRefresh = {
+                handleRefresh(state.path)
+            }
         )
     }
     viewModel.moveDialog?.let { state ->
         MoveDialog(
-            source = state.file,
+            source = state.files,
             target = state.path,
             onDismiss = { viewModel.moveDialog = null },
-            onRefresh = { handleRefresh(state.path, setOf(state.file.name)) }
+            onRefresh = {
+                handleRefresh(state.files.first().parentFile)
+                handleRefresh(state.path)
+            }
         )
     }
     viewModel.createDialog?.let { state ->
-        CreateDialog(onDismiss = { viewModel.createDialog = null }, state.path) { file ->
-            handleRefresh(state.path, setOf(file))
+        CreateDialog(onDismiss = { viewModel.createDialog = null }, state.file) {
+            handleRefresh(state.file.parentFile)
         }
     }
     viewModel.compressDialog?.let { state ->
-        CompressDialog(state.file, { viewModel.compressDialog = null })  { file ->
-            handleRefresh(file.parentFile!!, setOf(file.name))
+        CompressDialog(state.files, { viewModel.compressDialog = null })  {
+            handleRefresh(state.files.first().parentFile)
         }
     }
     if (viewModel.showSort) {
@@ -721,7 +712,7 @@ fun MainScreen(
         )
     }
     viewModel.searchDialog?.let { state ->
-        SearchDialog(onDismiss = { viewModel.searchDialog = null }, state.path) { file ->
+        SearchDialog(onDismiss = { viewModel.searchDialog = null }, state.file) { file ->
             viewModel.currentPanelState().path = file
             viewModel.searchDialog = null
         }
@@ -729,7 +720,7 @@ fun MainScreen(
     viewModel.apkDialog?.let { state ->
         PackageDetail(
             context = context,
-            targetFile = state.file,
+            targetFile = state.file as LocalFile,
             onDismiss = { viewModel.apkDialog = null },
             unpack = { viewModel.handleFileClick(context, state.file, type = FileType.ARCHIVE) })
     }
@@ -738,11 +729,11 @@ fun MainScreen(
     }
     viewModel.renameDialog?.let { state ->
         RenameDialog(state.file, { viewModel.renameDialog = null }) {
-            handleRefresh(LocalFile(state.file.parent!!))
+            handleRefresh(state.file.parentFile)
         }
     }
     viewModel.propertiesDialog?.let { state ->
-        PropertiesDialog(state.file) { viewModel.propertiesDialog = null }
+        PropertiesDialog(state.files) { viewModel.propertiesDialog = null }
     }
 }
 

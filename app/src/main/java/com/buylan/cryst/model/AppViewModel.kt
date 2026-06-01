@@ -42,6 +42,26 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun toggleDarkMode(isSystemInDark: Boolean) {
+        when (darkMode) {
+            DarkMode.System -> {
+                if (isSystemInDark) {
+                    setDarkTheme(DarkMode.Light)
+                } else {
+                    setDarkTheme(DarkMode.Dark)
+                }
+            }
+
+            DarkMode.Light -> {
+                setDarkTheme(DarkMode.Dark)
+            }
+
+            DarkMode.Dark -> {
+                setDarkTheme(DarkMode.Light)
+            }
+        }
+    }
+
     private suspend fun saveDarkMode(theme: DarkMode) {
         getApplication<Application>().dataStore.edit { prefs ->
             prefs[DARK_MODE_KEY] = theme.name

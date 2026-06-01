@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,11 +37,8 @@ import com.buylan.cryst.R
 import com.buylan.cryst.activity.AppListActivity
 import com.buylan.cryst.activity.TerminalActivity
 import com.buylan.cryst.model.AppViewModel
-import com.buylan.cryst.model.DarkMode
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
-import com.buylan.cryst.util.RootPath
-import com.buylan.cryst.vfs.LocalFile
-import kotlinx.coroutines.CoroutineScope
+import com.buylan.cryst.util.DefaultPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,10 +49,10 @@ fun ModalDrawer(
     viewModel: MainViewModel,
     appViewModel: AppViewModel,
     drawerState: DrawerState,
-    scope: CoroutineScope,
     modifier: Modifier = Modifier
 ) {
     val isSystemInDark = isSystemInDarkTheme()
+    val scope = rememberCoroutineScope()
     ModalDrawerSheet(
         modifier = modifier.fillMaxWidth(0.8f),
         drawerShape = MaterialTheme.shapes.extraLarge.copy(
@@ -78,25 +76,7 @@ fun ModalDrawer(
                 badge = {
                     IconButton(
                         onClick = {
-                            appViewModel.apply {
-                                when (darkMode) {
-                                    DarkMode.System -> {
-                                        if (isSystemInDark) {
-                                            setDarkTheme(DarkMode.Light)
-                                        } else {
-                                            setDarkTheme(DarkMode.Dark)
-                                        }
-                                    }
-
-                                    DarkMode.Light -> {
-                                        setDarkTheme(DarkMode.Dark)
-                                    }
-
-                                    DarkMode.Dark -> {
-                                        setDarkTheme(DarkMode.Light)
-                                    }
-                                }
-                            }
+                            appViewModel.toggleDarkMode(isSystemInDark)
                         }
                     ) {
                         Icon(
@@ -164,7 +144,7 @@ fun ModalDrawer(
                 },
                 onClick = {
                     scope.launch {
-                        viewModel.currentPanelState().path = LocalFile(RootPath)
+                        viewModel.currentPanelState().path = DefaultPath
                         drawerState.close()
                     }
                 }

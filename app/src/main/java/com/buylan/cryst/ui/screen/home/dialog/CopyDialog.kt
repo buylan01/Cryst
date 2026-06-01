@@ -24,7 +24,7 @@ import com.buylan.cryst.vfs.VirtualFile
 
 @Composable
 fun CopyDialog(
-    source: VirtualFile,
+    source: List<VirtualFile>,
     target: VirtualFile,
     onDismiss: () -> Unit,
     onRefresh: () -> Unit
@@ -47,7 +47,7 @@ fun CopyDialog(
         text = {
             Column {
                 when (uiState) {
-                    is FileOperaUiState.Idle -> Text("是否复制 ${source.name} 到 ${target.absolutePath} ?")
+                    is FileOperaUiState.Idle -> Text("是否复制 ${source.map { it.name }} 到 ${target.absolutePath} ?")
                     is FileOperaUiState.InProgress -> LinearProgressIndicator()
                     is FileOperaUiState.Progress -> {
                         val prog = uiState as FileOperaUiState.Progress

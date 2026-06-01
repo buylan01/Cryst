@@ -7,14 +7,12 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.Application
 import com.buylan.cryst.ui.screen.home.MainScreen
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
 import com.buylan.cryst.ui.theme.CrystTheme
 import com.buylan.cryst.util.textEditorStartup
-import com.buylan.cryst.vfs.LocalFile
 
 class MainActivity : ComponentActivity() {
 
@@ -29,13 +27,6 @@ class MainActivity : ComponentActivity() {
             val appViewModel = (applicationContext as Application).appViewModel
 
             val mainViewModel :MainViewModel = viewModel()
-
-            mainViewModel.leftPanelState.listState = rememberLazyListState()
-            mainViewModel.rightPanelState.listState = rememberLazyListState()
-
-            if (!initPath.isNullOrEmpty()) {
-                mainViewModel.currentPanelState().path = LocalFile(initPath!!)
-            }
 
             val isDark = appViewModel.isDarkMode(isSystemInDarkTheme())
 

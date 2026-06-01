@@ -35,13 +35,13 @@ import coil.compose.AsyncImage
 import com.buylan.cryst.R
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.util.install
-import com.buylan.cryst.vfs.VirtualFile
+import com.buylan.cryst.vfs.LocalFile
 import java.io.File
 
 @Composable
 fun PackageDetail(
     context: Context,
-    targetFile: VirtualFile,
+    targetFile: LocalFile,
     onDismiss: () -> Unit,
     unpack: () -> Unit
 ) {
@@ -162,7 +162,7 @@ fun PackageDetail(
                 }
                 Button(
                     onClick = {
-                        install(context, targetFile)
+                        install(context, targetFile.toFile())
                     }
                 ) {
                     Text(stringResource(R.string.install))

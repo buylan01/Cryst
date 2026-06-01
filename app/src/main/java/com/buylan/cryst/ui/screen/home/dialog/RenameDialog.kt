@@ -19,7 +19,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import com.buylan.cryst.R
 import com.buylan.cryst.util.invalidChars
-import com.buylan.cryst.util.renameFile
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 
@@ -75,10 +74,7 @@ fun RenameDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val renamer = renameFile(
-                        file,
-                        LocalFile("${file.parent}/${textFieldState.text}")
-                    )
+                    val renamer = file.renameTo(LocalFile("${file.parent}/${textFieldState.text}"))
                     if (!renamer) renameFail = true else {
                         onRefresh()
                         onDismiss()

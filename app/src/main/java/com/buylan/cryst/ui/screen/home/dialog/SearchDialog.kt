@@ -118,12 +118,13 @@ fun SearchDialog(
                             FileRow(
                                 file = file,
                                 type = getFileType(file),
-                                onFileClick = {
+                                onClick = {
                                     onFileClick(file)
                                 },
-                                onFileLongClick = {
+                                onLongClick = {
                                     //onFileClick(file, null)
-                                }
+                                },
+                                onSwipe = {}
                             )
                         }
                     }

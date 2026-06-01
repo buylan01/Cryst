@@ -16,30 +16,28 @@ class CopyFileViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<FileOperaUiState>(FileOperaUiState.Idle)
     val uiState: StateFlow<FileOperaUiState> = _uiState.asStateFlow()
 
-    fun startCopy(source: VirtualFile, targetDir: VirtualFile) {
+    fun startCopy(source: List<VirtualFile>, targetDir: VirtualFile) {
         viewModelScope.launch {
             _uiState.value = FileOperaUiState.InProgress
             withContext(Dispatchers.IO) {
                 try {
-                    if (!source.exists()) {
-                        _uiState.value = FileOperaUiState.Error("源文件不存在")
-                        return@withContext
-                    }
                     var failedCount = 0
                     var current = 0
-                    val allFiles = if (source.isDirectory) {
-                        source.walkTopDown()
-                    } else {
-                        listOf(source)
+                    val allFiles = source.flatMap { root ->
+                        if (root.isDirectory) {
+                            root.walkTopDown().toList().map { root to it }
+                        } else {
+                            listOf(root to root)
+                        }
                     }
                     val total = allFiles.size
-                    for (file in allFiles) {
+                    for ((root, file) in allFiles) {
                         try {
-                            val relativePath = file.relativeTo(source)
-                            val targetFile = if (source.isDirectory) {
-                                LocalFile(parent = targetDir.absolutePath, child="${source.name}/$relativePath")
+                            val relativePath = file.relativeTo(root)
+                            val targetFile = if (root.isDirectory) {
+                                LocalFile(parent = targetDir.absolutePath, child="${root.name}/$relativePath")
                             } else {
-                                LocalFile(targetDir.absolutePath, source.name)
+                                LocalFile(targetDir.absolutePath, root.name)
                             }
                             if (file.isDirectory) {
                                 targetFile.mkdirs()

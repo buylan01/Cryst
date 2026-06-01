@@ -83,14 +83,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
 import com.buylan.cryst.R
-import com.buylan.cryst.activity.MainActivity
 import com.buylan.cryst.util.ExtractPath
-import com.buylan.cryst.util.copyFile
 import com.buylan.cryst.util.formatFileSize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -314,7 +313,9 @@ fun ApplicationManager(){
                 AlertDialog(
                     onDismissRequest = { showAppDetailDialog = false },
                     text = {
-                        Column {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(0.85f)
+                        ) {
                             Row(
                                 modifier = Modifier.padding(bottom = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically
@@ -348,8 +349,7 @@ fun ApplicationManager(){
                                         text = appName,
                                         style = MaterialTheme.typography.bodyLarge,
                                         softWrap = false,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.widthIn(max = 160.dp)
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                     Spacer(Modifier.height(4.dp))
                                     Text(
@@ -360,7 +360,7 @@ fun ApplicationManager(){
                                 }
                             }
 
-                            HorizontalDivider(modifier = Modifier.width(230.dp))
+                            HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
                             Spacer(Modifier.height(8.dp))
 
@@ -382,25 +382,20 @@ fun ApplicationManager(){
                                     if (!target.exists()) {
                                         target.mkdir()
                                     }
-                                    val file = File("$ExtractPath/${appName}_${app.versionName}.apk")
-                                    val copy = copyFile(
-                                        file = File(app.applicationInfo!!.sourceDir),
-                                        targetFile = file
-                                    )
+                                    val copy = try {
+                                        File(app.applicationInfo!!.sourceDir).copyTo(File("$ExtractPath/${appName}_${app.versionName}.apk"))
+                                        true
+                                    } catch (_: IOException) {
+                                        false
+                                    }
                                     withContext(Dispatchers.Main) {
                                         Toast.makeText(context, if (copy) "提取成功, 文件被保存在$ExtractPath" else "提取失败",
                                             Toast.LENGTH_SHORT).show()
                                     }
-                                    val intent = Intent(context, MainActivity::class.java).apply {
-                                        putExtra("path", file.path)
-                                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP// or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                    }
-                                    context.startActivity(intent)
-                                    (context as ComponentActivity).finish()
                                 }
                             }
                         ) {
-                            Text("提取")
+                            Text(stringResource(R.string.extract))
                         }
                     },
                     dismissButton = {

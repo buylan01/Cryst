@@ -1,6 +1,7 @@
 package com.buylan.cryst.vfs
 
 import java.io.File
+import java.io.IOException
 
 class LocalFile(
     private val delegate: File,
@@ -25,7 +26,14 @@ class LocalFile(
     override fun resolve(fileName: String): VirtualFile = LocalFile(delegate.resolve(fileName).absolutePath)
     override fun createNewFile(): Boolean = delegate.createNewFile()
     override fun mkdir(): Boolean = delegate.mkdir()
-    override fun renameTo(targetFile: VirtualFile): Boolean = delegate.renameTo(targetFile.toFile())
+    override fun renameTo(targetFile: VirtualFile): Boolean {
+        return try {
+            delegate.renameTo(targetFile.toFile())
+            true
+        } catch (_: IOException) {
+            false
+        }
+    }
     override fun exists(): Boolean = delegate.exists()
     override fun walkTopDown(): List<VirtualFile> {
         val result = mutableListOf<VirtualFile>()

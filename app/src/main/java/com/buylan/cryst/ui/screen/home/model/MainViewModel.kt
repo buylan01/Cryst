@@ -15,14 +15,13 @@ import com.buylan.cryst.activity.ImageActivity
 import com.buylan.cryst.activity.TextEditorActivity
 import com.buylan.cryst.activity.VideoActivity
 import com.buylan.cryst.ui.screen.home.PanelStates
-import com.buylan.cryst.util.RootPath
+import com.buylan.cryst.util.DefaultPath
 import com.buylan.cryst.util.accessFiles
 import com.buylan.cryst.util.getActualFile
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.util.shareFile
 import com.buylan.cryst.vfs.ArchiveFile
-import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,21 +37,21 @@ class MainViewModel : ViewModel() {
         currentPanel = panel
     }
 
-    var currentPath by mutableStateOf<VirtualFile>(LocalFile(RootPath))
+    var currentPath by mutableStateOf(DefaultPath)
     var showPathDialog by mutableStateOf(false)
     var showAboutDialog by mutableStateOf(false)
     var showSort by mutableStateOf(false)
     var showPermissionRequest by mutableStateOf(!Environment.isExternalStorageManager())
-    var apkDialog: CommonDialogState? by mutableStateOf(null)
-    var deleteDialog: CommonDialogState? by mutableStateOf(null)
-    var renameDialog: CommonDialogState? by mutableStateOf(null)
-    var createDialog: PathDialogState? by mutableStateOf(null)
-    var searchDialog: PathDialogState? by mutableStateOf(null)
-    var audioDialog: CommonDialogState? by mutableStateOf(null)
-    var propertiesDialog: CommonDialogState? by mutableStateOf(null)
-    var openWithDialog: CommonDialogState? by mutableStateOf(null)
-    var compressDialog: CommonDialogState? by mutableStateOf(null)
-    var toolsDialog: CommonDialogState? by mutableStateOf(null)
+    var apkDialog: NormalDialogState? by mutableStateOf(null)
+    var deleteDialog: OperationDialogState? by mutableStateOf(null)
+    var renameDialog: NormalDialogState? by mutableStateOf(null)
+    var createDialog: NormalDialogState? by mutableStateOf(null)
+    var searchDialog: NormalDialogState? by mutableStateOf(null)
+    var audioDialog: NormalDialogState? by mutableStateOf(null)
+    var propertiesDialog: OperationDialogState? by mutableStateOf(null)
+    var openWithDialog: NormalDialogState? by mutableStateOf(null)
+    var compressDialog: OperationDialogState? by mutableStateOf(null)
+    var toolsDialog: OperationDialogState? by mutableStateOf(null)
     var copyDialog: ExtraDialogState? by mutableStateOf(null)
     var moveDialog: ExtraDialogState? by mutableStateOf(null)
     private val _scrollToIndex = MutableSharedFlow<Int>(extraBufferCapacity = 1)
@@ -62,11 +61,11 @@ class MainViewModel : ViewModel() {
 
     fun currentPanelState() = if (currentPanel == PanelPosition.L) leftPanelState else rightPanelState
     fun uncurrentPanelState() = if (currentPanel == PanelPosition.R) leftPanelState else rightPanelState
-    fun navigateBack() {
-        val state = currentPanelState()
+    fun navigateBack(state: PanelStates = currentPanelState()) {
         if (!currentPath.isRootPath()) {
             state.path = state.path.parentFile!!
             state.highLightFiles = emptySet()
+            state.selectedFiles.clear()
         }
     }
     fun refreshPanel(panelState: PanelStates) {
@@ -128,7 +127,7 @@ class MainViewModel : ViewModel() {
                 )
 
                 FileType.APK -> {
-                    apkDialog = CommonDialogState(actualFile)
+                    apkDialog = NormalDialogState(actualFile)
                 }
 
                 FileType.FONT -> context.startActivity(
@@ -146,17 +145,17 @@ class MainViewModel : ViewModel() {
                 )
 
                 FileType.AUDIO -> {
-                    audioDialog = CommonDialogState(actualFile)
+                    audioDialog = NormalDialogState(actualFile)
                 }
 
                 else -> {
-                    openWithDialog = CommonDialogState(actualFile)
+                    openWithDialog = NormalDialogState(actualFile)
                 }
             }
         }
     }
 
-    fun onToolAction(context: Context, action: ToolAction, file: VirtualFile) {
+    fun onToolAction(context: Context, action: ToolAction, file: List<VirtualFile>) {
         toolsDialog = null
         when (action) {
             ToolAction.Move -> {
@@ -168,27 +167,27 @@ class MainViewModel : ViewModel() {
             }
 
             ToolAction.Rename -> {
-                renameDialog = CommonDialogState(file)
+                renameDialog = NormalDialogState(file.singleOrNull() ?: return)
             }
 
             ToolAction.Delete -> {
-                deleteDialog = CommonDialogState(file)
+                deleteDialog = OperationDialogState(file)
             }
 
             ToolAction.Properties -> {
-                propertiesDialog = CommonDialogState(file)
+                propertiesDialog = OperationDialogState(file)
             }
 
             ToolAction.OpenWith -> {
-                openWithDialog = CommonDialogState(file)
+                openWithDialog = NormalDialogState(file.singleOrNull() ?: return)
             }
 
             ToolAction.Share -> {
-                context.shareFile(file)
+                context.shareFile(file.singleOrNull() ?: return)
             }
 
             ToolAction.Compress -> {
-                compressDialog = CommonDialogState(file)
+                compressDialog = OperationDialogState(file)
             }
         }
     }
@@ -202,9 +201,16 @@ enum class SortType(
 }
 
 enum class PanelPosition { L, R }
-data class CommonDialogState(val file: VirtualFile)
-data class ExtraDialogState(val file: VirtualFile, val path: VirtualFile)
-data class PathDialogState(val path: VirtualFile)
+data class NormalDialogState(
+    val file: VirtualFile
+)
+data class OperationDialogState(
+    val files: List<VirtualFile>
+)
+data class ExtraDialogState(
+    val files: List<VirtualFile>,
+    val path: VirtualFile
+)
 enum class FileType(
     val label: Int,
     val icon: Int

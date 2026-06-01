@@ -1,39 +1,25 @@
 package com.buylan.cryst.util
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings
 import android.webkit.MimeTypeMap
-import android.widget.Toast
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.ui.screen.home.model.SortType
 import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
-import org.apache.commons.compress.archivers.zip.ZipFile
-import org.apache.commons.compress.utils.IOUtils
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URLConnection
-import java.nio.file.Files
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.io.path.Path
 import kotlin.math.log10
 import kotlin.math.pow
 
-const val RootPath = "/storage/emulated/0"
-const val ExtractPath = "${RootPath}/Cryst/package"
+val DefaultPath: VirtualFile = LocalFile("/storage/emulated/0")
+const val ExtractPath = "/storage/emulated/0/Cryst/package"
 val invalidChars = listOf('/', '\\', ':', '*', '?', '"', '<', '>', '|')
 
 fun accessFiles(path: VirtualFile, sortType: SortType): List<VirtualFile> {
@@ -134,32 +120,6 @@ fun createFile(directory: VirtualFile, fileName: String): Boolean {
     }
 }
 
-fun renameFile(file: VirtualFile, targetFile: VirtualFile): Boolean {
-    return try {
-        file.renameTo(targetFile)
-    } catch (_: IOException) {
-        false
-    }
-}
-
-fun copyFile(file: File, targetFile: File): Boolean {
-    try {
-        file.copyTo(targetFile)
-        return true
-    } catch (_: IOException) {
-        return false
-    }
-}
-
-fun moveFile(file: VirtualFile, targetFile: VirtualFile): Boolean {
-    try {
-        Files.move(Path(file.path), Path(targetFile.path))
-        return true
-    } catch (_: IOException) {
-        return false
-    }
-}
-
 fun createFolder(directory: VirtualFile, folderName: String): Boolean {
     try {
         val folder = directory.resolve(folderName)
@@ -192,77 +152,6 @@ fun Context.shareFile(file: VirtualFile) {
     }
 }
 
-fun install(context: Context, file: VirtualFile) {
-    val intent = Intent(Intent.ACTION_VIEW).apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileProvider",
-            File(file.absolutePath)
-        )
-
-        setDataAndType(uri, "application/vnd.android.package-archive")
-    }
-    if (!context.packageManager.canRequestPackageInstalls()) {
-        context.startActivity(
-            Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                data = "package:${context.packageName}".toUri()
-            }
-        )
-        return
-    }
-
-    try {
-        context.startActivity(intent)
-    } catch (_: ActivityNotFoundException) {
-        Toast.makeText(context, "未找到安装程序", Toast.LENGTH_SHORT).show()
-    } catch (e: Exception) {
-        Toast.makeText(context, "安装失败: ${e.message}", Toast.LENGTH_SHORT).show()
-    }
-}
-
 fun VirtualFile.isRootPath(): Boolean {
     return absolutePath == "/storage/emulated/0"
-}
-
-fun createZip(
-    files: List<File>,
-    outputZipFile: File,
-    baseDir: File
-): File {
-    ZipArchiveOutputStream(outputZipFile).use { zipOut ->
-        files.forEach { file ->
-            val relativePath = file.relativeTo(baseDir).path.replace("\\", "/")
-            val entry = ZipArchiveEntry(file, relativePath)
-            zipOut.putArchiveEntry(entry)
-            FileInputStream(file).use { fis ->
-                fis.copyTo(zipOut)
-            }
-            zipOut.closeArchiveEntry()
-        }
-    }
-    return outputZipFile
-}
-
-fun createTar(
-    files: List<File>,
-    outputTarFile: File,
-    baseDir: File
-): File {
-    FileOutputStream(outputTarFile).use { fos ->
-        TarArchiveOutputStream(fos).use { zipOut ->
-            files.forEach { file ->
-                val relativePath = file.relativeTo(baseDir).path.replace("\\", "/")
-                val entry = TarArchiveEntry(file, relativePath)
-                zipOut.putArchiveEntry(entry)
-                FileInputStream(file).use { fis ->
-                    fis.copyTo(zipOut)
-                }
-                zipOut.closeArchiveEntry()
-            }
-        }
-    }
-    return outputTarFile
 }

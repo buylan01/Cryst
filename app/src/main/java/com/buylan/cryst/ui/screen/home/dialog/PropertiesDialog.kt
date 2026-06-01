@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,7 +20,7 @@ import com.buylan.cryst.vfs.VirtualFile
 
 @Composable
 fun PropertiesDialog(
-    file: VirtualFile,
+    files: List<VirtualFile>,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -30,8 +29,6 @@ fun PropertiesDialog(
             Text(stringResource(R.string.info))
         },
         text = {
-            val fileSize = remember(file) { getFileSize(file) }
-            val formattedDate = remember(file) { formatFileDate(file) }
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -60,11 +57,13 @@ fun PropertiesDialog(
                     }
                 }
 
-                PropertyRow(label = R.string.name, value = file.name)
-                PropertyRow(label = R.string.path, value = file.parent ?: stringResource(R.string.unknown))
-                PropertyRow(label = R.string.type, value = stringResource(getFileType(file).label))
-                PropertyRow(label = R.string.size, value = fileSize)
-                PropertyRow(label = R.string.time, value = formattedDate)
+                PropertyRow(label = R.string.name, value = files.singleOrNull()?.name ?: files.map { it.name }.toString())
+                PropertyRow(label = R.string.path, value = files[0].parent ?: stringResource(R.string.unknown))
+                if (files.size == 1) {
+                    PropertyRow(label = R.string.type, value = stringResource(getFileType(files[0]).label))
+                    PropertyRow(label = R.string.size, value = getFileSize(files[0]))
+                    PropertyRow(label = R.string.time, value = formatFileDate(files[0]))
+                }
             }
         },
         confirmButton = {

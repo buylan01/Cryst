@@ -4,56 +4,101 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.buylan.cryst.R
+import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.util.formatFileSize
-import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.VirtualFile
 import java.nio.file.Files
 import kotlin.io.path.Path
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileRow(
     file: VirtualFile,
-    type: com.buylan.cryst.ui.screen.home.model.FileType,
+    type: FileType,
     highLight: Boolean = false,
     selected: Boolean = false,
-    onFileClick: () -> Unit,
-    onFileLongClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    onSwipe: () -> Unit
 ) {
+    var offsetX by remember { mutableFloatStateOf(0f) }
     Row(
         modifier = Modifier
             .background(
-                color = if (!selected) Color.Transparent else MaterialTheme.colorScheme.primaryContainer
+                color = if (!selected) Color.Transparent else MaterialTheme.colorScheme.inversePrimary
             )
             .combinedClickable(
-                onClick = {
-                    onFileClick()
-                },
-                onLongClick = {
-                    onFileLongClick()
-                }
+                onClick = onClick, onLongClick = onLongClick
             )
             .fillMaxWidth()
-            .padding(6.dp),
+            .padding(6.dp)
+            .zIndex(-1f)
+            .offset {
+                IntOffset(offsetX.roundToInt(), 0)
+            }
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown()
+                    offsetX = 0f
+                    var dx = 0f
+                    var dy = 0f
+                    do {
+                        val event = awaitPointerEvent()
+                        val change = event.changes.first()
+                        val deltaX = change.positionChange().x
+                        val deltaY = change.positionChange().y
+                        when {
+                            abs(dy) > 20f && abs(dy) > abs(dx) -> {
+                                break
+                            }
+                            abs(dx) > 20f && abs(dx) > abs(dy) -> {
+                                change.consume()
+                            }
+                        }
+                        dx += deltaX
+                        dy += deltaY
+                        offsetX += deltaX
+                        offsetX = offsetX.coerceIn(
+                            -120f, 120f
+                        )
+                    } while (event.changes.any { it.pressed })
+                    val isHorizontalSwipe = abs(dx) > 60f && abs(dx) > abs(dy) * 2
+                    if (isHorizontalSwipe) {
+                        onSwipe()
+                    }
+                    offsetX = 0f
+                }
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

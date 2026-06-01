@@ -20,10 +20,11 @@ import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.DeleteFileViewModel
 import com.buylan.cryst.ui.screen.home.model.FileOperaUiState
 import com.buylan.cryst.vfs.VirtualFile
+import java.io.File
 
 @Composable
 fun DeleteDialog(
-    targetFile: VirtualFile,
+    targetFiles: List<VirtualFile>,
     onDismiss: () -> Unit,
     onRefresh: () -> Unit
 ) {
@@ -48,7 +49,7 @@ fun DeleteDialog(
             Column {
                 when (uiState) {
                     is FileOperaUiState.Idle -> {
-                        Text("是否删除 ${targetFile.name} ?", modifier = Modifier.padding(vertical = 8.dp))
+                        Text("是否删除 ${targetFiles.map { it.name + "," }} ?", modifier = Modifier.padding(vertical = 8.dp))
                         Text(
                             stringResource(R.string.delete_file_warning),
                             color = MaterialTheme.colorScheme.error
@@ -82,7 +83,7 @@ fun DeleteDialog(
         },
         confirmButton = {
             Button(
-                onClick = { viewModel.startDelete(targetFile.toFile()) },
+                onClick = { viewModel.startDelete(targetFiles.map { File(it.absolutePath) }) },
                 enabled = uiState is FileOperaUiState.Idle || uiState is FileOperaUiState.Error
             ) { Text(stringResource(R.string.confirm)) }
         },
