@@ -56,4 +56,11 @@
     <string name="format">Format</string>
     <string name="unknown">Unknown</string>
     <string name="extract">Extract</string>
+    <string name="about_libraries">About Libraries</string>
+    <string name="package_name">PackageName</string>
+    <string name="version_code">VersionCode</string>
+    <string name="source_dir">SourceDir</string>
+    <string name="data_dir">DataDir</string>
+    <string name="uid" translatable="false">UID</string>
+    <string name="installed">Installed</string>
 </resources>

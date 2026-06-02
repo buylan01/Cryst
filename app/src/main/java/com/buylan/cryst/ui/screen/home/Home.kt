@@ -134,7 +134,7 @@ fun MainScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler(
-        enabled = !viewModel.currentPanelState().path.isRootPath()
+        enabled = !viewModel.currentPanelState().path.isRootPath() || viewModel.currentPanelState().selectedFiles.isNotEmpty()
     ) {
         viewModel.navigateBack()
     }
@@ -157,7 +157,7 @@ fun MainScreen(
             )
         },
         drawerState = drawerState,
-        gesturesEnabled = true
+        gesturesEnabled = !drawerState.isClosed || drawerState.isAnimationRunning
     ) {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),

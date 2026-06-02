@@ -1,5 +1,6 @@
 package com.buylan.cryst.ui.screen.appmanager
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
@@ -16,8 +17,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
@@ -77,14 +75,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
 import com.buylan.cryst.R
+import com.buylan.cryst.ui.component.ApkInfoColumn
 import com.buylan.cryst.util.ExtractPath
-import com.buylan.cryst.util.formatFileSize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -92,6 +89,7 @@ import java.io.File
 import java.io.IOException
 
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApplicationManager(){
@@ -240,14 +238,13 @@ fun ApplicationManager(){
             LaunchedEffect(Unit) {
                 val allApps = withContext(Dispatchers.IO) {
                     pm.getInstalledPackages(PackageManager.GET_META_DATA)
+                        .sortedByDescending { it.lastUpdateTime }
                 }
 
-                val sortedApps = allApps.sortedByDescending { it.lastUpdateTime }
-
-                userApps = sortedApps.filter {
+                userApps = allApps.filter {
                     it.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM == 0
                 }
-                systemApps = sortedApps.filter {
+                systemApps = allApps.filter {
                     it.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM != 0
                 }
                 isLoading = false
@@ -359,19 +356,9 @@ fun ApplicationManager(){
                                     )
                                 }
                             }
-
                             HorizontalDivider(modifier = Modifier.fillMaxWidth())
-
                             Spacer(Modifier.height(8.dp))
-
-                            Column {
-                                InfoItem("包名", app.packageName)
-                                InfoItem("版本号", app.longVersionCode.toString())
-                                InfoItem("大小", formatFileSize(File(app.applicationInfo!!.sourceDir).length()))
-                                InfoItem("数据目录", app.applicationInfo!!.dataDir)
-                                InfoItem("安装目录", app.applicationInfo!!.sourceDir)
-                                InfoItem("UID", app.applicationInfo!!.uid.toString())
-                            }
+                            ApkInfoColumn(app, true,null)
                         }
                     },
                     confirmButton = {
@@ -442,25 +429,7 @@ fun ApplicationManager(){
     }
 }
 
-@Composable
-fun InfoItem(title: String, summary: String) {
-    Row(modifier = Modifier.width(230.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(title)
-        Text(
-            text = summary,
-            softWrap = false,
-            modifier = Modifier
-                .widthIn(max = 160.dp)
-                .combinedClickable(
-                    onClick = {
 
-                    }),
-            overflow = TextOverflow.MiddleEllipsis,
-            textAlign = TextAlign.End
-        )
-    }
-    Spacer(Modifier.height(4.dp))
-}
 @Composable
 fun AppItem(
     app: PackageInfo,

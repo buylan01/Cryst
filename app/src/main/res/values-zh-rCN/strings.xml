@@ -56,4 +56,10 @@
     <string name="format">格式</string>
     <string name="unknown">未知</string>
     <string name="extract">提取</string>
+    <string name="about_libraries">About Libraries</string>
+    <string name="package_name">包名</string>
+    <string name="version_code">版本</string>
+    <string name="source_dir">安装位置</string>
+    <string name="data_dir">数据目录</string>
+    <string name="installed">已安装</string>
 </resources>

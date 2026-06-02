@@ -62,10 +62,14 @@ class MainViewModel : ViewModel() {
     fun currentPanelState() = if (currentPanel == PanelPosition.L) leftPanelState else rightPanelState
     fun uncurrentPanelState() = if (currentPanel == PanelPosition.R) leftPanelState else rightPanelState
     fun navigateBack(state: PanelStates = currentPanelState()) {
-        if (!currentPath.isRootPath()) {
-            state.path = state.path.parentFile!!
-            state.highLightFiles = emptySet()
-            state.selectedFiles.clear()
+        if (state.selectedFiles.isEmpty()) {
+            if (!currentPath.isRootPath()) {
+                state.path = state.path.parentFile!!
+                state.highLightFiles = emptySet()
+                state.selectedFiles.clear()
+            }
+        } else {
+            state.resetSelection()
         }
     }
     fun refreshPanel(panelState: PanelStates) {

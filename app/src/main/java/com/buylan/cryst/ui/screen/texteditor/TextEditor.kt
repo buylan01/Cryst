@@ -120,7 +120,6 @@ private fun setCodeEditorFactory(
     editor.apply {
         setText(state.content)
         isStickyTextSelection = true
-        //colorScheme = TextMateColorScheme.create(ThemeRegistry.getInstance())
     }
     state.editor = editor
     return editor

@@ -18,7 +18,13 @@ class PanelStates {
         get() = selectedFiles.isNotEmpty()
     private var rangeAnchorPath: String? = null
 
+    fun resetSelection() {
+        rangeAnchorPath = null
+        selectedFiles.clear()
+    }
+
     fun toggleSelection(file: VirtualFile) {
+        rangeAnchorPath = null
         if (file.path in selectedFiles) {
             selectedFiles.remove(file.path)
         } else {

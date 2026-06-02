@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.buylan.cryst.R
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
@@ -27,7 +28,7 @@ fun AboutLibrariesScreen(onBackPressed: () -> Unit) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             MediumTopAppBar(
-                title = { Text("开源库声明") },
+                title = { Text(stringResource(R.string.about_libraries)) },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
                         Icon(painter = painterResource(R.drawable.ic_arrow_back), contentDescription = "返回")
@@ -41,7 +42,9 @@ fun AboutLibrariesScreen(onBackPressed: () -> Unit) {
         val libraries by produceLibraries(R.raw.aboutlibraries)
         LibrariesContainer(
             libraries = libraries,
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             showLicenseBadges = false
         )
     }

@@ -2,10 +2,7 @@ package com.buylan.cryst.ui.screen.home.dialog
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.widget.Toast
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,15 +25,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.buylan.cryst.R
-import com.buylan.cryst.util.formatFileSize
+import com.buylan.cryst.ui.component.ApkInfoColumn
 import com.buylan.cryst.util.install
 import com.buylan.cryst.vfs.LocalFile
-import java.io.File
 
 @Composable
 fun PackageDetail(
@@ -59,34 +54,21 @@ fun PackageDetail(
                         publicSourceDir = targetFile.absolutePath
                     }
 
-                    val installed = try {
+                    val installedInfo = try {
                         pm.getApplicationInfo(apkInfo.packageName, 0)
-                        true
                     } catch (_: PackageManager.NameNotFoundException) {
-                        false
+                        null
                     }
-
-                    val pkgInfo =
-                        if (installed) pm.getPackageInfo(apkInfo.packageName, 0) else null
-
-                    val packageInfo = PackageData(
-                        label = apkInfo.applicationInfo!!.loadLabel(pm).toString(),
-                        uid = if (installed) pkgInfo!!.applicationInfo!!.uid else null,
-                        versionName = apkInfo.versionName ?: "Unknown",
-                        versionCode = apkInfo.longVersionCode,
-                        packageName = apkInfo.packageName,
-                        icon = apkInfo.applicationInfo!!.loadIcon(pm),
-                        sourceDir = if (installed) pkgInfo!!.applicationInfo!!.sourceDir else null,
-                        dataDir = if (installed) pkgInfo!!.applicationInfo!!.dataDir else null
-                    )
 
                     Row(
                         modifier = Modifier.padding(bottom = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
+                        val icon = apkInfo.applicationInfo!!.loadIcon(pm)
+
                         AsyncImage(
-                            model = packageInfo.icon,
+                            model = icon,
                             contentDescription = "App icon",
                             modifier = Modifier.size(48.dp),
                             contentScale = ContentScale.Fit,
@@ -97,7 +79,7 @@ fun PackageDetail(
 
                         Column {
                             Text(
-                                text = packageInfo.label,
+                                text = apkInfo.applicationInfo!!.loadLabel(pm).toString(),
                                 style = MaterialTheme.typography.bodyLarge,
                                 softWrap = false,
                                 overflow = TextOverflow.Ellipsis,
@@ -105,7 +87,7 @@ fun PackageDetail(
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                text = packageInfo.versionName,
+                                text = apkInfo.versionName ?: "Unknown",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
@@ -116,39 +98,7 @@ fun PackageDetail(
 
                     Spacer(Modifier.height(8.dp))
 
-                    Column {
-                        @Composable
-                        fun InfoItem(title: String, summary: String) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(title)
-                                Text(
-                                    text = summary,
-                                    softWrap = false,
-                                    modifier = Modifier
-                                        .widthIn(max = 160.dp)
-                                        .combinedClickable(
-                                            onClick = {
-
-                                            }),
-                                    overflow = TextOverflow.MiddleEllipsis,
-                                    textAlign = TextAlign.End
-                                )
-                            }
-                            Spacer(Modifier.height(4.dp))
-                        }
-                        InfoItem("包名", packageInfo.packageName)
-                        InfoItem("版本号", packageInfo.versionCode.toString())
-                        InfoItem("安装状态", if (installed) "已安装" else "未安装")
-                        InfoItem("大小", formatFileSize(File(targetFile.path).length()))
-                        if (installed) {
-                            InfoItem("数据目录", packageInfo.dataDir!!)
-                            InfoItem("安装目录", packageInfo.sourceDir!!)
-                            InfoItem("UID", packageInfo.uid.toString())
-                        }
-                    }
+                    ApkInfoColumn(apkInfo, false,installedInfo)
                 }
             },
             confirmButton = {
@@ -167,27 +117,7 @@ fun PackageDetail(
                 ) {
                     Text(stringResource(R.string.install))
                 }
-            },
-            dismissButton = {
-//            TextButton(
-//                onClick = {
-//
-//                }
-//            ) {
-//                Text(stringResource(R.string.tools))
-//            }
             }
         )
     } ?: Toast.makeText(context, "无法获取安装包信息", Toast.LENGTH_SHORT).show()
 }
-
-data class PackageData(
-    val label: String,
-    val icon: Drawable,
-    val packageName: String,
-    val versionName: String,
-    val versionCode: Long,
-    val sourceDir: String? = null,
-    val dataDir: String? = null,
-    val uid: Int? = null
-)
