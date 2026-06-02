@@ -86,7 +86,7 @@ fun ToolDialog(
 
                     ToolItem(
                         text = stringResource(R.string.open_with),
-                        enabled = files.singleOrNull()?.isDirectory ?: false,
+                        enabled = files.singleOrNull()?.isDirectory == false,
                         icon = R.drawable.ic_open_with,
                         onClick = { onToolAction(ToolAction.OpenWith) }
                     )
@@ -113,7 +113,7 @@ fun ToolDialog(
                         text = stringResource(R.string.rename),
                         icon = R.drawable.ic_edit,
                         onClick = { onToolAction(ToolAction.Rename) },
-                        enabled = files.singleOrNull() is ArchiveFile
+                        enabled = files.singleOrNull() !is ArchiveFile
                     )
 
                     ToolItem(
@@ -127,7 +127,7 @@ fun ToolDialog(
                         text = stringResource(R.string.share),
                         icon = R.drawable.ic_share,
                         onClick = { onToolAction(ToolAction.Share) },
-                        enabled = files.singleOrNull()?.isDirectory ?: false
+                        enabled = files.singleOrNull()?.isDirectory == false
                     )
                 }
             }
