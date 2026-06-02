@@ -25,7 +25,7 @@ class CopyFileViewModel : ViewModel() {
                     var current = 0
                     val allFiles = source.flatMap { root ->
                         if (root.isDirectory) {
-                            root.walkTopDown().toList().map { root to it }
+                            root.walkTopDown().map { root to it }
                         } else {
                             listOf(root to root)
                         }

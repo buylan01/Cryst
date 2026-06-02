@@ -23,6 +23,7 @@ interface VirtualFile {
     fun toFile(): File = File(this.absolutePath)
     fun exists(): Boolean
     fun walkTopDown(): List<VirtualFile>
+    fun walkTopDownSequence(): Sequence<VirtualFile>
     fun relativeTo(source: VirtualFile): String
     fun mkdirs()
     fun copyTo(target: LocalFile, overwrite: Boolean)

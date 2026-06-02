@@ -45,7 +45,8 @@ fun SearchDialog(
 ) {
     var searchFileName by remember { mutableStateOf("") }
     val found = remember { mutableStateListOf<VirtualFile>() }
-    var processedFiles by remember { mutableIntStateOf(0) }
+    var tonalCount by remember { mutableIntStateOf(0) }
+    var foundCount by remember { mutableIntStateOf(0) }
     var isSearching by remember { mutableStateOf(false) }
     var includeSub by remember { mutableStateOf(true) }
 
@@ -53,15 +54,16 @@ fun SearchDialog(
         withContext(Dispatchers.IO) {
             if (isSearching) {
                 val candidates = if (includeSub) {
-                    targetPath.walkTopDown().filter { !it.isDirectory }
+                    targetPath.walkTopDownSequence()
                 } else {
-                    targetPath.listFiles()?.filter { !it.isDirectory } ?: emptyList()
+                    targetPath.listFiles()?.asSequence() ?: emptySequence()
                 }
 
                 candidates.forEach { file ->
-                    processedFiles++
+                    tonalCount++
                     if (file.name.contains(searchFileName, true)) {
                         found.add(file)
+                        foundCount++
                     }
                 }
                 isSearching = false
@@ -105,7 +107,10 @@ fun SearchDialog(
                             .fillMaxWidth()
                             .padding(vertical = 16.dp)
                     )
-                    Text("$processedFiles")
+                }
+
+                if (isSearching || found.isNotEmpty()) {
+                    Text("在" + "$tonalCount" + "个文件里找到" + "$foundCount")
                 }
 
                 if (found.isNotEmpty()) {
@@ -134,7 +139,8 @@ fun SearchDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    processedFiles = 0
+                    foundCount = 0
+                    tonalCount = 0
                     found.clear()
                     isSearching = true
                 },

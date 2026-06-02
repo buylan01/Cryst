@@ -118,6 +118,20 @@ class ArchiveFile(
         return result
     }
 
+    override fun walkTopDownSequence(): Sequence<VirtualFile> {
+        val self = this
+        return sequence {
+            yield(self)
+            if (isDirectory) {
+                val entries = delegate.entries
+                for (child in entries) {
+                    if (!child.name.startsWith(name) || entryName == child.name) continue
+                    yield(ArchiveFile(entranceFile, child, self))
+                }
+            }
+        }
+    }
+
     override fun relativeTo(source: VirtualFile): String {
         val sourcePath = (source as? ArchiveFile)?.absolutePath ?: source.path
         val prefix = if (sourcePath.endsWith("/")) sourcePath else "$sourcePath/"

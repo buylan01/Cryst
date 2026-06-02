@@ -45,6 +45,19 @@ class LocalFile(
         }
         return result
     }
+
+    override fun walkTopDownSequence(): Sequence<VirtualFile> {
+        val self = this
+        return sequence {
+            yield(self)
+            if (isDirectory) {
+                listFiles()?.forEach { child ->
+                    yieldAll(child.walkTopDownSequence())
+                }
+            }
+        }
+    }
+
     override fun relativeTo(source: VirtualFile): String = delegate.relativeTo(source.toFile()).absolutePath
     override fun copyTo(target: LocalFile, overwrite: Boolean) {
         delegate.copyTo(target.delegate, overwrite)

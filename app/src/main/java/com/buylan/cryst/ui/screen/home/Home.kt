@@ -427,7 +427,7 @@ fun MainScreen(
                             item {
                                 UpwardItem { viewModel.navigateBack(panelState) }
                             }
-                            items(files) { file ->
+                            items(files, key = { it.hashCode() }) { file ->
                                 FileRow(
                                     file = file,
                                     type = getFileType(file),
