@@ -5,12 +5,13 @@ commonsCompress = "1.28.0"
 coreKtx = "1.18.0"
 datastorePreferences = "1.1.1"
 editor = "0.24.5"
+fastscrollerMaterial3 = "0.3.2"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 composeBom = "2026.05.01"
 lifecycleViewmodelCompose = "2.10.0"
 media3Exoplayer = "1.10.1"
@@ -28,6 +29,7 @@ androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", versi
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commonsCompress" }
 editor-bom = { module = "io.github.rosemoe:editor-bom", version.ref = "editor" }
+fastscroller-material3 = { module = "io.github.oikvpqya.compose.fastscroller:fastscroller-material3", version.ref = "fastscrollerMaterial3" }
 image-viewer = { module = "com.jvziyaoyao.scale:image-viewer", version.ref = "scale" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -48,7 +50,6 @@ terminal-view = { module = "com.github.termux.termux-app:terminal-view", version
 #noinspection Aligned16KB
 terminal-emulator = { module = "com.github.termux.termux-app:terminal-emulator", version.ref = "termux" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
-aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

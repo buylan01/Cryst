@@ -86,6 +86,7 @@ import com.buylan.cryst.activity.SettingsActivity
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.model.DarkMode
 import com.buylan.cryst.ui.component.Segment
+import com.buylan.cryst.ui.component.materialScrollbarStyle
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
 import com.buylan.cryst.ui.screen.home.dialog.CompressDialog
 import com.buylan.cryst.ui.screen.home.dialog.CopyDialog
@@ -108,6 +109,8 @@ import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
+import io.github.oikvpqya.compose.fastscroller.VerticalScrollbar
+import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -406,51 +409,80 @@ fun MainScreen(
                         targetValue = if (panelPosition == currentPanel) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
                         animationSpec = tween(150)
                     )
-                    AnimatedContent(
-                        targetState = panelState.files,
-                        modifier = Modifier.weight(1f),
-                        transitionSpec = { animation }
-                    ) { files ->
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(1f)
-                                .background(color = backgroundColor)
-                                .pointerInteropFilter { event ->
-                                    if (event.action == MotionEvent.ACTION_DOWN) {
-                                        viewModel.setPanel(panelPosition)
-                                    }
-                                    false
-                                },
-                            state = lazyState
-                        ) {
-                            item {
-                                UpwardItem { viewModel.navigateBack(panelState) }
-                            }
-                            items(files, key = { it.hashCode() }) { file ->
-                                FileRow(
-                                    file = file,
-                                    type = getFileType(file),
-                                    highLight = file.name in panelState.highLightFiles,
-                                    selected = file.path in panelState.selectedFiles,
-                                    onClick = {
-                                        if (panelState.selectionMode) {
-                                            panelState.toggleSelection(file)
-                                        } else {
-                                            viewModel.handleFileClick(context, file)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                    ) {
+                        AnimatedContent(
+                            targetState = panelState.files,
+                            modifier = Modifier.fillMaxSize(),
+                            transitionSpec = { animation }
+                        ) { files ->
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(color = backgroundColor)
+                                    .pointerInteropFilter { event ->
+                                        if (event.action == MotionEvent.ACTION_DOWN) {
+                                            viewModel.setPanel(panelPosition)
                                         }
+                                        false
                                     },
-                                    onLongClick = {
-                                        val selected =
-                                            panelState.files.filter { it.path in panelState.selectedFiles }
-                                        handleFileLongClick(selected.ifEmpty { listOf(file) })
-                                    },
-                                    onSwipe = {
-                                        panelState.swipeSelect(file)
-                                    }
-                                )
+                                state = lazyState
+                            ) {
+                                item {
+                                    UpwardItem { viewModel.navigateBack(panelState) }
+                                }
+                                items(files, key = { it.hashCode() }) { file ->
+                                    FileRow(
+                                        file = file,
+                                        type = getFileType(file),
+                                        highLight = file.name in panelState.highLightFiles,
+                                        selected = file.path in panelState.selectedFiles,
+                                        onClick = {
+                                            if (panelState.selectionMode) {
+                                                panelState.toggleSelection(file)
+                                            } else {
+                                                viewModel.handleFileClick(context, file)
+                                            }
+                                        },
+                                        onLongClick = {
+                                            val selected =
+                                                panelState.files.filter { it.path in panelState.selectedFiles }
+                                            handleFileLongClick(selected.ifEmpty { listOf(file) })
+                                        },
+                                        onSwipe = {
+                                            panelState.swipeSelect(file)
+                                        }
+                                    )
+                                }
                             }
                         }
+                        var showScrollbar by remember { mutableStateOf(false) }
+                        LaunchedEffect(lazyState) {
+                            snapshotFlow {
+                                val layoutInfo = lazyState.layoutInfo
+                                val vh = layoutInfo.viewportSize.height
+                                if (vh <= 0) false
+                                else {
+                                    val vis = layoutInfo.visibleItemsInfo
+                                    if (vis.isEmpty()) false
+                                    else {
+                                        val avg = vis.sumOf { it.size } / vis.size
+                                        val totalEst = avg * layoutInfo.totalItemsCount
+                                        totalEst > 2 * vh
+                                    }
+                                }
+                            }.distinctUntilChanged()
+                                .collect { showScrollbar = it }
+                        }
+                        if (showScrollbar)
+                        VerticalScrollbar(
+                            adapter = rememberScrollbarAdapter(lazyState),
+                            style = materialScrollbarStyle(),
+                            modifier = Modifier.align(Alignment.TopEnd)
+                        )
                     }
                 }
 
