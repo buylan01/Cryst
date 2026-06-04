@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,17 +25,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.vfs.VirtualFile
+import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.Path
 import kotlin.math.abs
@@ -101,23 +109,33 @@ fun FileRow(
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            painter = painterResource(type.icon),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-            modifier = Modifier
-                .border(
-                    width = 1.5.dp,
-                    shape = MaterialTheme.shapes.small,
-                    color = MaterialTheme.colorScheme.primaryContainer
-                )
-                //It can be a controllable feature.
-//                .background(
-//                    shape = MaterialTheme.shapes.small,
-//                    color = MaterialTheme.colorScheme.primaryContainer
-//                )
-                .padding(4.dp)
-        )
+
+        val context = LocalContext.current
+        val imageRequest = ImageRequest.Builder(context)
+            .data(File(file.path))
+            .size(64)
+            .crossfade(true)
+            .build()
+
+        if (type == FileType.IMAGE) {
+            SubcomposeAsyncImage(
+                model = imageRequest,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(MaterialTheme.shapes.small),
+                contentScale = ContentScale.Crop,
+                filterQuality = FilterQuality.Low,
+                loading = {
+                    FileIcon(R.drawable.ic_image)
+                },
+                error = {
+                    FileIcon(R.drawable.ic_broken_image)
+                }
+            )
+        } else {
+            FileIcon(type.icon)
+        }
 
         Spacer(modifier = Modifier.width(8.dp))
 
@@ -145,6 +163,22 @@ fun FileRow(
             )
         }
     }
+}
+
+@Composable
+fun FileIcon(iconRes: Int) {
+    Icon(
+        painter = painterResource(iconRes),
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+        modifier = Modifier
+            .border(
+                width = 1.5.dp,
+                shape = MaterialTheme.shapes.small,
+                color = MaterialTheme.colorScheme.primaryContainer
+            )
+            .padding(4.dp)
+    )
 }
 
 @Composable
