@@ -1,11 +1,13 @@
 package com.buylan.cryst.ui.screen.home.dialog
 
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,15 +29,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.buylan.cryst.R
+import com.buylan.cryst.util.getAudioMetadata
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.delay
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +63,8 @@ fun AudioPlayer(
                 }
             }
 
+            val metadata = getAudioMetadata(targetFile.absolutePath)
+
             var isPlaying by remember { mutableStateOf(true) }
             var isLooping by remember { mutableStateOf(false) }
             var playbackSpeed by remember { mutableFloatStateOf(1f) }
@@ -67,73 +77,119 @@ fun AudioPlayer(
                 }
             }
 
+            DisposableEffect(exoPlayer) {
+                val listener = object : Player.Listener {
+                    override fun onIsPlayingChanged(playing: Boolean) {
+                        isPlaying = playing
+                    }
+                    override fun onPlaybackStateChanged(state: Int) {}
+                }
+                exoPlayer.addListener(listener)
+                onDispose {
+                    exoPlayer.removeListener(listener)
+                }
+            }
+
             LaunchedEffect(exoPlayer) {
                 exoPlayer.play()
                 while (true) {
                     currentPosition = exoPlayer.currentPosition
                     totalDuration = exoPlayer.duration
-                    if (totalDuration in 1..currentPosition && !isLooping) {
-                        exoPlayer.pause()
-                        isPlaying = false
-                    }
-                    delay(1)
+                    delay(10.milliseconds)
                 }
             }
 
             Surface(
-                modifier = Modifier.padding(16.dp),
                 shape = MaterialTheme.shapes.extraLarge,
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {
                 Column(
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.Center
+                    modifier = Modifier.padding(24.dp).fillMaxWidth(0.9f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
                 ) {
-                    Spacer(modifier = Modifier.padding(vertical = 8.dp))
-                    Text(
-                        targetFile.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
+
+                    Column {
+                        Text(
+                            text = metadata?.title ?: targetFile.name,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        metadata?.artist?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                    }
+
+                    metadata?.cover?.let {
+                        val ratio = it.width.toFloat() / it.height.toFloat()
+                        Image(
+                            bitmap = it.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(ratio)
+                                .heightIn(max = 280.dp)
+                                .clip(MaterialTheme.shapes.large),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
 
                     Column(
-                        modifier = Modifier.padding(top = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
+                        var isDragging by remember { mutableStateOf(false) }
+                        var sliderPosition by remember { mutableFloatStateOf(0f) }
+
+                        LaunchedEffect(currentPosition) {
+                            if (!isDragging) {
+                                sliderPosition = if (totalDuration > 0) currentPosition.toFloat() else 0f
+                            }
+                        }
+
                         Slider(
-                            value = if (totalDuration > 0) currentPosition.toFloat()
-                                .coerceIn(0f, totalDuration.toFloat()) else 0f,
-                            onValueChange = { exoPlayer.seekTo(it.toLong()) },
+                            value = sliderPosition,
+                            onValueChange = {
+                                sliderPosition = it
+                                if (!isDragging) {
+                                    isDragging = true
+                                }
+                            },
+                            onValueChangeFinished = {
+                                isDragging = false
+                                exoPlayer.seekTo(sliderPosition.toLong())
+                            },
                             valueRange = if (totalDuration > 0) 0f..totalDuration.toFloat() else 0f..0f,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp, vertical = 8.dp)
                         )
 
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            TextButton(onClick = {
-                                playbackSpeed = when (playbackSpeed) {
-                                    0.5f -> 1f
-                                    1f -> 1.5f
-                                    1.5f -> 2f
-                                    else -> 0.5f
+                            TextButton(
+                                onClick = {
+                                    playbackSpeed = when (playbackSpeed) {
+                                        0.5f -> 1f
+                                        1f -> 1.5f
+                                        1.5f -> 2f
+                                        else -> 0.5f
+                                    }
+                                    exoPlayer.setPlaybackSpeed(playbackSpeed)
                                 }
-                                exoPlayer.setPlaybackSpeed(playbackSpeed)
-                            }) {
+                            ) {
                                 Text("$playbackSpeed x")
                             }
 
-                            IconButton(onClick = {
-                                isLooping = !isLooping
-                                exoPlayer.repeatMode =
-                                    if (isLooping) ExoPlayer.REPEAT_MODE_ONE else ExoPlayer.REPEAT_MODE_OFF
-                            }) {
+                            IconButton(
+                                onClick = {
+                                    isLooping = !isLooping
+                                    exoPlayer.repeatMode =
+                                        if (isLooping) ExoPlayer.REPEAT_MODE_ONE else ExoPlayer.REPEAT_MODE_OFF
+                                }
+                            ) {
                                 Icon(
                                     painter = painterResource(if (isLooping) R.drawable.ic_repeat_on else R.drawable.ic_repeat),
                                     contentDescription = null
@@ -147,7 +203,6 @@ fun AudioPlayer(
                                     } else {
                                         exoPlayer.play()
                                     }
-                                    isPlaying = !isPlaying
                                     if (totalDuration in 1..currentPosition) {
                                         exoPlayer.seekTo(0)
                                     }

@@ -2,8 +2,12 @@ package com.buylan.cryst.util
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import com.buylan.cryst.ui.screen.home.model.AudioFileData
 import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.ui.screen.home.model.SortType
 import com.buylan.cryst.vfs.ArchiveFile
@@ -154,4 +158,36 @@ fun Context.shareFile(file: VirtualFile) {
 
 fun VirtualFile.isRootPath(): Boolean {
     return absolutePath == "/storage/emulated/0"
+}
+
+fun getAudioMetadata(file: String): AudioFileData? {
+    val retriever = MediaMetadataRetriever()
+    try {
+        retriever.setDataSource(file)
+
+        val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+        val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+        val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+        val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        var bitmap: Bitmap?
+
+        val pictureData = retriever.embeddedPicture
+        bitmap = if (pictureData != null && pictureData.isNotEmpty())
+            BitmapFactory.decodeByteArray(pictureData, 0, pictureData.size)
+        else
+            null
+
+        return AudioFileData(
+            title = title,
+            artist = artist,
+            album = album,
+            duration = duration,
+            cover = bitmap
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return null
+    } finally {
+        retriever.release()
+    }
 }
