@@ -10,21 +10,29 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.R
 import com.buylan.cryst.util.setEditorTheme
+import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.langs.textmate.TextMateColorScheme
 import io.github.rosemoe.sora.langs.textmate.TextMateLanguage
 import io.github.rosemoe.sora.langs.textmate.registry.ThemeRegistry
 import io.github.rosemoe.sora.text.Content
 import io.github.rosemoe.sora.widget.CodeEditor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +45,28 @@ fun TextEditor(
     onBack: () -> Unit
 ) {
     val file = remember { File(filePath) }
+    val scope = rememberCoroutineScope()
+
+    viewModel.editorState.content = Content(file.readText())
+    val state = viewModel.editorState
+    val editor = remember {
+        setCodeEditorFactory(
+            context = context, state = state, filePath = filePath
+        )
+    }
+
+    var canUndo by remember { mutableStateOf(false) }
+    var canRedo by remember { mutableStateOf(false) }
+    var isDirty by remember { mutableStateOf(false) }
+
+    DisposableEffect(editor) {
+        val subscriber = editor.subscribeEvent(ContentChangeEvent::class.java) { _, _ ->
+            canUndo = editor.canUndo()
+            canRedo = editor.canRedo()
+            isDirty = editor.isDirty
+        }
+        onDispose { subscriber?.unsubscribe() }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -56,37 +86,73 @@ fun TextEditor(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = { editor.undo() },
+                        enabled = canUndo
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_undo),
+                            contentDescription = null
+                        )
+                    }
+                    IconButton(
+                        onClick = { editor.redo() },
+                        enabled = canRedo
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_redo),
+                            contentDescription = null
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                try {
+                                    withContext(Dispatchers.IO) {
+                                        val text = editor.text.toString()
+                                        File(filePath).writeText(text)
+                                    }
 
-                }, colors = TopAppBarDefaults.topAppBarColors()
+                                } catch (e: Exception) {
+
+                                }
+                            }
+                        },
+                        enabled = isDirty
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_save),
+                            contentDescription = null
+                        )
+                    }
+                    IconButton(
+                        onClick = {  }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_more_vert),
+                            contentDescription = null
+                        )
+                    }
+                }
             )
-        }) { padding ->
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(innerPadding)
         ) {
-            viewModel.editorState.content = Content(file.readText())
-            val state = viewModel.editorState
-            val editor = remember {
-                setCodeEditorFactory(
-                    context = context, state = state, filePath = filePath
-                )
-            }
-
-            LaunchedEffect(key1 = state.content) {
-                state.editor?.apply {
-                    setText(state.content)
-                }
-            }
             LaunchedEffect(isDark) {
                 setEditorTheme(isDark)
                 state.editor?.colorScheme =
                     TextMateColorScheme.create(ThemeRegistry.getInstance())
             }
 
-            AndroidView(factory = { editor }, modifier = Modifier.fillMaxSize(), onRelease = {
-                it.release()
-            })
+            AndroidView(
+                factory = { editor },
+                modifier = Modifier.fillMaxSize(),
+                onRelease = { it.release() }
+            )
         }
     }
 }
@@ -120,6 +186,7 @@ private fun setCodeEditorFactory(
     editor.apply {
         setText(state.content)
         isStickyTextSelection = true
+        isUndoEnabled = true
     }
     state.editor = editor
     return editor
