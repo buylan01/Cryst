@@ -144,7 +144,7 @@ fun ModalDrawer(
                 },
                 onClick = {
                     scope.launch {
-                        viewModel.currentPanelState().path = DefaultPath
+                        viewModel.currentPanel.path = DefaultPath
                         drawerState.close()
                     }
                 }

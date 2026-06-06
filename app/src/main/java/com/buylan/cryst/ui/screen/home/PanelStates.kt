@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.setValue
 import com.buylan.cryst.ui.screen.home.model.SortType
 import com.buylan.cryst.util.DefaultPath
+import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.VirtualFile
 
 class PanelStates {
@@ -17,6 +18,22 @@ class PanelStates {
     val selectionMode: Boolean
         get() = selectedFiles.isNotEmpty()
     private var rangeAnchorPath: String? = null
+
+    fun navigateBack() {
+        if (selectedFiles.isEmpty()) {
+            if (!path.isRootPath()) {
+                path = path.parentFile ?: DefaultPath
+                resetHighLight()
+                resetSelection()
+            }
+        } else {
+            resetSelection()
+        }
+    }
+
+    fun resetHighLight() {
+        highLightFiles = emptySet()
+    }
 
     fun resetSelection() {
         rangeAnchorPath = null

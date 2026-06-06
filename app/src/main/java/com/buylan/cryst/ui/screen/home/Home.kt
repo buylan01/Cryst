@@ -125,7 +125,7 @@ fun MainScreen(
     appViewModel: AppViewModel = viewModel()
 ) {
     val scope = rememberCoroutineScope()
-    val currentPanel = viewModel.currentPanel
+    val currentPanel = viewModel.currentPosition
     val currentPath = viewModel.currentPath
     val leftLazyState = rememberLazyListState()
     val rightLazyState = rememberLazyListState()
@@ -136,9 +136,9 @@ fun MainScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler(
-        enabled = !viewModel.currentPanelState().path.isRootPath() || viewModel.currentPanelState().selectedFiles.isNotEmpty()
+        enabled = !viewModel.currentPanel.path.isRootPath() || viewModel.currentPanel.selectedFiles.isNotEmpty()
     ) {
-        viewModel.navigateBack()
+        viewModel.onNavigateBack()
     }
 
     BackHandler(
@@ -224,7 +224,7 @@ fun MainScreen(
                                         )
                                     },
                                     onClick = {
-                                        viewModel.refreshPanel(viewModel.currentPanelState())
+                                        viewModel.refreshPanel(viewModel.currentPanel)
                                         expanded = false
                                     }
                                 )
@@ -316,7 +316,7 @@ fun MainScreen(
                                     contentDescription = null
                                 )
                             }
-                            IconButton(onClick = { viewModel.refreshPanel(viewModel.currentPanelState()) }) {
+                            IconButton(onClick = { viewModel.refreshPanel(viewModel.currentPanel) }) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_refresh),
                                     contentDescription = null,
@@ -346,7 +346,7 @@ fun MainScreen(
                                     contentDescription = null,
                                 )
                             }
-                            IconButton(onClick = { viewModel.navigateBack() }) {
+                            IconButton(onClick = { viewModel.onNavigateBack() }) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_arrow_upward),
                                     contentDescription = null,
@@ -369,14 +369,6 @@ fun MainScreen(
 
                 LaunchedEffect(rightPanelState.path) {
                     viewModel.refreshPanel(rightPanelState)
-                }
-
-                LaunchedEffect(Unit) {
-                    snapshotFlow { viewModel.currentPanelState().path }
-                        .distinctUntilChanged()
-                        .collect { path ->
-                            viewModel.currentPath = path
-                        }
                 }
 
                 LaunchedEffect(Unit) {
@@ -429,7 +421,7 @@ fun MainScreen(
                                 state = lazyState
                             ) {
                                 item {
-                                    UpwardItem { viewModel.navigateBack(panelState) }
+                                    UpwardItem { panelState.navigateBack() }
                                 }
                                 items(files, key = { it.hashCode() }) { file ->
                                     FileRow(
@@ -642,7 +634,7 @@ fun MainScreen(
     }
 
     if (viewModel.showPathDialog) {
-        val textFieldState = rememberTextFieldState(initialText = viewModel.currentPanelState().path.absolutePath)
+        val textFieldState = rememberTextFieldState(initialText = viewModel.currentPanel.path.absolutePath)
         AlertDialog(
             onDismissRequest = { viewModel.showPathDialog = false },
             title = { Text(stringResource(R.string.path)) },
@@ -662,7 +654,7 @@ fun MainScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.currentPanelState().path = LocalFile(textFieldState.text.toString())
+                        viewModel.currentPanel.path = LocalFile(textFieldState.text.toString())
                         viewModel.showPathDialog = false
                     }
                 ) {
@@ -736,13 +728,13 @@ fun MainScreen(
     if (viewModel.showSort) {
         SortOrderDialog(
             onDismiss = { viewModel.showSort = false },
-            viewModel.currentPanelState(),
+            viewModel.currentPanel,
             currentPanel
         )
     }
     viewModel.searchDialog?.let { state ->
         SearchDialog(onDismiss = { viewModel.searchDialog = null }, state.file) { file ->
-            viewModel.currentPanelState().path = file
+            viewModel.currentPanel.path = file
             viewModel.searchDialog = null
         }
     }

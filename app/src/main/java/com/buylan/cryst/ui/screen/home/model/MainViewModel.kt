@@ -15,11 +15,9 @@ import com.buylan.cryst.activity.ImageActivity
 import com.buylan.cryst.activity.TextEditorActivity
 import com.buylan.cryst.activity.VideoActivity
 import com.buylan.cryst.ui.screen.home.PanelStates
-import com.buylan.cryst.util.DefaultPath
 import com.buylan.cryst.util.accessFiles
 import com.buylan.cryst.util.getActualFile
 import com.buylan.cryst.util.getFileType
-import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.util.shareFile
 import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.VirtualFile
@@ -30,14 +28,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainViewModel : ViewModel() {
-    var currentPanel by mutableStateOf(PanelPosition.L)
+    var currentPosition by mutableStateOf(PanelPosition.L)
         private set
 
     fun setPanel(panel: PanelPosition) {
-        currentPanel = panel
+        currentPosition = panel
     }
 
-    var currentPath by mutableStateOf(DefaultPath)
+    private val _scrollToIndex = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+
+    //dialogs mountain
     var showPathDialog by mutableStateOf(false)
     var showAboutDialog by mutableStateOf(false)
     var showSort by mutableStateOf(false)
@@ -54,24 +54,18 @@ class MainViewModel : ViewModel() {
     var toolsDialog: OperationDialogState? by mutableStateOf(null)
     var copyDialog: ExtraDialogState? by mutableStateOf(null)
     var moveDialog: ExtraDialogState? by mutableStateOf(null)
-    private val _scrollToIndex = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+
     val scrollToIndex = _scrollToIndex.asSharedFlow()
     val leftPanelState = PanelStates()
     val rightPanelState = PanelStates()
+    val currentPanel
+        get() =  if (currentPosition == PanelPosition.L) leftPanelState else rightPanelState
+    val anotherPanel
+        get() =  if (currentPosition == PanelPosition.R) leftPanelState else rightPanelState
+    val currentPath
+        get() = currentPanel.path
 
-    fun currentPanelState() = if (currentPanel == PanelPosition.L) leftPanelState else rightPanelState
-    fun uncurrentPanelState() = if (currentPanel == PanelPosition.R) leftPanelState else rightPanelState
-    fun navigateBack(state: PanelStates = currentPanelState()) {
-        if (state.selectedFiles.isEmpty()) {
-            if (!currentPath.isRootPath()) {
-                state.path = state.path.parentFile!!
-                state.highLightFiles = emptySet()
-                state.selectedFiles.clear()
-            }
-        } else {
-            state.resetSelection()
-        }
-    }
+    fun onNavigateBack() = currentPanel.navigateBack()
     fun refreshPanel(panelState: PanelStates) {
         viewModelScope.launch {
             panelState.files = withContext(Dispatchers.IO) {
@@ -97,10 +91,9 @@ class MainViewModel : ViewModel() {
     }
 
     fun handleFileClick(context: Context, file: VirtualFile, type: FileType? = null) {
-        val currentPanel = currentPanelState()
         if (file.isDirectory) {
             currentPanel.path = file
-            currentPanel.highLightFiles = emptySet()
+            currentPanel.resetHighLight()
         } else {
             val actualType = type ?: getFileType(file)
             val actualFile = getActualFile(context, file)
@@ -163,11 +156,11 @@ class MainViewModel : ViewModel() {
         toolsDialog = null
         when (action) {
             ToolAction.Move -> {
-                moveDialog = ExtraDialogState(file, uncurrentPanelState().path)
+                moveDialog = ExtraDialogState(file, anotherPanel.path)
             }
 
             ToolAction.Copy -> {
-                copyDialog = ExtraDialogState(file, uncurrentPanelState().path)
+                copyDialog = ExtraDialogState(file, anotherPanel.path)
             }
 
             ToolAction.Rename -> {
