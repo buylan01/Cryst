@@ -7,16 +7,13 @@ plugins {
 android {
     namespace = "com.buylan.cryst"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version = release(37)
     }
 
     defaultConfig {
         applicationId = "com.buylan.cryst"
         minSdk = 31
-        //noinspection OldTargetApi
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "0.1.0"
 

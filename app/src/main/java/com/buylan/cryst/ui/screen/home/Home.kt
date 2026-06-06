@@ -112,7 +112,6 @@ import com.buylan.cryst.vfs.VirtualFile
 import io.github.oikvpqya.compose.fastscroller.VerticalScrollbar
 import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -384,9 +383,7 @@ fun MainScreen(
                     viewModel.scrollToIndex.collect { index ->
                         val currentState = if (currentPanel == PanelPosition.L) leftLazyState else rightLazyState
 
-                        snapshotFlow { currentState.layoutInfo.totalItemsCount }
-                            .filter { it > index }
-                            .first()
+                        snapshotFlow { currentState.layoutInfo.totalItemsCount }.first { it > index }
                         currentState.scrollToItem(index)
                     }
                 }

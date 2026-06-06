@@ -2,8 +2,8 @@
 agp = "9.2.1"
 coilCompose = "2.7.0"
 commonsCompress = "1.28.0"
-coreKtx = "1.18.0"
-datastorePreferences = "1.1.1"
+coreKtx = "1.19.0"
+datastorePreferences = "1.2.1"
 editor = "0.24.5"
 fastscrollerMaterial3 = "0.3.2"
 junit = "4.13.2"
@@ -47,7 +47,6 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 language-textmate = { module = "io.github.rosemoe:language-textmate" }
 rosemoe-editor = { module = "io.github.rosemoe:editor" }
 terminal-view = { module = "com.github.termux.termux-app:terminal-view", version.ref = "termux" }
-#noinspection Aligned16KB
 terminal-emulator = { module = "com.github.termux.termux-app:terminal-emulator", version.ref = "termux" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
 

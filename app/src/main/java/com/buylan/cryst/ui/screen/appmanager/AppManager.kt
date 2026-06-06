@@ -403,7 +403,7 @@ fun ApplicationManager(){
                                     context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                                         .apply {
                                             data = Uri.fromParts("package", app.packageName, null)
-                                            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                         }
                                     )
                                 }
