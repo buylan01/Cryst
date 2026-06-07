@@ -41,7 +41,7 @@ fun CreateDialog(
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text("新建") },
+        title = { Text(stringResource(R.string.create)) },
         text = {
             val hasInvalidChar = remember(fileName) {
                 fileName.any { it in invalidChars }
@@ -61,17 +61,17 @@ fun CreateDialog(
                 supportingText = {
                     when {
                         isEmpty -> Text(
-                            "文件名不能为空",
+                            text = stringResource(R.string.filename_cannot_be_empty),
                             color = MaterialTheme.colorScheme.error
                         )
 
                         hasInvalidChar -> Text(
-                            "不能包含: ${invalidChars.joinToString("")}",
+                            text = stringResource(R.string.filename_cannot_contain,invalidChars.joinToString("")),
                             color = MaterialTheme.colorScheme.error
                         )
 
                         createFail -> Text(
-                            "创建失败",
+                            stringResource(R.string.create_failed),
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -90,14 +90,14 @@ fun CreateDialog(
                     createFile(false, fileName)
                 }
             ) {
-                Text("文件")
+                Text(stringResource(R.string.file))
             }
             Button(
                 onClick = {
                     createFile(true, fileName)
                 }
             ) {
-                Text("文件夹")
+                Text(stringResource(R.string.folder))
             }
         },
         dismissButton = {

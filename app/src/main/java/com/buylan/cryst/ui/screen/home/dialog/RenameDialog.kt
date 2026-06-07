@@ -49,17 +49,20 @@ fun RenameDialog(
                 supportingText = {
                     when {
                         isEmpty -> Text(
-                            "命名不能为空",
+                            stringResource(R.string.filename_cannot_be_empty),
                             color = MaterialTheme.colorScheme.error
                         )
 
                         hasInvalidChar -> Text(
-                            "不能包含: ${invalidChars.joinToString("")}",
+                            stringResource(
+                                R.string.filename_cannot_contain,
+                                invalidChars.joinToString("")
+                            ),
                             color = MaterialTheme.colorScheme.error
                         )
 
                         renameFail -> Text(
-                            "命名失败",
+                            stringResource(R.string.rename_failed),
                             color = MaterialTheme.colorScheme.error
                         )
                     }

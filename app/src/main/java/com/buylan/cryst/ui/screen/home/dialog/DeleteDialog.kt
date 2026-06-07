@@ -49,7 +49,7 @@ fun DeleteDialog(
             Column {
                 when (uiState) {
                     is FileOperaUiState.Idle -> {
-                        Text("是否删除 ${targetFiles.map { it.name }} ?", modifier = Modifier.padding(vertical = 8.dp))
+                        Text(stringResource(R.string.confirm_delete, targetFiles.map { it.name }), modifier = Modifier.padding(vertical = 8.dp))
                         Text(
                             stringResource(R.string.delete_file_warning),
                             color = MaterialTheme.colorScheme.error
@@ -70,12 +70,12 @@ fun DeleteDialog(
                     }
 
                     is FileOperaUiState.Success -> Text(
-                        "删除成功",
+                        stringResource(R.string.delete_success),
                         color = MaterialTheme.colorScheme.primary
                     )
 
                     is FileOperaUiState.Error -> Text(
-                        (uiState as FileOperaUiState.Error).message,
+                        text = stringResource((uiState as FileOperaUiState.Error).messageResId),
                         color = MaterialTheme.colorScheme.error
                     )
                 }

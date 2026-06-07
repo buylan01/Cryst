@@ -111,6 +111,7 @@ import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import io.github.oikvpqya.compose.fastscroller.VerticalScrollbar
 import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -122,7 +123,8 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     context: Context,
     viewModel: MainViewModel = viewModel(),
-    appViewModel: AppViewModel = viewModel()
+    appViewModel: AppViewModel = viewModel(),
+    pathFlow: SharedFlow<String>
 ) {
     val scope = rememberCoroutineScope()
     val currentPanel = viewModel.currentPosition
@@ -380,6 +382,13 @@ fun MainScreen(
                     }
                 }
 
+                LaunchedEffect(Unit) {
+                    pathFlow.collect { path ->
+                        viewModel.currentPanel.path = LocalFile(path)
+                        drawerState.close()
+                    }
+                }
+
                 fun handleFileLongClick(file: List<VirtualFile>) {
                     viewModel.toolsDialog = OperationDialogState(file)
                 }
@@ -543,9 +552,9 @@ fun MainScreen(
     if (viewModel.showPermissionRequest) {
         AlertDialog(
             onDismissRequest = { viewModel.showPermissionRequest = false },
-            title = { Text("权限请求") },
+            title = { Text(stringResource(R.string.permission_request)) },
             text = {
-                Text(stringResource(R.string.app_name) + " 需要获取泥的文件管理权限> <")
+                Text(stringResource(R.string.app_name) + stringResource(R.string.permission_manage_file_require))
             },
             confirmButton = {
                 Button(
@@ -555,17 +564,17 @@ fun MainScreen(
                         viewModel.showPermissionRequest = false
                     }
                 ) {
-                    Text("去~")
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = {
-                        Toast.makeText(context, "你会后悔的 TAT", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "TAT", Toast.LENGTH_SHORT).show()
                         viewModel.showPermissionRequest = false
                     }
                 ) {
-                    Text("滚~")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

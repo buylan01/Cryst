@@ -74,17 +74,17 @@ fun CompressDialog(
                     supportingText = {
                         when {
                             isEmpty -> Text(
-                                "文件名不能为空",
+                                text = stringResource(R.string.filename_cannot_be_empty),
                                 color = MaterialTheme.colorScheme.error
                             )
 
                             hasInvalidChar -> Text(
-                                "不能包含: ${invalidChars.joinToString("")}",
+                                text = stringResource(R.string.filename_cannot_contain,invalidChars.joinToString("")),
                                 color = MaterialTheme.colorScheme.error
                             )
 
                             createFail -> Text(
-                                "创建失败",
+                                stringResource(R.string.create_failed),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }

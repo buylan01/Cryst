@@ -42,16 +42,21 @@ fun MoveDialog(
         text = {
             Column {
                 when (uiState) {
-                    is FileOperaUiState.Idle -> Text("是否移动 ${source.map { it.name }} 到 ${target.absolutePath} ?")
+                    is FileOperaUiState.Idle -> Text(
+                        stringResource(
+                            R.string.confirm_move_to,
+                            source.map { it.name },
+                            target.absolutePath
+                        ))
                     is FileOperaUiState.InProgress -> LinearProgressIndicator()
                     is FileOperaUiState.Progress -> { }
                     is FileOperaUiState.Success -> Text(
-                        "移动成功",
+                        stringResource(R.string.move_to_success),
                         color = MaterialTheme.colorScheme.primary
                     )
 
                     is FileOperaUiState.Error -> Text(
-                        (uiState as FileOperaUiState.Error).message,
+                        text = stringResource((uiState as FileOperaUiState.Error).messageResId),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -81,7 +86,7 @@ fun MoveDialog(
                             onDismiss()
                             onRefresh()
                         } else {
-                            uiStateFlow.emit(FileOperaUiState.Error("Some files failed to move"))
+                            uiStateFlow.emit(FileOperaUiState.Error(R.string.move_to_failed))
                         }
                     }
                 }

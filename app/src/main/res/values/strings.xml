@@ -63,4 +63,23 @@
     <string name="data_dir">DataDir</string>
     <string name="uid" translatable="false">UID</string>
     <string name="installed">Installed</string>
+    <string name="locate">Locate</string>
+    <string name="tip">Tip</string>
+    <string name="file_saved_to">The file has been saved to %1$s</string>
+    <string name="filename_cannot_be_empty">Filename cannot be empty</string>
+    <string name="filename_cannot_contain">Cannot contain: %1$s</string>
+    <string name="rename_failed">Rename failed</string>
+    <string name="confirm_move_to">Move %1$s to %2$s?</string>
+    <string name="move_to_success">Move successful</string>
+    <string name="move_to_failed">Some files failed to move</string>
+    <string name="confirm_delete">Delete %1$s?</string>
+    <string name="delete_success">Delete successful</string>
+    <string name="create">Create</string>
+    <string name="create_failed">Create failed</string>
+    <string name="confirm_copy_to">Copy %1$s to %2$s?</string>
+    <string name="copy_to_success">Copy successful</string>
+    <string name="copy_to_failed">Some files failed to copy</string>
+    <string name="permission_request">Permission request</string>
+    <string name="permission_manage_file_require">File management permission is required</string>
+    <string name="delete_failed">Some files failed to delete</string>
 </resources>

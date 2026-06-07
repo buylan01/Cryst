@@ -231,5 +231,5 @@ sealed class FileOperaUiState {
         FileOperaUiState()
 
     data class Success(val all: Boolean) : FileOperaUiState()
-    data class Error(val message: String) : FileOperaUiState()
+    data class Error(val messageResId: Int) : FileOperaUiState()
 }

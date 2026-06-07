@@ -2,6 +2,7 @@ package com.buylan.cryst.ui.screen.home.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.buylan.cryst.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,7 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.io.walkBottomUp
 
 class DeleteFileViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<FileOperaUiState>(FileOperaUiState.Idle)
@@ -43,7 +43,7 @@ class DeleteFileViewModel : ViewModel() {
                     }
                     _uiState.value = FileOperaUiState.Success(failedCount == 0)
                 } catch (e: Exception) {
-                    _uiState.value = FileOperaUiState.Error(e.message ?: "未知错误")
+                    _uiState.value = FileOperaUiState.Error(R.string.delete_failed)
                 }
             }
         }

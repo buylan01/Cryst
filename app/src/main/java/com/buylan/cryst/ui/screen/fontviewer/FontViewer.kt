@@ -107,7 +107,7 @@ fun FontViewer(
                         TextStyle(fontFamily = fontFamily, fontSize = 24.sp),
                     )
 
-                    val sampleText = "Fantasy is the continuation of pain.\n幻想是痛的延续。"
+                    val sampleText = "I wandered lonely as a cloud that floats on high o'er vales and hills.\n相恨不如潮有信，相思始觉海非深。"
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),

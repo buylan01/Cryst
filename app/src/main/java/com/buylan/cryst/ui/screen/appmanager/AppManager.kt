@@ -50,6 +50,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -80,6 +81,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
 import com.buylan.cryst.R
+import com.buylan.cryst.activity.MainActivity
 import com.buylan.cryst.ui.component.ApkInfoColumn
 import com.buylan.cryst.util.ExtractPath
 import kotlinx.coroutines.Dispatchers
@@ -99,6 +101,8 @@ fun ApplicationManager(){
     var systemApps by remember { mutableStateOf(emptyList<PackageInfo>()) }
     var checkedApp by remember { mutableStateOf<PackageInfo?>(null) }
     var showAppDetailDialog by remember { mutableStateOf(false) }
+    var showLocateDialog by remember { mutableStateOf(false) }
+    var outputPath by remember { mutableStateOf("") }
     var searchActive by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     val searchField = rememberTextFieldState()
@@ -369,15 +373,25 @@ fun ApplicationManager(){
                                     if (!target.exists()) {
                                         target.mkdir()
                                     }
+                                    outputPath = "$ExtractPath/${appName}_${app.versionName}.apk"
+
                                     val copy = try {
-                                        File(app.applicationInfo!!.sourceDir).copyTo(File("$ExtractPath/${appName}_${app.versionName}.apk"))
+                                        File(app.applicationInfo!!.sourceDir).copyTo(File(outputPath))
                                         true
                                     } catch (_: IOException) {
                                         false
                                     }
                                     withContext(Dispatchers.Main) {
-                                        Toast.makeText(context, if (copy) "提取成功, 文件被保存在$ExtractPath" else "提取失败",
-                                            Toast.LENGTH_SHORT).show()
+                                        if (copy) {
+                                            showLocateDialog = true
+                                            showAppDetailDialog = false
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "提取失败",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                     }
                                 }
                             }
@@ -425,6 +439,59 @@ fun ApplicationManager(){
                     }
                 )
             }
+        }
+        if (showLocateDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    showLocateDialog = false
+                },
+
+                title = {
+                    Text(stringResource(R.string.tip))
+                },
+
+                text = {
+                    Text(stringResource(R.string.file_saved_to, outputPath))
+                },
+
+                confirmButton = {
+                    Button(
+                        onClick = {
+
+                            context.startActivity(
+                                Intent(
+                                    context,
+                                    MainActivity::class.java
+                                ).apply {
+
+                                    putExtra(
+                                        "path",
+                                        outputPath
+                                    )
+
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                                Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                }
+                            )
+
+                            showLocateDialog = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.locate))
+                    }
+                },
+
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            showLocateDialog = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.dismiss))
+                    }
+                }
+            )
         }
     }
 }

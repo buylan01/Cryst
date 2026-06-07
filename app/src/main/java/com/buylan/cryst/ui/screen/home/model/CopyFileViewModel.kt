@@ -2,6 +2,7 @@ package com.buylan.cryst.ui.screen.home.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.buylan.cryst.R
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
@@ -61,9 +62,7 @@ class CopyFileViewModel : ViewModel() {
                     }
                     _uiState.value = FileOperaUiState.Success(failedCount == 0)
                 } catch (e: Exception) {
-                    _uiState.value = FileOperaUiState.Error(
-                        e.message ?: "未知错误"
-                    )
+                    _uiState.value = FileOperaUiState.Error(R.string.copy_to_failed)
                 }
             }
         }

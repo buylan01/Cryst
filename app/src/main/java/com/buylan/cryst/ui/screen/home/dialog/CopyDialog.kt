@@ -47,7 +47,13 @@ fun CopyDialog(
         text = {
             Column {
                 when (uiState) {
-                    is FileOperaUiState.Idle -> Text("是否复制 ${source.map { it.name }} 到 ${target.absolutePath} ?")
+                    is FileOperaUiState.Idle -> Text(
+                        stringResource(
+                            R.string.confirm_copy_to,
+                            source.map { it.name },
+                            target.absolutePath
+                        )
+                    )
                     is FileOperaUiState.InProgress -> LinearProgressIndicator()
                     is FileOperaUiState.Progress -> {
                         val prog = uiState as FileOperaUiState.Progress
@@ -56,7 +62,7 @@ fun CopyDialog(
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
                         Text(
-                            text = "进度: ${prog.percentage}%  ${prog.current}/${prog.total} (失败 ${prog.failed})",
+                            text = "${prog.percentage}%  ${prog.current}/${prog.total} (失败: ${prog.failed})",
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
@@ -64,13 +70,13 @@ fun CopyDialog(
                     is FileOperaUiState.Success -> {
                         val isAll = (uiState as FileOperaUiState.Success).all
                         Text(
-                            if(isAll) "复制成功" else "部分或全部复制失败",
+                            if(isAll) stringResource(R.string.copy_to_success) else stringResource(R.string.copy_to_failed),
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
 
                     is FileOperaUiState.Error -> Text(
-                        (uiState as FileOperaUiState.Error).message,
+                        text = stringResource((uiState as FileOperaUiState.Error).messageResId),
                         color = MaterialTheme.colorScheme.error
                     )
                 }

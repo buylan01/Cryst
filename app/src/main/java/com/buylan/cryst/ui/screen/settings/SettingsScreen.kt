@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
 
@@ -27,7 +28,7 @@ fun SettingsScreen(onBackPressed: () -> Unit) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { Text("设置") },
+                title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
                         Icon(painter = painterResource(R.drawable.ic_arrow_back), contentDescription = "返回")
