@@ -1,6 +1,8 @@
 package com.buylan.cryst.ui.screen.home
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -19,8 +21,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
@@ -36,12 +41,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.graphics.drawable.toBitmap
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.vfs.VirtualFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.Path
@@ -89,6 +97,7 @@ fun FileRow(
                             abs(dy) > 20f && abs(dy) > abs(dx) -> {
                                 break
                             }
+
                             abs(dx) > 20f && abs(dx) > abs(dy) -> {
                                 change.consume()
                             }
@@ -109,32 +118,68 @@ fun FileRow(
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         val context = LocalContext.current
-        val imageRequest = ImageRequest.Builder(context)
-            .data(File(file.path))
-            .size(64)
-            .crossfade(true)
-            .build()
 
-        if (type == FileType.IMAGE) {
-            SubcomposeAsyncImage(
-                model = imageRequest,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(MaterialTheme.shapes.small),
-                contentScale = ContentScale.Crop,
-                filterQuality = FilterQuality.Low,
-                loading = {
-                    FileIcon(R.drawable.ic_image)
-                },
-                error = {
-                    FileIcon(R.drawable.ic_broken_image)
+        when(type) {
+            FileType.IMAGE -> {
+                val imageRequest = ImageRequest.Builder(context)
+                    .data(File(file.path))
+                    .size(64)
+                    .crossfade(true)
+                    .build()
+
+                SubcomposeAsyncImage(
+                    model = imageRequest,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.Crop,
+                    filterQuality = FilterQuality.Low,
+                    loading = {
+                        FileIcon(R.drawable.ic_image)
+                    },
+                    error = {
+                        FileIcon(R.drawable.ic_broken_image)
+                    }
+                )
+            }
+
+            FileType.APK -> {
+                var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+                LaunchedEffect(file.path) {
+                    withContext(Dispatchers.Default) {
+                        val pm = context.packageManager
+                        try {
+                            pm.getPackageArchiveInfo(file.path, 0)
+                        } catch (_: Exception) {
+                            null
+                        }?.let {
+                            it.applicationInfo!!.apply {
+                                sourceDir = file.absolutePath
+                                publicSourceDir = file.absolutePath
+                            }
+                            bitmap = it.applicationInfo!!.loadIcon(pm).toBitmap()
+                        }
+                    }
                 }
-            )
-        } else {
-            FileIcon(type.icon)
+                if (bitmap != null) {
+                    Image(
+                        bitmap = bitmap!!.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(MaterialTheme.shapes.small),
+                        contentScale = ContentScale.Fit
+                    )
+                } else {
+                    FileIcon(R.drawable.ic_apk_document)
+                }
+            }
+
+            else -> {
+                FileIcon(type.icon)
+            }
         }
 
         Spacer(modifier = Modifier.width(8.dp))
