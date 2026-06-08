@@ -31,15 +31,16 @@ fun ApkInfoColumn(
         InfoItem(R.string.package_name, info.packageName)
         InfoItem(R.string.version_code, info.longVersionCode.toString())
         InfoItem(R.string.size, formatFileSize(File(info.applicationInfo!!.sourceDir).length()))
-        if (!alwaysInstalled) InfoItem(R.string.installed, (installedInfo != null).toString())
-        if (alwaysInstalled) {
-            InfoItem(R.string.source_dir, info.applicationInfo!!.dataDir)
-            InfoItem(R.string.data_dir, info.applicationInfo!!.sourceDir)
-            InfoItem(R.string.uid, info.applicationInfo!!.uid.toString())
+        if (!alwaysInstalled)
+            InfoItem(R.string.installed, (installedInfo != null).toString())
+        val appInfo = when {
+            alwaysInstalled -> info.applicationInfo
+            installedInfo != null -> installedInfo
+            else -> null
         }
-        installedInfo?.let {
-            InfoItem(R.string.source_dir, it.dataDir)
-            InfoItem(R.string.data_dir, it.sourceDir)
+        appInfo?.let {
+            InfoItem(R.string.source_dir, it.sourceDir)
+            InfoItem(R.string.data_dir, it.dataDir)
             InfoItem(R.string.uid, it.uid.toString())
         }
     }
