@@ -1,16 +1,14 @@
 package com.buylan.cryst.ui.screen.home.dialog
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,7 +22,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -88,18 +85,12 @@ fun SearchDialog(
                     focusRequester.requestFocus()
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .offset(x = (-12).dp)
-                ) {
-                    Checkbox(
-                        checked = includeSub,
-                        onCheckedChange = { includeSub = it }
-                    )
-                    Text(stringResource(R.string.search_subdirectories))
-                }
+                FilterChip(
+                    selected = includeSub,
+                    onClick = { includeSub = !includeSub },
+                    label = { Text(stringResource(R.string.search_subdirectories)) },
+                    modifier = Modifier.padding(top = 8.dp)
+                )
 
                 if (isSearching) {
                     LinearProgressIndicator(
