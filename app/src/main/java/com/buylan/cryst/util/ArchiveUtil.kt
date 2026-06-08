@@ -7,7 +7,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import kotlin.collections.forEach
 
 fun createZip(
     files: List<File>,
@@ -33,16 +32,34 @@ fun createTar(
     outputTarFile: File,
     baseDir: File
 ): File {
+
+    require(files.none { it.absolutePath == outputTarFile.absolutePath }) {
+        "Output tar file must not be in the input list"
+    }
+
     FileOutputStream(outputTarFile).use { fos ->
-        TarArchiveOutputStream(fos).use { zipOut ->
-            files.forEach { file ->
-                val relativePath = file.relativeTo(baseDir).path.replace("\\", "/")
-                val entry = TarArchiveEntry(file, relativePath)
-                zipOut.putArchiveEntry(entry)
-                FileInputStream(file).use { fis ->
-                    fis.copyTo(zipOut)
+        TarArchiveOutputStream(fos).use { tarOut ->
+            files.forEach { item ->
+                val relativePath = item.relativeTo(baseDir).path.replace("\\", "/")
+                when {
+                    item.isDirectory -> {
+                        val entry = TarArchiveEntry("$relativePath/")
+                        tarOut.putArchiveEntry(entry)
+                        tarOut.closeArchiveEntry()
+                    }
+                    item.isFile -> {
+                        val entry = TarArchiveEntry(item, relativePath)
+                        tarOut.putArchiveEntry(entry)
+                        try {
+                            FileInputStream(item).buffered().use { it.copyTo(tarOut) }
+                        } finally {
+                            tarOut.closeArchiveEntry()
+                        }
+                    }
+                    else -> {
+
+                    }
                 }
-                zipOut.closeArchiveEntry()
             }
         }
     }

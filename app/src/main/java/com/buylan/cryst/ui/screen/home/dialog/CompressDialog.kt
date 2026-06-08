@@ -44,7 +44,7 @@ fun CompressDialog(
 ) {
 
     var fileName by remember { mutableStateOf(
-        if (source.size == 1) source[0].name else source[0].parent + ".zip"
+        (if (source.size == 1) source[0].name else source[0].parentFile?.name) + ".zip"
     ) }
     var createFail by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -138,7 +138,7 @@ fun CompressDialog(
                             val allFiles = source.flatMap { item ->
                                 val ioFile = item.toFile()
                                 if (item.isDirectory) {
-                                    ioFile.walkTopDown().filter { it.isFile }.toList()
+                                    ioFile.walkTopDown().toList()
                                 } else {
                                     listOf(ioFile)
                                 }

@@ -726,7 +726,7 @@ fun MainScreen(
     }
     viewModel.createDialog?.let { state ->
         CreateDialog(onDismiss = { viewModel.createDialog = null }, state.file) {
-            handleRefresh(state.file.parentFile)
+            handleRefresh(state.file)
         }
     }
     viewModel.compressDialog?.let { state ->
