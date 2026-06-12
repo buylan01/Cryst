@@ -1,13 +1,12 @@
 package com.buylan.cryst.ui.screen.home.dialog
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -22,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
 import com.buylan.cryst.util.createFile
 import com.buylan.cryst.util.createFolder
@@ -93,16 +93,12 @@ fun CreateDialog(
                     modifier = Modifier.focusRequester(focusRequester)
                 )
 
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    options.forEachIndexed { index, label ->
-                        SegmentedButton(
-                            shape = SegmentedButtonDefaults.itemShape(
-                                index = index,
-                                count = options.size
-                            ),
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    options.forEachIndexed { index, string ->
+                        FilterChip(
+                            selected = selectedIndex == index,
                             onClick = { selectedIndex = index },
-                            selected = index == selectedIndex,
-                            label = { Text(label) }
+                            label = { Text(string) }
                         )
                     }
                 }
