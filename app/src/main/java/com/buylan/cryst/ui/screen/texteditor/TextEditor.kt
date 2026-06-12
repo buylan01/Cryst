@@ -1,6 +1,7 @@
 package com.buylan.cryst.ui.screen.texteditor
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -61,9 +62,9 @@ fun TextEditor(
 
     DisposableEffect(editor) {
         val subscriber = editor.subscribeEvent(ContentChangeEvent::class.java) { _, _ ->
-            canUndo = editor.canUndo()
-            canRedo = editor.canRedo()
             isDirty = editor.isDirty
+            canUndo = editor.canUndo() && isDirty
+            canRedo = editor.canRedo()
         }
         onDispose { subscriber?.unsubscribe() }
     }
@@ -114,7 +115,7 @@ fun TextEditor(
                                     }
 
                                 } catch (e: Exception) {
-
+                                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
