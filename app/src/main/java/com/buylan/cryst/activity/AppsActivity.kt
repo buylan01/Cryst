@@ -8,10 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.buylan.cryst.Application
-import com.buylan.cryst.ui.screen.appmanager.ApplicationManager
+import com.buylan.cryst.ui.screen.apps.AppsScreen
 import com.buylan.cryst.ui.theme.CrystTheme
 
-class AppListActivity : ComponentActivity() {
+class AppsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,7 +29,7 @@ class AppListActivity : ComponentActivity() {
             ))
 
             CrystTheme(isDark) {
-                ApplicationManager()
+                AppsScreen()
             }
         }
     }

@@ -8,7 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.buylan.cryst.Application
-import com.buylan.cryst.ui.screen.about.AboutLibrariesScreen
+import com.buylan.cryst.ui.screen.libraries.LibrariesScreen
 import com.buylan.cryst.ui.theme.CrystTheme
 
 class LicensesActivity : ComponentActivity() {
@@ -27,7 +27,7 @@ class LicensesActivity : ComponentActivity() {
             ))
 
             CrystTheme(isDark) {
-                AboutLibrariesScreen(onBackPressed = { finish() })
+                LibrariesScreen(onBackPressed = { finish() })
             }
         }
     }

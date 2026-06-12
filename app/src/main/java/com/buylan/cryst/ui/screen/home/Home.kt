@@ -153,7 +153,7 @@ fun MainScreen(
 
     ModalNavigationDrawer(
         drawerContent = {
-            ModalDrawer(
+            DrawerContent(
                 context,
                 viewModel,
                 appViewModel,

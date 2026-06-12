@@ -1,4 +1,4 @@
-package com.buylan.cryst.ui.screen.imageviewer
+package com.buylan.cryst.ui.screen.image
 
 import android.annotation.SuppressLint
 import android.content.Context

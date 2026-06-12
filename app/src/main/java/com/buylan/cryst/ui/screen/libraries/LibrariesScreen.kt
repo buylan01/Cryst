@@ -1,4 +1,4 @@
-package com.buylan.cryst.ui.screen.about
+package com.buylan.cryst.ui.screen.libraries
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +22,7 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutLibrariesScreen(onBackPressed: () -> Unit) {
+fun LibrariesScreen(onBackPressed: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),

@@ -1,4 +1,4 @@
-package com.buylan.cryst.ui.screen.videoplayer
+package com.buylan.cryst.ui.screen.video
 
 import android.annotation.SuppressLint
 import android.content.Context

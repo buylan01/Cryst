@@ -34,7 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
-import com.buylan.cryst.activity.AppListActivity
+import com.buylan.cryst.activity.AppsActivity
 import com.buylan.cryst.activity.TerminalActivity
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.screen.home.model.MainViewModel
@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun ModalDrawer(
+fun DrawerContent(
     context: Context,
     viewModel: MainViewModel,
     appViewModel: AppViewModel,
@@ -167,7 +167,7 @@ fun ModalDrawer(
                     )
                 },
                 onClick = {
-                    context.startActivity(Intent(context, AppListActivity::class.java))
+                    context.startActivity(Intent(context, AppsActivity::class.java))
                 }
             )
             NavigationDrawerItem(

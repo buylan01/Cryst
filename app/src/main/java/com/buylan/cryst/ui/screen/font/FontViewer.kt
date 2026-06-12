@@ -1,4 +1,4 @@
-package com.buylan.cryst.ui.screen.fontviewer
+package com.buylan.cryst.ui.screen.font
 
 import android.content.Context
 import android.graphics.Typeface

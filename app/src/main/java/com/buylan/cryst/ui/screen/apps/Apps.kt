@@ -1,4 +1,4 @@
-package com.buylan.cryst.ui.screen.appmanager
+package com.buylan.cryst.ui.screen.apps
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -94,7 +94,7 @@ import java.io.IOException
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ApplicationManager(){
+fun AppsScreen(){
     val context = LocalContext.current
     var selectedDestination by rememberSaveable { mutableStateOf(Destination.USER) }
     var userApps by remember { mutableStateOf(emptyList<PackageInfo>()) }

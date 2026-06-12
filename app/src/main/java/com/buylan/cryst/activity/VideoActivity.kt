@@ -9,7 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.buylan.cryst.Application
-import com.buylan.cryst.ui.screen.videoplayer.VideoViewer
+import com.buylan.cryst.ui.screen.video.VideoViewer
 import com.buylan.cryst.ui.theme.CrystTheme
 
 class VideoActivity : ComponentActivity() {

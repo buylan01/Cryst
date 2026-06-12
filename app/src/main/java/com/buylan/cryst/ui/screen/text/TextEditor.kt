@@ -1,4 +1,4 @@
-package com.buylan.cryst.ui.screen.texteditor
+package com.buylan.cryst.ui.screen.text
 
 import android.content.Context
 import android.widget.Toast
