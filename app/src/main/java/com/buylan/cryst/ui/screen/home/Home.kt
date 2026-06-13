@@ -340,15 +340,11 @@ fun MainScreen(
                                     contentDescription = null,
                                 )
                             }
-                            IconButton(onClick = {
-                                scope.launch {
-                                    if (currentPanel == PanelPosition.L) {
-                                        rightPanelState.path = leftPanelState.path
-                                    } else {
-                                        leftPanelState.path = rightPanelState.path
-                                    }
+                            IconButton(
+                                onClick = {
+                                    viewModel.anotherPanel.path = viewModel.currentPanel.path
                                 }
-                            }) {
+                            ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_swap_horiz),
                                     contentDescription = null,
