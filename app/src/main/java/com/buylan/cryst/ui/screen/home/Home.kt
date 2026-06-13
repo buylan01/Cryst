@@ -312,15 +312,21 @@ fun MainScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            IconButton(onClick = { /* do something */ }) {
+                            IconButton(
+                                enabled = viewModel.currentPanel.canUnNavigate,
+                                onClick = { viewModel.currentPanel.unNavigate() }
+                            ) {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_apps),
+                                    painter = painterResource(R.drawable.ic_keyboard_arrow_left),
                                     contentDescription = null
                                 )
                             }
-                            IconButton(onClick = { viewModel.refreshPanel(viewModel.currentPanel) }) {
+                            IconButton(
+                                enabled = viewModel.currentPanel.canReNavigate,
+                                onClick = { viewModel.currentPanel.reNavigate() }
+                            ) {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_refresh),
+                                    painter = painterResource(R.drawable.ic_keyboard_arrow_right),
                                     contentDescription = null,
                                 )
                             }
@@ -344,7 +350,7 @@ fun MainScreen(
                                 }
                             }) {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_arrows_outward),
+                                    painter = painterResource(R.drawable.ic_swap_horiz),
                                     contentDescription = null,
                                 )
                             }

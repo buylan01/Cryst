@@ -10,7 +10,20 @@ import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.VirtualFile
 
 class PanelStates {
-    var path by mutableStateOf(DefaultPath)
+    var pathState = mutableStateOf(DefaultPath)
+    private val history = mutableListOf(DefaultPath)
+    private var historyIndex = 0
+    private var isUndoRedo = false
+    var path: VirtualFile
+        get() = pathState.value
+        set(value) {
+            if (value != pathState.value) {
+                if (!isUndoRedo) {
+                    addHistory(value)
+                }
+                pathState.value = value
+            }
+        }
     var highLightFiles by mutableStateOf(emptySet<String>())
     var selectedFiles = mutableStateSetOf<String>()
     var files by mutableStateOf(emptyList<VirtualFile>())
@@ -18,6 +31,12 @@ class PanelStates {
     val selectionMode: Boolean
         get() = selectedFiles.isNotEmpty()
     private var rangeAnchorPath: String? = null
+
+    val canUnNavigate: Boolean
+        get() = historyIndex > 0
+
+    val canReNavigate: Boolean
+        get() = historyIndex < history.size - 1
 
     fun navigateBack() {
         if (selectedFiles.isEmpty()) {
@@ -28,6 +47,32 @@ class PanelStates {
             }
         } else {
             resetSelection()
+        }
+    }
+
+    private fun addHistory(newPath: VirtualFile) {
+        while (history.size > historyIndex + 1) {
+            history.removeAt(history.size)
+        }
+        history.add(newPath)
+        historyIndex = history.size - 1
+    }
+
+    fun unNavigate() {
+        if (canUnNavigate) {
+            isUndoRedo = true
+            historyIndex--
+            path = history[historyIndex]
+            isUndoRedo = false
+        }
+    }
+
+    fun reNavigate() {
+        if (canReNavigate) {
+            isUndoRedo = true
+            historyIndex++
+            path = history[historyIndex]
+            isUndoRedo = false
         }
     }
 
