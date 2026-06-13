@@ -52,7 +52,7 @@ class PanelStates {
 
     private fun addHistory(newPath: VirtualFile) {
         while (history.size > historyIndex + 1) {
-            history.removeAt(history.size)
+            history.removeAt(history.size - 1)
         }
         history.add(newPath)
         historyIndex = history.size - 1
