@@ -1,5 +1,6 @@
 package com.buylan.cryst.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -26,10 +27,16 @@ val DefaultPath: VirtualFile = LocalFile("/storage/emulated/0")
 const val ExtractPath = "/storage/emulated/0/Cryst/package"
 val invalidChars = listOf('/', '\\', ':', '*', '?', '"', '<', '>', '|')
 
+@SuppressLint("SdCardPath")
+private val VIRTUAL_DIRS_MAP = mapOf(
+    "/" to listOf("/data", "/etc" ,"/mnt" ,"/proc", "/product", "/storage", "/system", "/system_ext", "/vendor", "/sdcard"),
+    "/storage" to listOf("/storage/emulated"),
+    "/storage/emulated" to listOf("/storage/emulated/0")
+)
+
 fun accessFiles(path: VirtualFile, sortType: SortType): List<VirtualFile> {
     try {
         val files = path.listFiles()?.toList()!!
-
         return files.sortedWith(
             compareBy<VirtualFile> { !it.isDirectory }
                 .then(
@@ -43,7 +50,7 @@ fun accessFiles(path: VirtualFile, sortType: SortType): List<VirtualFile> {
         )
     } catch (e: Exception) {
         e.printStackTrace()
-        return emptyList()
+        return VIRTUAL_DIRS_MAP[path.absolutePath]?.map { LocalFile(it) } ?: emptyList()
     }
 }
 
@@ -157,7 +164,7 @@ fun Context.shareFile(file: VirtualFile) {
 }
 
 fun VirtualFile.isRootPath(): Boolean {
-    return absolutePath == "/storage/emulated/0"
+    return absolutePath == "/"
 }
 
 fun getAudioMetadata(file: String): AudioFileData? {
