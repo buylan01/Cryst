@@ -82,4 +82,6 @@
     <string name="permission_request">Permission request</string>
     <string name="permission_manage_file_require">File management permission is required</string>
     <string name="delete_failed">Some files failed to delete</string>
+    <string name="install_time">Install time</string>
+    <string name="update_time">Update time</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,8 +45,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
@@ -97,6 +101,7 @@ import java.io.IOException
 fun AppsScreen(){
     val context = LocalContext.current
     var selectedDestination by rememberSaveable { mutableStateOf(Destination.USER) }
+    var sortType by rememberSaveable { mutableStateOf(AppsSortType.UPDATE_TIME) }
     var userApps by remember { mutableStateOf(emptyList<PackageInfo>()) }
     var systemApps by remember { mutableStateOf(emptyList<PackageInfo>()) }
     var checkedApp by remember { mutableStateOf<PackageInfo?>(null) }
@@ -106,33 +111,37 @@ fun AppsScreen(){
     var searchActive by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     val searchField = rememberTextFieldState()
+    var showMenu by remember { mutableStateOf(false) }
+    var showSortDialog by remember { mutableStateOf(false) }
     val pm = context.packageManager
     val scope = rememberCoroutineScope()
 
-    val filteredUserApps = remember(userApps,searchField.text) {
-        if (!searchActive) {
+    val filteredUserApps = remember(userApps,searchField.text, sortType) {
+        val apps = if (!searchActive) {
             userApps
         } else {
             val text = searchField.text
             userApps.filter { app ->
-                app.applicationInfo!!.loadLabel(context.packageManager)
+                app.applicationInfo!!.loadLabel(pm)
                     .toString()
                     .contains(text, ignoreCase = true) || app.packageName.contains(text)
             }
         }
+        sortApps(apps, sortType, pm)
     }
 
-    val filteredSystemApps = remember(systemApps,searchField.text) {
-        val text = searchField.text
-        if (!searchActive) {
+    val filteredSystemApps = remember(systemApps,searchField.text, sortType) {
+        val apps = if (!searchActive) {
             systemApps
         } else {
+            val text = searchField.text
             systemApps.filter { app ->
-                app.applicationInfo!!.loadLabel(context.packageManager)
+                app.applicationInfo!!.loadLabel(pm)
                     .toString()
                     .contains(text, ignoreCase = true)|| app.packageName.contains(text)
             }
         }
+        sortApps(apps, sortType, pm)
     }
 
     Scaffold(
@@ -172,9 +181,6 @@ fun AppsScreen(){
                     }
                 },
                 actions = {
-
-                    var showMenu by remember { mutableStateOf(false) }
-
                     IconButton(
                         onClick = {
                             val text = searchField.text
@@ -208,8 +214,10 @@ fun AppsScreen(){
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.sort)) },
-                            onClick = { Toast.makeText(context, "这里没做其实是作者的一个小巧思喵, 有意见去gayhub反馈喵",
-                                Toast.LENGTH_LONG).show() }
+                            onClick = {
+                                showSortDialog = true
+                                showMenu = false
+                            }
                         )
                     }
                 }
@@ -493,6 +501,52 @@ fun AppsScreen(){
                 }
             )
         }
+        if (showSortDialog) {
+            var selectedSortOption by remember { mutableStateOf(sortType) }
+            AlertDialog(
+                onDismissRequest = { showSortDialog = false },
+                title = { Text(text = stringResource(R.string.sort)) },
+                text = {
+                    Column(
+                        modifier = Modifier
+                    ) {
+                        AppsSortType.entries.forEach { sortType ->
+                            ListItem(
+                                headlineContent = { Text(stringResource(sortType.label)) },
+                                leadingContent = {
+                                    RadioButton(
+                                        selected = selectedSortOption == sortType,
+                                        onClick = { selectedSortOption = sortType }
+                                    )
+                                },
+                                modifier = Modifier
+                                    .clickable { selectedSortOption = sortType },
+                                colors = ListItemDefaults.colors(
+                                    containerColor = Color.Transparent
+                                )
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            sortType = selectedSortOption
+                            showSortDialog = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showSortDialog = false }
+                    ) {
+                        Text(stringResource(R.string.dismiss))
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -550,9 +604,29 @@ fun AppItem(
     }
 }
 
+fun sortApps(apps: List<PackageInfo>, sortType: AppsSortType, pm: PackageManager): List<PackageInfo> {
+    return apps.sortedWith(
+        when (sortType) {
+            AppsSortType.LABEL -> compareBy { it.applicationInfo!!.loadLabel(pm).toString().lowercase() }
+            AppsSortType.SIZE -> compareBy { File(it.applicationInfo!!.sourceDir).length() }
+            AppsSortType.UPDATE_TIME -> compareByDescending { it.lastUpdateTime }
+            AppsSortType.INSTALL_TIME -> compareBy { it.firstInstallTime }
+        }
+    )
+}
+
 enum class Destination(
     val label: Int
 ) {
     USER(R.string.user),
     SYSTEM(R.string.system),
+}
+
+enum class AppsSortType(
+    val label: Int
+) {
+    LABEL(R.string.name),
+    SIZE(R.string.size),
+    INSTALL_TIME(R.string.install_time),
+    UPDATE_TIME(R.string.update_time)
 }
