@@ -30,13 +30,21 @@ class ArchiveFile(
     }
 
     val delegate: ZipFile by lazy { getZipFile(entranceFile.absolutePath) }
-    override val absolutePath = entryName ?: entry?.name ?: ""
-    override val name: String = absolutePath.trimEnd('/').split('/').lastOrNull() ?: ""
-    override val parent: String? = parentFile?.absolutePath
-    override val isDirectory = entry?.isDirectory ?: true
-    override val path = absolutePath
-    override val pathDisplay: String = entranceFile.name + "/" + path
-    override val extension: String = name.substringAfterLast(".")
+
+    override val absolutePath
+        get() =  entryName ?: entry?.name ?: ""
+    override val name: String
+        get() =  absolutePath.trimEnd('/').split('/').lastOrNull() ?: ""
+    override val parent: String?
+        get() =  parentFile?.absolutePath
+    override val isDirectory
+        get() =  entry?.isDirectory ?: true
+    override val path
+        get() =  absolutePath
+    override val pathDisplay: String
+        get() =  entranceFile.name + "/" + path
+    override val extension: String
+        get() =  name.substringAfterLast(".")
 
     override fun listFiles(): List<VirtualFile>? {
         if (!isDirectory) return null

@@ -5,19 +5,29 @@ import java.io.IOException
 
 class LocalFile(
     private val delegate: File,
-    override val parentFile: VirtualFile? = delegate.parentFile?.takeIf { it != delegate }?.let { LocalFile(it) }
 ) : VirtualFile {
-    constructor(parent: String?, child: String) : this(parent?.let { File(it, child) } ?: File(child))
-    constructor(parent: VirtualFile? = null, path: String) : this(File(path), parentFile = parent)
     constructor(path: String) : this(File(path))
+    constructor(parentFile: VirtualFile, child: String) : this(child) { this._parentFile = parentFile }
+    constructor(parent: String?, child: String) : this(parent?.let { File(it, child) } ?: File(child))
 
-    override val name: String = delegate.name
-    override val parent: String? = delegate.parent
-    override val isDirectory = delegate.isDirectory
-    override val absolutePath: String = delegate.absolutePath
-    override var path: String = delegate.path
-    override val pathDisplay: String = absolutePath
-    override val extension = delegate.extension
+    private var _parentFile: VirtualFile? = null
+
+    override val name: String
+        get() = delegate.name
+    override val parent: String?
+        get() = delegate.parent
+    override val parentFile: VirtualFile?
+        get() = _parentFile ?: delegate.parentFile?.let { LocalFile(it) }
+    override val isDirectory
+        get() = delegate.isDirectory
+    override val absolutePath: String
+        get() = delegate.absolutePath
+    override val path: String
+        get() = delegate.path
+    override val pathDisplay: String
+        get() = absolutePath
+    override val extension
+        get() =  delegate.extension
 
     override fun listFiles(): List<VirtualFile>? = delegate.listFiles()?.map { LocalFile(it) }
     override fun readBytes(): ByteArray? = if (!isDirectory) delegate.readBytes() else null
