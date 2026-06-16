@@ -70,17 +70,7 @@ fun getActualFile(context: Context, f: VirtualFile): VirtualFile {
 }
 
 fun getFileType(file: VirtualFile): FileType {
-    return if (file.isDirectory) FileType.FOLDER else when (file.extension.lowercase()) {
-        "txt", "xml", "prop", "conf", "json", "smali", "cpp", "html", "bat", "log" -> FileType.TEXT
-        "jpg", "jpeg", "png", "gif", "webp" -> FileType.IMAGE
-        "mp3", "wav", "ogg", "flac" -> FileType.AUDIO
-        "mp4" -> FileType.VIDEO
-        "sh", "rc" -> FileType.SCRIPT
-        "ttf", "otf" -> FileType.FONT
-        "apk" -> FileType.APK
-        "zip", "rar", "7z" -> FileType.ARCHIVE
-        else -> FileType.FILE
-    }
+    return if (file.isDirectory) FileType.FOLDER else FileTypeRegistry.getType(file.extension)
 }
 
 fun formatFileSize(sizeInBytes: Long): String {
