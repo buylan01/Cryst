@@ -46,6 +46,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.home.model.FileType
+import com.buylan.cryst.util.formatFileDate
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
@@ -190,11 +191,22 @@ fun FileRow(
                 style = MaterialTheme.typography.titleSmall,
                 color = if (!highLight) Color.Unspecified else MaterialTheme.colorScheme.primary
             )
-            if (!file.isDirectory) {
+            Row {
                 Text(
-                    text = formatFileSize(file.length()),
-                    style = MaterialTheme.typography.bodySmall
+                    text = formatFileDate(file, "yy-MM-dd HH:mm"),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline,
+                    maxLines = 1
                 )
+                Spacer(Modifier.width(4.dp))
+                if (!file.isDirectory) {
+                    Text(
+                        text = formatFileSize(file.length()),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline,
+                        maxLines = 1
+                    )
+                }
             }
         }
 

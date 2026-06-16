@@ -115,9 +115,9 @@ fun formatSizeDetail(size: Long): String {
     )
 }
 
-fun formatFileDate(file: VirtualFile): String {
+fun formatFileDate(file: VirtualFile, format: String = "yyyy-MM-dd HH:mm:ss"): String {
     val date = Date(file.lastModified())
-    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    val formatter = SimpleDateFormat(format, Locale.getDefault())
     return formatter.format(date)
 }
 
