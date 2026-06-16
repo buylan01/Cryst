@@ -42,7 +42,10 @@ fun CopyDialog(
 
     AlertDialog(
         modifier = Modifier.width(560.dp),
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = {
+            onDismiss()
+            viewModel.finish()
+        },
         title = { Text(stringResource(R.string.copy)) },
         text = {
             Column {
