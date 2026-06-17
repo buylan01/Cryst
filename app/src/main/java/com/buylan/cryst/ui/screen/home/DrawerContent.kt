@@ -53,7 +53,7 @@ import com.buylan.cryst.R
 import com.buylan.cryst.activity.AppsActivity
 import com.buylan.cryst.activity.TerminalActivity
 import com.buylan.cryst.model.AppViewModel
-import com.buylan.cryst.ui.screen.home.model.MainViewModel
+import com.buylan.cryst.ui.screen.home.model.HomeViewModel
 import com.buylan.cryst.util.DefaultPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -62,7 +62,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun DrawerContent(
     context: Context,
-    viewModel: MainViewModel,
+    viewModel: HomeViewModel,
     appViewModel: AppViewModel,
     drawerState: DrawerState,
     modifier: Modifier = Modifier
@@ -106,7 +106,7 @@ fun DrawerContent(
                     )
                 },
                 onClick = {
-                    viewModel.showAboutDialog = true
+                    viewModel.dialogsViewModel.showAboutDialog()
                 }
             )
             HorizontalDivider()

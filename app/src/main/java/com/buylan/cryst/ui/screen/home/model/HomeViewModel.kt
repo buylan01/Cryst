@@ -18,11 +18,7 @@ package com.buylan.cryst.ui.screen.home.model
 
 import android.content.Context
 import android.content.Intent
-import android.os.Environment
 import android.widget.Toast
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.buylan.cryst.R
@@ -30,7 +26,10 @@ import com.buylan.cryst.activity.FontActivity
 import com.buylan.cryst.activity.ImageActivity
 import com.buylan.cryst.activity.TextEditorActivity
 import com.buylan.cryst.activity.VideoActivity
+import com.buylan.cryst.ui.screen.home.HomeUiState
 import com.buylan.cryst.ui.screen.home.PanelStates
+import com.buylan.cryst.ui.screen.home.dialog.DialogsState
+import com.buylan.cryst.ui.screen.home.dialog.DialogsViewModel
 import com.buylan.cryst.util.accessFiles
 import com.buylan.cryst.util.getActualFile
 import com.buylan.cryst.util.getFileType
@@ -39,45 +38,39 @@ import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainViewModel : ViewModel() {
-    var currentPosition by mutableStateOf(PanelPosition.L)
-        private set
+class HomeViewModel(
+    private val _dialogsViewModel: DialogsViewModel = DialogsViewModel()
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+    val dialogsViewModel: DialogsViewModel = _dialogsViewModel
+    val dialogsState: StateFlow<DialogsState> = _dialogsViewModel.dialogsState
 
     fun setPanel(panel: PanelPosition) {
-        currentPosition = panel
+        _uiState.update { currentState ->
+            currentState.copy(panelPosition = panel)
+        }
     }
 
     private val _scrollToIndex = MutableSharedFlow<Int>(extraBufferCapacity = 1)
-
-    //dialogs mountain
-    var showPathDialog by mutableStateOf(false)
-    var showAboutDialog by mutableStateOf(false)
-    var showSort by mutableStateOf(false)
-    var showPermissionRequest by mutableStateOf(!Environment.isExternalStorageManager())
-    var apkDialog: NormalDialogState? by mutableStateOf(null)
-    var deleteDialog: OperationDialogState? by mutableStateOf(null)
-    var renameDialog: NormalDialogState? by mutableStateOf(null)
-    var createDialog: NormalDialogState? by mutableStateOf(null)
-    var searchDialog: NormalDialogState? by mutableStateOf(null)
-    var audioDialog: NormalDialogState? by mutableStateOf(null)
-    var propertiesDialog: OperationDialogState? by mutableStateOf(null)
-    var openWithDialog: NormalDialogState? by mutableStateOf(null)
-    var compressDialog: OperationDialogState? by mutableStateOf(null)
-    var toolsDialog: OperationDialogState? by mutableStateOf(null)
-    var copyDialog: ExtraDialogState? by mutableStateOf(null)
-    var moveDialog: ExtraDialogState? by mutableStateOf(null)
 
     val scrollToIndex = _scrollToIndex.asSharedFlow()
     val leftPanelState = PanelStates()
     val rightPanelState = PanelStates()
     val currentPanel
-        get() =  if (currentPosition == PanelPosition.L) leftPanelState else rightPanelState
+        get() =  if (_uiState.value.panelPosition == PanelPosition.L) leftPanelState else rightPanelState
     val anotherPanel
-        get() =  if (currentPosition == PanelPosition.R) leftPanelState else rightPanelState
+        get() =  if (_uiState.value.panelPosition == PanelPosition.R) leftPanelState else rightPanelState
     val currentPath
         get() = currentPanel.path
 
@@ -117,15 +110,24 @@ class MainViewModel : ViewModel() {
             val actualFile = getActualFile(context, file)
 
             when (actualType) {
-                FileType.TEXT -> {
-                    context.startActivity(
-                        Intent(
-                            context,
-                            TextEditorActivity::class.java
-                        ).putExtra("filePath", actualFile.path)
-                    )
-                }
-
+                FileType.TEXT -> context.startActivity(
+                    Intent(context, TextEditorActivity::class.java)
+                        .putExtra("filePath", actualFile.path)
+                )
+                FileType.IMAGE -> context.startActivity(
+                    Intent(context, ImageActivity::class.java)
+                        .putExtra("filePath", actualFile.path)
+                )
+                FileType.FONT -> context.startActivity(
+                    Intent(context, FontActivity::class.java)
+                        .putExtra("filePath", actualFile.path)
+                )
+                FileType.VIDEO -> context.startActivity(
+                    Intent(context, VideoActivity::class.java)
+                        .putExtra("filePath", actualFile.path)
+                )
+                FileType.APK -> _dialogsViewModel.showApkDialog(actualFile)
+                FileType.AUDIO -> _dialogsViewModel.showAudioDialog(actualFile)
                 FileType.ARCHIVE -> {
                     try {
                         currentPanel.path = ArchiveFile(entranceFile = actualFile)
@@ -133,76 +135,38 @@ class MainViewModel : ViewModel() {
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                     }
                 }
-
-                FileType.IMAGE -> context.startActivity(
-                    Intent(
-                        context,
-                        ImageActivity::class.java
-                    ).putExtra("filePath", actualFile.path)
-                )
-
-                FileType.APK -> {
-                    apkDialog = NormalDialogState(actualFile)
-                }
-
-                FileType.FONT -> context.startActivity(
-                    Intent(
-                        context,
-                        FontActivity::class.java
-                    ).putExtra("filePath", actualFile.path)
-                )
-
-                FileType.VIDEO -> context.startActivity(
-                    Intent(
-                        context,
-                        VideoActivity::class.java
-                    ).putExtra("filePath", actualFile.path)
-                )
-
-                FileType.AUDIO -> {
-                    audioDialog = NormalDialogState(actualFile)
-                }
-
-                else -> {
-                    openWithDialog = NormalDialogState(actualFile)
-                }
+                else -> _dialogsViewModel.showOpenWithDialog(actualFile)
             }
         }
     }
 
     fun onToolAction(context: Context, action: ToolAction, file: List<VirtualFile>) {
-        toolsDialog = null
+        _dialogsViewModel.hideToolsDialog()
+
         when (action) {
             ToolAction.Move -> {
-                moveDialog = ExtraDialogState(file, anotherPanel.path)
+                _dialogsViewModel.showMoveDialog(ExtraDialogState(file, anotherPanel.path))
             }
-
             ToolAction.Copy -> {
-                copyDialog = ExtraDialogState(file, anotherPanel.path)
+                _dialogsViewModel.showCopyDialog(ExtraDialogState(file, anotherPanel.path))
             }
-
             ToolAction.Rename -> {
-                renameDialog = NormalDialogState(file.singleOrNull() ?: return)
+                _dialogsViewModel.showRenameDialog(file.singleOrNull() ?: return)
             }
-
             ToolAction.Delete -> {
-                deleteDialog = OperationDialogState(file)
+                _dialogsViewModel.showDeleteDialog(OperationDialogState(file))
             }
-
             ToolAction.Properties -> {
-                propertiesDialog = OperationDialogState(file)
+                _dialogsViewModel.showPropertiesDialog(OperationDialogState(file))
             }
-
             ToolAction.OpenWith -> {
-                openWithDialog = NormalDialogState(file.singleOrNull() ?: return)
+                _dialogsViewModel.showOpenWithDialog(file.singleOrNull() ?: return)
             }
-
             ToolAction.Share -> {
                 context.shareFile(file.singleOrNull() ?: return)
             }
-
             ToolAction.Compress -> {
-                compressDialog = OperationDialogState(file)
+                _dialogsViewModel.showCompressDialog(OperationDialogState(file))
             }
         }
     }
@@ -216,9 +180,6 @@ enum class SortType(
 }
 
 enum class PanelPosition { L, R }
-data class NormalDialogState(
-    val file: VirtualFile
-)
 data class OperationDialogState(
     val files: List<VirtualFile>
 )

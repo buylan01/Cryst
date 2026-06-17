@@ -30,14 +30,23 @@ fun createZip(
     baseDir: File
 ): File {
     ZipArchiveOutputStream(outputZipFile).use { zipOut ->
-        files.forEach { file ->
-            val relativePath = file.relativeTo(baseDir).path.replace("\\", "/")
-            val entry = ZipArchiveEntry(file, relativePath)
-            zipOut.putArchiveEntry(entry)
-            FileInputStream(file).use { fis ->
-                fis.copyTo(zipOut)
+        files.forEach { item ->
+            val relativePath = item.relativeTo(baseDir).path.replace("\\", "/")
+            when {
+                item.isDirectory -> {
+                    val entry = ZipArchiveEntry("$relativePath/")
+                    zipOut.putArchiveEntry(entry)
+                    zipOut.closeArchiveEntry()
+                }
+                item.isFile -> {
+                    val entry = ZipArchiveEntry(item, relativePath)
+                    zipOut.putArchiveEntry(entry)
+                    FileInputStream(item).use { fis ->
+                        fis.copyTo(zipOut)
+                    }
+                    zipOut.closeArchiveEntry()
+                }
             }
-            zipOut.closeArchiveEntry()
         }
     }
     return outputZipFile

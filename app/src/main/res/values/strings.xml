@@ -66,7 +66,7 @@
     <string name="style">style</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
-    <string name="dark_mode">DarkMode</string>
+    <string name="settings_dark_mode_title">DarkMode</string>
     <string name="install">Install</string>
     <string name="unpack">Unpack</string>
     <string name="format">Format</string>
@@ -100,4 +100,6 @@
     <string name="delete_failed">Some files failed to delete</string>
     <string name="install_time">Install time</string>
     <string name="update_time">Update time</string>
+    <string name="settings_dark_mode_description">Choose the app theme appearance</string>
+    <string name="settings_group_appearance">Appearance</string>
 </resources>

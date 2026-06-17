@@ -64,9 +64,9 @@
     <string name="move">移动</string>
     <string name="delete_file_warning">文件将永久丢失</string>
     <string name="style">外观</string>
-    <string name="light">明亮</string>
-    <string name="dark">黑暗</string>
-    <string name="dark_mode">暗色模式</string>
+    <string name="light">浅色</string>
+    <string name="dark">深色</string>
+    <string name="settings_dark_mode_title">深色模式</string>
     <string name="install">安装</string>
     <string name="unpack">解包</string>
     <string name="format">格式</string>
@@ -99,4 +99,6 @@
     <string name="delete_failed">删除失败</string>
     <string name="install_time">安装时间</string>
     <string name="update_time">更新时间</string>
+    <string name="settings_dark_mode_description">选择应用的主题外观</string>
+    <string name="settings_group_appearance">外观</string>
 </resources>

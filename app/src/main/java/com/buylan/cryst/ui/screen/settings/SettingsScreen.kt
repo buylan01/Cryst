@@ -18,8 +18,10 @@ package com.buylan.cryst.ui.screen.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.DropdownMenu
@@ -29,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -71,18 +74,24 @@ fun SettingsScreen(appViewModel: AppViewModel, onBackPressed: () -> Unit) {
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item { Spacer(Modifier.height(12.dp)) }
+            item {
+                Text(
+                    text = stringResource(R.string.settings_group_appearance),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 16.dp),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
             item {
                 var showDarkModeMenu by remember { mutableStateOf(false) }
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.dark_mode)) },
+                    headlineContent = { Text(stringResource(R.string.settings_dark_mode_title)) },
                     modifier = Modifier.clickable(onClick = { showDarkModeMenu = true }),
                     leadingContent = { Icon(painter = painterResource(R.drawable.ic_dark_mode), contentDescription = null) },
-                    supportingContent = {
-                        Text(
-                            text = stringResource(appViewModel.darkMode.label)
-                        )
-                    },
+                    supportingContent = { Text(stringResource(R.string.settings_dark_mode_description)) },
                     trailingContent = {
+                        Text(text = stringResource(appViewModel.darkMode.label))
                         DropdownMenu(
                             expanded = showDarkModeMenu,
                             onDismissRequest = { showDarkModeMenu = false }

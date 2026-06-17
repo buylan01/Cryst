@@ -75,6 +75,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -113,8 +114,7 @@ import com.buylan.cryst.ui.screen.home.dialog.SearchDialog
 import com.buylan.cryst.ui.screen.home.dialog.SortOrderDialog
 import com.buylan.cryst.ui.screen.home.dialog.ToolDialog
 import com.buylan.cryst.ui.screen.home.model.FileType
-import com.buylan.cryst.ui.screen.home.model.MainViewModel
-import com.buylan.cryst.ui.screen.home.model.NormalDialogState
+import com.buylan.cryst.ui.screen.home.model.HomeViewModel
 import com.buylan.cryst.ui.screen.home.model.OperationDialogState
 import com.buylan.cryst.ui.screen.home.model.PanelPosition
 import com.buylan.cryst.util.getFileType
@@ -132,20 +132,18 @@ import kotlinx.coroutines.launch
     ExperimentalLayoutApi::class
 )
 @Composable
-fun MainScreen(
+fun HomeScreen(
     context: Context,
-    viewModel: MainViewModel = viewModel(),
+    viewModel: HomeViewModel = viewModel(),
     appViewModel: AppViewModel = viewModel(),
     pathFlow: SharedFlow<String>
 ) {
+    val homeUiState by viewModel.uiState.collectAsState()
+    val dialogsState by viewModel.dialogsState.collectAsState()
     val scope = rememberCoroutineScope()
-    val currentPanel = viewModel.currentPosition
-    val currentPath = viewModel.currentPath
     val leftLazyState = rememberLazyListState()
     val rightLazyState = rememberLazyListState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val leftPanelState = viewModel.leftPanelState
-    val rightPanelState = viewModel.rightPanelState
 
     BackHandler(
         enabled = !viewModel.currentPanel.path.isRootPath() || viewModel.currentPanel.selectedFiles.isNotEmpty()
@@ -180,13 +178,13 @@ fun MainScreen(
                     title = {
                         Column {
                             Text(
-                                text = currentPath.pathDisplay,
+                                text = viewModel.currentPath.pathDisplay,
                                 maxLines = 1,
                                 overflow = TextOverflow.StartEllipsis,
                                 softWrap = false,
                                 modifier = Modifier.clickable(
                                     onClick = {
-                                        viewModel.showPathDialog = true
+                                        viewModel.dialogsViewModel.showPathDialog()
                                     }
                                 )
                             )
@@ -249,10 +247,7 @@ fun MainScreen(
                                         )
                                     },
                                     onClick = {
-                                        viewModel.searchDialog =
-                                            NormalDialogState(
-                                                currentPath
-                                            )
+                                        viewModel.dialogsViewModel.showSearchDialog(viewModel.currentPath)
                                         expanded = false
                                     }
                                 )
@@ -266,7 +261,7 @@ fun MainScreen(
                                         )
                                     },
                                     onClick = {
-                                        viewModel.showSort = true
+                                        viewModel.dialogsViewModel.showSortDialog()
                                         expanded = false
                                     }
                                 )
@@ -328,11 +323,9 @@ fun MainScreen(
                                     contentDescription = null,
                                 )
                             }
-                            IconButton(onClick = { viewModel.createDialog =
-                                NormalDialogState(
-                                    currentPath
-                                )
-                            }) {
+                            IconButton(
+                                onClick = { viewModel.dialogsViewModel.showCreateDialog(viewModel.currentPath) }
+                            ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_add),
                                     contentDescription = null,
@@ -365,17 +358,17 @@ fun MainScreen(
                     .padding(contentPadding)
             ) {
 
-                LaunchedEffect(leftPanelState.path) {
-                    viewModel.refreshPanel(leftPanelState)
+                LaunchedEffect(viewModel.leftPanelState.path) {
+                    viewModel.refreshPanel(viewModel.leftPanelState)
                 }
 
-                LaunchedEffect(rightPanelState.path) {
-                    viewModel.refreshPanel(rightPanelState)
+                LaunchedEffect(viewModel.rightPanelState.path) {
+                    viewModel.refreshPanel(viewModel.rightPanelState)
                 }
 
                 LaunchedEffect(Unit) {
                     viewModel.scrollToIndex.collect { index ->
-                        val currentState = if (currentPanel == PanelPosition.L) leftLazyState else rightLazyState
+                        val currentState = if (homeUiState.panelPosition == PanelPosition.L) leftLazyState else rightLazyState
 
                         snapshotFlow { currentState.layoutInfo.totalItemsCount }.first { it > index }
                         currentState.scrollToItem(index)
@@ -390,7 +383,7 @@ fun MainScreen(
                 }
 
                 fun handleFileLongClick(file: List<VirtualFile>) {
-                    viewModel.toolsDialog = OperationDialogState(file)
+                    viewModel.dialogsViewModel.showToolsDialog(OperationDialogState(file))
                 }
 
                 val animation = (fadeIn(animationSpec = tween(220,0)) + scaleIn(
@@ -404,7 +397,7 @@ fun MainScreen(
                     panelPosition: PanelPosition
                 ) {
                     val backgroundColor by animateColorAsState(
-                        targetValue = if (panelPosition == currentPanel) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
+                        targetValue = if (panelPosition == homeUiState.panelPosition) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
                         animationSpec = tween(150)
                     )
                     Box(
@@ -492,20 +485,20 @@ fun MainScreen(
 
     fun handleRefresh(path: VirtualFile?, highlights: Set<String> = emptySet()) {
         path?.let {
-            if (leftPanelState.path.absolutePath == path.absolutePath) {
-                viewModel.leftPanelState.highLightFiles = highlights
-                viewModel.refreshPanel(leftPanelState)
-            }
-            if (rightPanelState.path.absolutePath == path.absolutePath) {
-                viewModel.rightPanelState.highLightFiles = highlights
-                viewModel.refreshPanel(rightPanelState)
+            val panelState =
+                if (viewModel.leftPanelState.path.absolutePath == path.absolutePath) viewModel.leftPanelState
+                else if (viewModel.rightPanelState.path.absolutePath == path.absolutePath) viewModel.rightPanelState
+                else null
+            panelState?.let {
+                it.highLightFiles = highlights
+                viewModel.refreshPanel(it)
             }
         }
     }
 
-    if (viewModel.showPermissionRequest) {
+    if (dialogsState.permissionRequest) {
         AlertDialog(
-            onDismissRequest = { viewModel.showPermissionRequest = false },
+            onDismissRequest = { viewModel.dialogsViewModel.hidePermissionRequest() },
             title = { Text(stringResource(R.string.permission_request)) },
             text = {
                 Text(stringResource(R.string.app_name) + stringResource(R.string.permission_manage_file_require))
@@ -515,7 +508,7 @@ fun MainScreen(
                     onClick = {
                         val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                         context.startActivity(intent)
-                        viewModel.showPermissionRequest = false
+                        viewModel.dialogsViewModel.hidePermissionRequest()
                     }
                 ) {
                     Text(stringResource(R.string.confirm))
@@ -525,7 +518,7 @@ fun MainScreen(
                 TextButton(
                     onClick = {
                         Toast.makeText(context, "TAT", Toast.LENGTH_SHORT).show()
-                        viewModel.showPermissionRequest = false
+                        viewModel.dialogsViewModel.hidePermissionRequest()
                     }
                 ) {
                     Text(stringResource(R.string.cancel))
@@ -534,9 +527,9 @@ fun MainScreen(
         )
     }
 
-    if (viewModel.showAboutDialog) {
+    if (dialogsState.aboutDialog) {
         BasicAlertDialog(
-            onDismissRequest = { viewModel.showAboutDialog = false },
+            onDismissRequest = { viewModel.dialogsViewModel.hideAboutDialog() },
             content = {
                 Surface(
                     shape = MaterialTheme.shapes.extraLarge,
@@ -596,10 +589,10 @@ fun MainScreen(
         )
     }
 
-    if (viewModel.showPathDialog) {
+    if (dialogsState.pathDialog) {
         val textFieldState = rememberTextFieldState(initialText = viewModel.currentPanel.path.absolutePath)
         AlertDialog(
-            onDismissRequest = { viewModel.showPathDialog = false },
+            onDismissRequest = { viewModel.dialogsViewModel.hidePathDialog() },
             title = { Text(stringResource(R.string.path)) },
             text = {
                 val focusRequester = remember { FocusRequester() }
@@ -618,7 +611,7 @@ fun MainScreen(
                 Button(
                     onClick = {
                         viewModel.currentPanel.path = LocalFile(textFieldState.text.toString())
-                        viewModel.showPathDialog = false
+                        viewModel.dialogsViewModel.hidePathDialog()
                     }
                 ) {
                     Text(stringResource(R.string.confirm))
@@ -626,7 +619,7 @@ fun MainScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { viewModel.showPathDialog = false }
+                    onClick = { viewModel.dialogsViewModel.hidePathDialog() }
                 ) {
                     Text(stringResource(R.string.cancel))
                 }
@@ -634,90 +627,90 @@ fun MainScreen(
         )
     }
 
-    viewModel.openWithDialog?.let { state ->
+    dialogsState.openWithDialog?.let { file ->
         OpenWithDialog(
-            onDismiss = { viewModel.openWithDialog = null }
-        ) { viewModel.handleFileClick(context, state.file, it) }
+            onDismiss = { viewModel.dialogsViewModel.hideOpenWithDialog() }
+        ) { viewModel.handleFileClick(context, file, it) }
     }
 
-    viewModel.toolsDialog?.let { state ->
+    dialogsState.toolsDialog?.let { state ->
         ToolDialog(
-            state.files, currentPanel,
-            onDismiss = { viewModel.toolsDialog = null },
+            state.files, homeUiState.panelPosition,
+            onDismiss = { viewModel.dialogsViewModel.hideToolsDialog() },
             onToolAction = { viewModel.onToolAction(context,it, state.files) },
         )
     }
 
-    viewModel.deleteDialog?.let { state ->
+    dialogsState.deleteDialog?.let { state ->
         DeleteDialog(
             targetFiles = state.files,
-            onDismiss = { viewModel.deleteDialog = null },
+            onDismiss = { viewModel.dialogsViewModel.hideDeleteDialog() },
             onRefresh = {
                 handleRefresh(state.files.first().parentFile)
             }
         )
     }
-    viewModel.copyDialog?.let { state ->
+    dialogsState.copyDialog?.let { state ->
         CopyDialog(
             source = state.files,
             target = state.path,
-            onDismiss = { viewModel.copyDialog = null },
+            onDismiss = { viewModel.dialogsViewModel.hideCopyDialog() },
             onRefresh = {
                 handleRefresh(state.path)
             }
         )
     }
-    viewModel.moveDialog?.let { state ->
+    dialogsState.moveDialog?.let { state ->
         MoveDialog(
             source = state.files,
             target = state.path,
-            onDismiss = { viewModel.moveDialog = null },
+            onDismiss = { viewModel.dialogsViewModel.hideMoveDialog() },
             onRefresh = {
                 handleRefresh(state.files.first().parentFile)
                 handleRefresh(state.path)
             }
         )
     }
-    viewModel.createDialog?.let { state ->
-        CreateDialog(onDismiss = { viewModel.createDialog = null }, state.file) {
-            handleRefresh(state.file)
+    dialogsState.createDialog?.let { file ->
+        CreateDialog(onDismiss = { viewModel.dialogsViewModel.hideCreateDialog() }, file) {
+            handleRefresh(file)
         }
     }
-    viewModel.compressDialog?.let { state ->
-        CompressDialog(state.files, { viewModel.compressDialog = null })  {
+    dialogsState.compressDialog?.let { state ->
+        CompressDialog(state.files, { viewModel.dialogsViewModel.hideCompressDialog() })  {
             handleRefresh(state.files.first().parentFile)
         }
     }
-    if (viewModel.showSort) {
+    if (dialogsState.sortDialog) {
         SortOrderDialog(
-            onDismiss = { viewModel.showSort = false },
+            onDismiss = { viewModel.dialogsViewModel.hideSortDialog() },
             viewModel.currentPanel,
-            currentPanel
+            homeUiState.panelPosition
         )
     }
-    viewModel.searchDialog?.let { state ->
-        SearchDialog(onDismiss = { viewModel.searchDialog = null }, state.file) { file ->
+    dialogsState.searchDialog?.let { file ->
+        SearchDialog(onDismiss = { viewModel.dialogsViewModel.hideSearchDialog() }, file) { file ->
             viewModel.currentPanel.path = file
-            viewModel.searchDialog = null
+            viewModel.dialogsViewModel.hideSearchDialog()
         }
     }
-    viewModel.apkDialog?.let { state ->
+    dialogsState.apkDialog?.let { file ->
         PackageDetail(
             context = context,
-            targetFile = state.file as LocalFile,
-            onDismiss = { viewModel.apkDialog = null },
-            unpack = { viewModel.handleFileClick(context, state.file, type = FileType.ARCHIVE) })
+            targetFile = file as LocalFile,
+            onDismiss = { viewModel.dialogsViewModel.hideApkDialog() },
+            unpack = { viewModel.handleFileClick(context, file, type = FileType.ARCHIVE) })
     }
-    viewModel.audioDialog?.let { state ->
-        AudioPlayer(onDismiss = { viewModel.audioDialog = null }, state.file)
+    dialogsState.audioDialog?.let { file ->
+        AudioPlayer(onDismiss = { viewModel.dialogsViewModel.hideAudioDialog() }, file)
     }
-    viewModel.renameDialog?.let { state ->
-        RenameDialog(state.file, { viewModel.renameDialog = null }) {
-            handleRefresh(state.file.parentFile)
+    dialogsState.renameDialog?.let { file ->
+        RenameDialog(file, { viewModel.dialogsViewModel.hideRenameDialog() }) {
+            handleRefresh(file.parentFile)
         }
     }
-    viewModel.propertiesDialog?.let { state ->
-        PropertiesDialog(state.files) { viewModel.propertiesDialog = null }
+    dialogsState.propertiesDialog?.let { state ->
+        PropertiesDialog(state.files) { viewModel.dialogsViewModel.hidePropertiesDialog() }
     }
 }
 
