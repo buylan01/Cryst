@@ -87,6 +87,8 @@ class MainViewModel : ViewModel() {
                     _scrollToIndex.tryEmit(index)
                 }
             }
+
+            panelState.resetSelection()
         }
     }
 
