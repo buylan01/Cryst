@@ -61,7 +61,7 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.buylan.cryst.R
-import com.buylan.cryst.ui.screen.home.model.FileType
+import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.formatFileDate
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.vfs.VirtualFile
@@ -75,7 +75,7 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FileRow(
+fun FileItem(
     file: VirtualFile,
     type: FileType,
     highLight: Boolean = false,

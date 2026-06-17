@@ -113,10 +113,10 @@ import com.buylan.cryst.ui.screen.home.dialog.RenameDialog
 import com.buylan.cryst.ui.screen.home.dialog.SearchDialog
 import com.buylan.cryst.ui.screen.home.dialog.SortOrderDialog
 import com.buylan.cryst.ui.screen.home.dialog.ToolDialog
-import com.buylan.cryst.ui.screen.home.model.FileType
 import com.buylan.cryst.ui.screen.home.model.HomeViewModel
-import com.buylan.cryst.ui.screen.home.model.OperationDialogState
-import com.buylan.cryst.ui.screen.home.model.PanelPosition
+import com.buylan.cryst.ui.screen.home.model.PanelStates
+import com.buylan.cryst.util.FileType
+import com.buylan.cryst.util.PanelPosition
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.LocalFile
@@ -383,7 +383,7 @@ fun HomeScreen(
                 }
 
                 fun handleFileLongClick(file: List<VirtualFile>) {
-                    viewModel.dialogsViewModel.showToolsDialog(OperationDialogState(file))
+                    viewModel.dialogsViewModel.showToolsDialog(file)
                 }
 
                 val animation = (fadeIn(animationSpec = tween(220,0)) + scaleIn(
@@ -426,7 +426,7 @@ fun HomeScreen(
                                     UpwardItem { panelState.navigateBack() }
                                 }
                                 items(files, key = { it.hashCode() }) { file ->
-                                    FileRow(
+                                    FileItem(
                                         file = file,
                                         type = getFileType(file),
                                         highLight = file.name in panelState.highLightFiles,
@@ -633,20 +633,20 @@ fun HomeScreen(
         ) { viewModel.handleFileClick(context, file, it) }
     }
 
-    dialogsState.toolsDialog?.let { state ->
+    dialogsState.toolsDialog?.let { files ->
         ToolDialog(
-            state.files, homeUiState.panelPosition,
+            files, homeUiState.panelPosition,
             onDismiss = { viewModel.dialogsViewModel.hideToolsDialog() },
-            onToolAction = { viewModel.onToolAction(context,it, state.files) },
+            onToolAction = { viewModel.onToolAction(context,it, files) },
         )
     }
 
-    dialogsState.deleteDialog?.let { state ->
+    dialogsState.deleteDialog?.let { files ->
         DeleteDialog(
-            targetFiles = state.files,
+            targetFiles = files,
             onDismiss = { viewModel.dialogsViewModel.hideDeleteDialog() },
             onRefresh = {
-                handleRefresh(state.files.first().parentFile)
+                handleRefresh(files.first().parentFile)
             }
         )
     }
@@ -676,9 +676,9 @@ fun HomeScreen(
             handleRefresh(file)
         }
     }
-    dialogsState.compressDialog?.let { state ->
-        CompressDialog(state.files, { viewModel.dialogsViewModel.hideCompressDialog() })  {
-            handleRefresh(state.files.first().parentFile)
+    dialogsState.compressDialog?.let { files ->
+        CompressDialog(files, { viewModel.dialogsViewModel.hideCompressDialog() })  {
+            handleRefresh(files.first().parentFile)
         }
     }
     if (dialogsState.sortDialog) {
@@ -709,8 +709,8 @@ fun HomeScreen(
             handleRefresh(file.parentFile)
         }
     }
-    dialogsState.propertiesDialog?.let { state ->
-        PropertiesDialog(state.files) { viewModel.dialogsViewModel.hidePropertiesDialog() }
+    dialogsState.propertiesDialog?.let { files ->
+        PropertiesDialog(files) { viewModel.dialogsViewModel.hidePropertiesDialog() }
     }
 }
 

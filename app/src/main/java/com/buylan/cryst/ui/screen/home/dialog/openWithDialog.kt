@@ -36,7 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
-import com.buylan.cryst.ui.screen.home.model.FileType
+import com.buylan.cryst.util.FileType
 
 @Composable
 fun OpenWithDialog(

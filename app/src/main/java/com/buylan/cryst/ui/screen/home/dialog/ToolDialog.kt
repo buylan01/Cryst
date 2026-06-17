@@ -34,8 +34,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
-import com.buylan.cryst.ui.screen.home.model.PanelPosition
-import com.buylan.cryst.ui.screen.home.model.ToolAction
+import com.buylan.cryst.util.PanelPosition
+import com.buylan.cryst.util.ToolAction
 import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.VirtualFile
 

@@ -21,15 +21,13 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.buylan.cryst.R
 import com.buylan.cryst.activity.FontActivity
 import com.buylan.cryst.activity.ImageActivity
 import com.buylan.cryst.activity.TextEditorActivity
 import com.buylan.cryst.activity.VideoActivity
-import com.buylan.cryst.ui.screen.home.HomeUiState
-import com.buylan.cryst.ui.screen.home.PanelStates
-import com.buylan.cryst.ui.screen.home.dialog.DialogsState
-import com.buylan.cryst.ui.screen.home.dialog.DialogsViewModel
+import com.buylan.cryst.util.FileType
+import com.buylan.cryst.util.PanelPosition
+import com.buylan.cryst.util.ToolAction
 import com.buylan.cryst.util.accessFiles
 import com.buylan.cryst.util.getActualFile
 import com.buylan.cryst.util.getFileType
@@ -154,10 +152,10 @@ class HomeViewModel(
                 _dialogsViewModel.showRenameDialog(file.singleOrNull() ?: return)
             }
             ToolAction.Delete -> {
-                _dialogsViewModel.showDeleteDialog(OperationDialogState(file))
+                _dialogsViewModel.showDeleteDialog(file)
             }
             ToolAction.Properties -> {
-                _dialogsViewModel.showPropertiesDialog(OperationDialogState(file))
+                _dialogsViewModel.showPropertiesDialog(file)
             }
             ToolAction.OpenWith -> {
                 _dialogsViewModel.showOpenWithDialog(file.singleOrNull() ?: return)
@@ -166,49 +164,8 @@ class HomeViewModel(
                 context.shareFile(file.singleOrNull() ?: return)
             }
             ToolAction.Compress -> {
-                _dialogsViewModel.showCompressDialog(OperationDialogState(file))
+                _dialogsViewModel.showCompressDialog(file)
             }
         }
     }
-}
-
-enum class ToolAction { Move, Copy, Rename, Delete, Properties, OpenWith, Compress, Share }
-enum class SortType(
-    val label: Int
-) {
-    NAME(R.string.name), SIZE(R.string.size), TIME(R.string.time), TYPE(R.string.type)
-}
-
-enum class PanelPosition { L, R }
-data class OperationDialogState(
-    val files: List<VirtualFile>
-)
-data class ExtraDialogState(
-    val files: List<VirtualFile>,
-    val path: VirtualFile
-)
-enum class FileType(
-    val label: Int,
-    val icon: Int
-) {
-    FOLDER(R.string.folder, R.drawable.ic_folder),
-    FILE(R.string.file, R.drawable.ic_draft),
-    TEXT(R.string.text, R.drawable.ic_description),
-    AUDIO(R.string.audio, R.drawable.ic_audio_file),
-    IMAGE(R.string.image, R.drawable.ic_image),
-    VIDEO(R.string.video, R.drawable.ic_video_file),
-    ARCHIVE(R.string.archive, R.drawable.ic_folder_zip),
-    APK(R.string.installable, R.drawable.ic_apk_document),
-    SCRIPT(R.string.script, R.drawable.ic_terminal_2),
-    FONT(R.string.font, R.drawable.ic_font_download)
-}
-
-sealed class FileOperaUiState {
-    object Idle : FileOperaUiState()
-    object InProgress : FileOperaUiState()
-    data class Progress(val current: Int, val total: Int, val percentage: Int, val failed: Int) :
-        FileOperaUiState()
-
-    data class Success(val all: Boolean) : FileOperaUiState()
-    data class Error(val messageResId: Int) : FileOperaUiState()
 }

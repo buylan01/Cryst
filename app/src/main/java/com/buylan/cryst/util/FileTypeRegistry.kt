@@ -16,8 +16,6 @@
 
 package com.buylan.cryst.util
 
-import com.buylan.cryst.ui.screen.home.model.FileType
-
 object FileTypeRegistry {
     private val extensionMap = mutableMapOf<String, FileType>()
 

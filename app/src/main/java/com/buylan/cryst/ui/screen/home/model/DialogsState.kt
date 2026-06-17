@@ -14,11 +14,9 @@
  *    limitations under the License.
  */
 
-package com.buylan.cryst.ui.screen.home.dialog
+package com.buylan.cryst.ui.screen.home.model
 
 import android.os.Environment
-import com.buylan.cryst.ui.screen.home.model.ExtraDialogState
-import com.buylan.cryst.ui.screen.home.model.OperationDialogState
 import com.buylan.cryst.vfs.VirtualFile
 
 data class DialogsState(
@@ -34,10 +32,10 @@ data class DialogsState(
     val audioDialog: VirtualFile? = null,
     val openWithDialog: VirtualFile? = null,
 
-    val propertiesDialog: OperationDialogState? = null,
-    val deleteDialog: OperationDialogState? = null,
-    val compressDialog: OperationDialogState? = null,
-    val toolsDialog: OperationDialogState? = null,
+    val propertiesDialog: List<VirtualFile>? = null,
+    val deleteDialog: List<VirtualFile>? = null,
+    val compressDialog: List<VirtualFile>? = null,
+    val toolsDialog: List<VirtualFile>? = null,
 
     val copyDialog: ExtraDialogState? = null,
     val moveDialog: ExtraDialogState? = null

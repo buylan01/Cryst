@@ -136,7 +136,7 @@ fun Terminal(
                         override fun onScale(scale: Float): Float = scale
                         override fun onSingleTapUp(e: MotionEvent?) {
                             view.requestFocus()
-                            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+                            view.windowInsetsController?.show(android.view.WindowInsets.Type.ime())
                         }
 
                         override fun shouldBackButtonBeMappedToEscape(): Boolean = false

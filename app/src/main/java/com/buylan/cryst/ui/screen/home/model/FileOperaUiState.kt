@@ -14,10 +14,14 @@
  *    limitations under the License.
  */
 
-package com.buylan.cryst.ui.screen.home
+package com.buylan.cryst.ui.screen.home.model
 
-import com.buylan.cryst.ui.screen.home.model.PanelPosition
+sealed class FileOperaUiState {
+    object Idle : FileOperaUiState()
+    object InProgress : FileOperaUiState()
+    data class Progress(val current: Int, val total: Int, val percentage: Int, val failed: Int) :
+        FileOperaUiState()
 
-data class HomeUiState(
-    val panelPosition: PanelPosition = PanelPosition.L
-)
+    data class Success(val all: Boolean) : FileOperaUiState()
+    data class Error(val messageResId: Int) : FileOperaUiState()
+}

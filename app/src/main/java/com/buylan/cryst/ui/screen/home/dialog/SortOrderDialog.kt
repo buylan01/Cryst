@@ -34,9 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.buylan.cryst.R
-import com.buylan.cryst.ui.screen.home.PanelStates
-import com.buylan.cryst.ui.screen.home.model.PanelPosition
-import com.buylan.cryst.ui.screen.home.model.SortType
+import com.buylan.cryst.ui.screen.home.model.PanelStates
+import com.buylan.cryst.util.FileSortType
+import com.buylan.cryst.util.PanelPosition
 
 @Composable
 fun SortOrderDialog(
@@ -44,7 +44,7 @@ fun SortOrderDialog(
     panelStates: PanelStates,
     currentPanel: PanelPosition
 ) {
-    var selectedSortOption by remember { mutableStateOf(SortType.NAME) }
+    var selectedSortOption by remember { mutableStateOf(FileSortType.NAME) }
     selectedSortOption = panelStates.sortType
 
     AlertDialog(
@@ -54,7 +54,7 @@ fun SortOrderDialog(
             Column(
                 modifier = Modifier
             ) {
-                SortType.entries.forEach { sortType ->
+                FileSortType.entries.forEach { sortType ->
                     ListItem(
                         headlineContent = { Text(stringResource(sortType.label)) },
                         leadingContent = {

@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-package com.buylan.cryst.ui.screen.home
+package com.buylan.cryst.ui.screen.home.model
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.setValue
-import com.buylan.cryst.ui.screen.home.model.SortType
 import com.buylan.cryst.util.DefaultPath
+import com.buylan.cryst.util.FileSortType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.VirtualFile
 
@@ -43,7 +43,7 @@ class PanelStates {
     var highLightFiles by mutableStateOf(emptySet<String>())
     var selectedFiles = mutableStateSetOf<String>()
     var files by mutableStateOf(emptyList<VirtualFile>())
-    var sortType by mutableStateOf(SortType.NAME)
+    var sortType by mutableStateOf(FileSortType.NAME)
     val selectionMode: Boolean
         get() = selectedFiles.isNotEmpty()
     private var rangeAnchorPath: String? = null

@@ -25,8 +25,6 @@ import android.media.MediaMetadataRetriever
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import com.buylan.cryst.ui.screen.home.model.AudioFileData
-import com.buylan.cryst.ui.screen.home.model.FileType
-import com.buylan.cryst.ui.screen.home.model.SortType
 import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
@@ -50,17 +48,17 @@ private val VIRTUAL_DIRS_MAP = mapOf(
     "/storage/emulated" to listOf("/storage/emulated/0")
 )
 
-fun accessFiles(path: VirtualFile, sortType: SortType): List<VirtualFile> {
+fun accessFiles(path: VirtualFile, sortType: FileSortType): List<VirtualFile> {
     try {
         val files = path.listFiles()?.toList()!!
         return files.sortedWith(
             compareBy<VirtualFile> { !it.isDirectory }
                 .then(
                     when (sortType) {
-                        SortType.NAME -> compareBy { it.name.lowercase() }
-                        SortType.TYPE -> compareBy { it.extension.lowercase() }
-                        SortType.SIZE -> compareBy { it.length() }
-                        SortType.TIME -> compareByDescending { it.lastModified() }
+                        FileSortType.NAME -> compareBy { it.name.lowercase() }
+                        FileSortType.TYPE -> compareBy { it.extension.lowercase() }
+                        FileSortType.SIZE -> compareBy { it.length() }
+                        FileSortType.TIME -> compareByDescending { it.lastModified() }
                     }
                 )
         )

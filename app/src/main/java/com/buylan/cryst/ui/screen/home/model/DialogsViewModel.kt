@@ -14,11 +14,9 @@
  *    limitations under the License.
  */
 
-package com.buylan.cryst.ui.screen.home.dialog
+package com.buylan.cryst.ui.screen.home.model
 
 import androidx.lifecycle.ViewModel
-import com.buylan.cryst.ui.screen.home.model.ExtraDialogState
-import com.buylan.cryst.ui.screen.home.model.OperationDialogState
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,7 +72,7 @@ class DialogsViewModel : ViewModel() {
     }
 
     // Delete Dialog
-    fun showDeleteDialog(data: OperationDialogState) {
+    fun showDeleteDialog(data: List<VirtualFile>) {
         _dialogsState.value = _dialogsState.value.copy(deleteDialog = data)
     }
 
@@ -119,7 +117,7 @@ class DialogsViewModel : ViewModel() {
     }
 
     // Properties Dialog
-    fun showPropertiesDialog(data: OperationDialogState) {
+    fun showPropertiesDialog(data: List<VirtualFile>) {
         _dialogsState.value = _dialogsState.value.copy(propertiesDialog = data)
     }
 
@@ -137,7 +135,7 @@ class DialogsViewModel : ViewModel() {
     }
 
     // Compress Dialog
-    fun showCompressDialog(data: OperationDialogState) {
+    fun showCompressDialog(data: List<VirtualFile>) {
         _dialogsState.value = _dialogsState.value.copy(compressDialog = data)
     }
 
@@ -146,7 +144,7 @@ class DialogsViewModel : ViewModel() {
     }
 
     // Tools Dialog
-    fun showToolsDialog(data: OperationDialogState) {
+    fun showToolsDialog(data: List<VirtualFile>) {
         _dialogsState.value = _dialogsState.value.copy(toolsDialog = data)
     }
 

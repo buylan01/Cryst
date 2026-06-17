@@ -44,7 +44,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
-import com.buylan.cryst.ui.screen.home.FileRow
+import com.buylan.cryst.ui.screen.home.FileItem
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
@@ -127,7 +127,7 @@ fun SearchDialog(
                             .heightIn(max = 400.dp)
                     ) {
                         items(found) { file ->
-                            FileRow(
+                            FileItem(
                                 file = file,
                                 type = getFileType(file),
                                 onClick = {
