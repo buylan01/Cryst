@@ -43,7 +43,7 @@ class SettingsActivity : ComponentActivity() {
             ))
 
             CrystTheme(isDark) {
-                SettingsScreen { finish() }
+                SettingsScreen(appViewModel) { finish() }
             }
         }
     }

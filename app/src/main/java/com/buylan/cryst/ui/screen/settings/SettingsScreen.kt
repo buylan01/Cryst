@@ -16,29 +16,39 @@
 
 package com.buylan.cryst.ui.screen.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
+import com.buylan.cryst.model.AppViewModel
+import com.buylan.cryst.model.DarkMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onBackPressed: () -> Unit) {
+fun SettingsScreen(appViewModel: AppViewModel, onBackPressed: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -58,11 +68,38 @@ fun SettingsScreen(onBackPressed: () -> Unit) {
         LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
+            item {
+                var showDarkModeMenu by remember { mutableStateOf(false) }
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.dark_mode)) },
+                    modifier = Modifier.clickable(onClick = { showDarkModeMenu = true }),
+                    leadingContent = { Icon(painter = painterResource(R.drawable.ic_dark_mode), contentDescription = null) },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(appViewModel.darkMode.label)
+                        )
+                    },
+                    trailingContent = {
+                        DropdownMenu(
+                            expanded = showDarkModeMenu,
+                            onDismissRequest = { showDarkModeMenu = false }
+                        ) {
+                            DarkMode.entries.forEach {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(it.label)) },
+                                    onClick = {
+                                        appViewModel.setDarkTheme(it)
+                                        showDarkModeMenu = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
 }

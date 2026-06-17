@@ -65,7 +65,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -74,7 +73,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -100,8 +98,6 @@ import com.buylan.cryst.R
 import com.buylan.cryst.activity.LicensesActivity
 import com.buylan.cryst.activity.SettingsActivity
 import com.buylan.cryst.model.AppViewModel
-import com.buylan.cryst.model.DarkMode
-import com.buylan.cryst.ui.component.Segment
 import com.buylan.cryst.ui.component.materialScrollbarStyle
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
 import com.buylan.cryst.ui.screen.home.dialog.CompressDialog
@@ -150,8 +146,6 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val leftPanelState = viewModel.leftPanelState
     val rightPanelState = viewModel.rightPanelState
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    var showBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler(
         enabled = !viewModel.currentPanel.path.isRootPath() || viewModel.currentPanel.selectedFiles.isNotEmpty()
@@ -292,18 +286,6 @@ fun MainScreen(
                                                 SettingsActivity::class.java
                                             )
                                         )
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.style)) },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_style),
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        showBottomSheet = true
                                     }
                                 )
                                 DropdownMenuItem(
@@ -505,52 +487,6 @@ fun MainScreen(
                 Panel(viewModel.leftPanelState, leftLazyState, PanelPosition.L)
                 Panel(viewModel.rightPanelState, rightLazyState, PanelPosition.R)
             }
-        }
-    }
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            modifier = Modifier.fillMaxHeight(),
-            onDismissRequest = {
-                showBottomSheet = false
-            },
-            sheetState = sheetState
-        ) {
-            var showDarkModeMenu by remember { mutableStateOf(false) }
-            Segment(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .clip(shape = MaterialTheme.shapes.extraLarge)
-                    .background(color = MaterialTheme.colorScheme.surfaceContainer)
-                    .height(64.dp),
-                onClick = { showDarkModeMenu = true },
-                title = {
-                    Text(
-                        stringResource(R.string.dark_mode),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                },
-                text = {
-                    Text(
-                        text = stringResource(appViewModel.darkMode.label)
-                    )
-                    DropdownMenu(
-                        expanded = showDarkModeMenu,
-                        onDismissRequest = { showDarkModeMenu = false }
-                    ) {
-                        DarkMode.entries.forEach {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(it.label)) },
-                                onClick = {
-                                    appViewModel.setDarkTheme(it)
-                                    showDarkModeMenu = false
-                                }
-                            )
-                        }
-                    }
-                }
-            )
         }
     }
 
