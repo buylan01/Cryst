@@ -368,7 +368,7 @@ fun HomeScreen(
 
                 LaunchedEffect(Unit) {
                     viewModel.scrollToIndex.collect { index ->
-                        val currentState = if (homeUiState.panelPosition == PanelPosition.L) leftLazyState else rightLazyState
+                        val currentState = if (viewModel.panelPosition == PanelPosition.L) leftLazyState else rightLazyState
 
                         snapshotFlow { currentState.layoutInfo.totalItemsCount }.first { it > index }
                         currentState.scrollToItem(index)
@@ -397,7 +397,7 @@ fun HomeScreen(
                     panelPosition: PanelPosition
                 ) {
                     val backgroundColor by animateColorAsState(
-                        targetValue = if (panelPosition == homeUiState.panelPosition) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
+                        targetValue = if (panelPosition == viewModel.panelPosition) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
                         animationSpec = tween(150)
                     )
                     Box(
@@ -635,7 +635,7 @@ fun HomeScreen(
 
     dialogsState.toolsDialog?.let { files ->
         ToolDialog(
-            files, homeUiState.panelPosition,
+            files, viewModel.panelPosition,
             onDismiss = { viewModel.dialogsViewModel.hideToolsDialog() },
             onToolAction = { viewModel.onToolAction(context,it, files) },
         )
@@ -685,7 +685,7 @@ fun HomeScreen(
         SortOrderDialog(
             onDismiss = { viewModel.dialogsViewModel.hideSortDialog() },
             viewModel.currentPanel,
-            homeUiState.panelPosition
+            viewModel.panelPosition
         )
     }
     dialogsState.searchDialog?.let { file ->

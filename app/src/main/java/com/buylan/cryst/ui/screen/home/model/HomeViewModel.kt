@@ -19,6 +19,9 @@ package com.buylan.cryst.ui.screen.home.model
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.buylan.cryst.activity.FontActivity
@@ -40,7 +43,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -54,10 +56,11 @@ class HomeViewModel(
     val dialogsViewModel: DialogsViewModel = _dialogsViewModel
     val dialogsState: StateFlow<DialogsState> = _dialogsViewModel.dialogsState
 
+    var panelPosition: PanelPosition by mutableStateOf(PanelPosition.L)
+        private set
+
     fun setPanel(panel: PanelPosition) {
-        _uiState.update { currentState ->
-            currentState.copy(panelPosition = panel)
-        }
+        panelPosition = panel
     }
 
     private val _scrollToIndex = MutableSharedFlow<Int>(extraBufferCapacity = 1)
@@ -66,9 +69,9 @@ class HomeViewModel(
     val leftPanelState = PanelStates()
     val rightPanelState = PanelStates()
     val currentPanel
-        get() =  if (_uiState.value.panelPosition == PanelPosition.L) leftPanelState else rightPanelState
+        get() =  if (panelPosition == PanelPosition.L) leftPanelState else rightPanelState
     val anotherPanel
-        get() =  if (_uiState.value.panelPosition == PanelPosition.R) leftPanelState else rightPanelState
+        get() =  if (panelPosition == PanelPosition.R) leftPanelState else rightPanelState
     val currentPath
         get() = currentPanel.path
 
