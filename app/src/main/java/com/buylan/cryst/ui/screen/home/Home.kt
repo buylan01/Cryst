@@ -23,13 +23,8 @@ import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -86,6 +81,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -115,6 +111,7 @@ import com.buylan.cryst.ui.screen.home.dialog.SortOrderDialog
 import com.buylan.cryst.ui.screen.home.dialog.ToolDialog
 import com.buylan.cryst.ui.screen.home.model.HomeViewModel
 import com.buylan.cryst.ui.screen.home.model.PanelStates
+import com.buylan.cryst.ui.screen.home.model.PanelViewModel
 import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.PanelPosition
 import com.buylan.cryst.util.getFileType
@@ -138,15 +135,18 @@ fun HomeScreen(
     appViewModel: AppViewModel = viewModel(),
     pathFlow: SharedFlow<String>
 ) {
-    val homeUiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val dialogsState by viewModel.dialogsState.collectAsState()
+    val leftPanelState by viewModel.leftPanelState.collectAsState()
+    val rightPanelState by viewModel.rightPanelState.collectAsState()
+    val currentPanel = if (uiState.panelPosition == PanelPosition.L) leftPanelState else rightPanelState
     val scope = rememberCoroutineScope()
     val leftLazyState = rememberLazyListState()
     val rightLazyState = rememberLazyListState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     BackHandler(
-        enabled = !viewModel.currentPanel.path.isRootPath() || viewModel.currentPanel.selectedFiles.isNotEmpty()
+        enabled = !currentPanel.path.isRootPath() || currentPanel.selectedFiles.isNotEmpty()
     ) {
         viewModel.onNavigateBack()
     }
@@ -178,7 +178,7 @@ fun HomeScreen(
                     title = {
                         Column {
                             Text(
-                                text = viewModel.currentPath.pathDisplay,
+                                text = currentPanel.path.pathDisplay,
                                 maxLines = 1,
                                 overflow = TextOverflow.StartEllipsis,
                                 softWrap = false,
@@ -234,7 +234,7 @@ fun HomeScreen(
                                         )
                                     },
                                     onClick = {
-                                        viewModel.refreshPanel(viewModel.currentPanel)
+                                        viewModel.refreshPanel()
                                         expanded = false
                                     }
                                 )
@@ -247,7 +247,7 @@ fun HomeScreen(
                                         )
                                     },
                                     onClick = {
-                                        viewModel.dialogsViewModel.showSearchDialog(viewModel.currentPath)
+                                        viewModel.dialogsViewModel.showSearchDialog(currentPanel.path)
                                         expanded = false
                                     }
                                 )
@@ -306,8 +306,8 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             IconButton(
-                                enabled = viewModel.currentPanel.canUnNavigate,
-                                onClick = { viewModel.currentPanel.unNavigate() }
+                                enabled = viewModel.currentPanelViewModel.canUnNavigate,
+                                onClick = { viewModel.currentPanelViewModel.unNavigate() }
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_keyboard_arrow_left),
@@ -315,8 +315,8 @@ fun HomeScreen(
                                 )
                             }
                             IconButton(
-                                enabled = viewModel.currentPanel.canReNavigate,
-                                onClick = { viewModel.currentPanel.reNavigate() }
+                                enabled = viewModel.currentPanelViewModel.canReNavigate,
+                                onClick = { viewModel.currentPanelViewModel.reNavigate() }
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_keyboard_arrow_right),
@@ -324,7 +324,7 @@ fun HomeScreen(
                                 )
                             }
                             IconButton(
-                                onClick = { viewModel.dialogsViewModel.showCreateDialog(viewModel.currentPath) }
+                                onClick = { viewModel.dialogsViewModel.showCreateDialog(currentPanel.path) }
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_add),
@@ -333,7 +333,7 @@ fun HomeScreen(
                             }
                             IconButton(
                                 onClick = {
-                                    viewModel.anotherPanel.path = viewModel.currentPanel.path
+                                    viewModel.anotherPanelViewModel.setPath(currentPanel.path)
                                 }
                             ) {
                                 Icon(
@@ -358,17 +358,17 @@ fun HomeScreen(
                     .padding(contentPadding)
             ) {
 
-                LaunchedEffect(viewModel.leftPanelState.path) {
-                    viewModel.refreshPanel(viewModel.leftPanelState)
+                LaunchedEffect(leftPanelState.path) {
+                    viewModel.refreshPanel(PanelPosition.L)
                 }
 
-                LaunchedEffect(viewModel.rightPanelState.path) {
-                    viewModel.refreshPanel(viewModel.rightPanelState)
+                LaunchedEffect(rightPanelState.path) {
+                    viewModel.refreshPanel(PanelPosition.R)
                 }
 
                 LaunchedEffect(Unit) {
-                    viewModel.scrollToIndex.collect { index ->
-                        val currentState = if (viewModel.panelPosition == PanelPosition.L) leftLazyState else rightLazyState
+                    viewModel.currentPanelViewModel.scrollToIndex.collect { index ->
+                        val currentState = if (uiState.panelPosition == PanelPosition.L) leftLazyState else rightLazyState
 
                         snapshotFlow { currentState.layoutInfo.totalItemsCount }.first { it > index }
                         currentState.scrollToItem(index)
@@ -377,7 +377,7 @@ fun HomeScreen(
 
                 LaunchedEffect(Unit) {
                     pathFlow.collect { path ->
-                        viewModel.currentPanel.path = LocalFile(path)
+                        viewModel.currentPanelViewModel.setPath(LocalFile(path))
                         drawerState.close()
                     }
                 }
@@ -386,18 +386,15 @@ fun HomeScreen(
                     viewModel.dialogsViewModel.showToolsDialog(file)
                 }
 
-                val animation = (fadeIn(animationSpec = tween(220,0)) + scaleIn(
-                    initialScale = 0.99f, animationSpec = tween(220,0)
-                )).togetherWith(fadeOut(animationSpec = tween(0,0)))
-
                 @Composable
                 fun Panel(
                     panelState: PanelStates,
+                    panelViewModel: PanelViewModel,
                     lazyState: LazyListState,
                     panelPosition: PanelPosition
                 ) {
                     val backgroundColor by animateColorAsState(
-                        targetValue = if (panelPosition == viewModel.panelPosition) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
+                        targetValue = if (panelPosition == uiState.panelPosition) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
                         animationSpec = tween(150)
                     )
                     Box(
@@ -405,49 +402,45 @@ fun HomeScreen(
                             .fillMaxHeight()
                             .weight(1f)
                     ) {
-                        AnimatedContent(
-                            targetState = panelState.files,
-                            modifier = Modifier.fillMaxSize(),
-                            transitionSpec = { animation }
-                        ) { files ->
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(color = backgroundColor)
-                                    .pointerInteropFilter { event ->
-                                        if (event.action == MotionEvent.ACTION_DOWN) {
-                                            viewModel.setPanel(panelPosition)
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .drawBehind {
+                                    drawRect(backgroundColor)
+                                }
+                                .pointerInteropFilter { event ->
+                                    if (event.action == MotionEvent.ACTION_DOWN) {
+                                        viewModel.setPanel(panelPosition)
+                                    }
+                                    false
+                                },
+                            state = lazyState
+                        ) {
+                            item {
+                                UpwardItem { panelViewModel.navigateBack() }
+                            }
+                            items(panelState.files, key = { it.hashCode() }) { file ->
+                                FileItem(
+                                    file = file,
+                                    type = getFileType(file),
+                                    highLight = file.name in panelState.highLightFiles,
+                                    selected = file.path in panelState.selectedFiles,
+                                    onClick = {
+                                        if (panelViewModel.selectionMode) {
+                                            panelViewModel.toggleSelection(file)
+                                        } else {
+                                            viewModel.handleFileClick(context, file)
                                         }
-                                        false
                                     },
-                                state = lazyState
-                            ) {
-                                item {
-                                    UpwardItem { panelState.navigateBack() }
-                                }
-                                items(files, key = { it.hashCode() }) { file ->
-                                    FileItem(
-                                        file = file,
-                                        type = getFileType(file),
-                                        highLight = file.name in panelState.highLightFiles,
-                                        selected = file.path in panelState.selectedFiles,
-                                        onClick = {
-                                            if (panelState.selectionMode) {
-                                                panelState.toggleSelection(file)
-                                            } else {
-                                                viewModel.handleFileClick(context, file)
-                                            }
-                                        },
-                                        onLongClick = {
-                                            val selected =
-                                                panelState.files.filter { it.path in panelState.selectedFiles }
-                                            handleFileLongClick(selected.ifEmpty { listOf(file) })
-                                        },
-                                        onSwipe = {
-                                            panelState.swipeSelect(file)
-                                        }
-                                    )
-                                }
+                                    onLongClick = {
+                                        val selected =
+                                            panelState.files.filter { it.path in panelState.selectedFiles }
+                                        handleFileLongClick(selected.ifEmpty { listOf(file) })
+                                    },
+                                    onSwipe = {
+                                        panelViewModel.swipeSelect(file)
+                                    }
+                                )
                             }
                         }
                         var showScrollbar by remember { mutableStateOf(false) }
@@ -477,20 +470,19 @@ fun HomeScreen(
                     }
                 }
 
-                Panel(viewModel.leftPanelState, leftLazyState, PanelPosition.L)
-                Panel(viewModel.rightPanelState, rightLazyState, PanelPosition.R)
+                Panel(leftPanelState,viewModel.leftPanelViewModel, leftLazyState, PanelPosition.L)
+                Panel(rightPanelState,viewModel.rightPanelViewModel, rightLazyState, PanelPosition.R)
             }
         }
     }
 
-    fun handleRefresh(path: VirtualFile?, highlights: Set<String> = emptySet()) {
+    fun handleRefresh(path: VirtualFile?) {
         path?.let {
-            val panelState =
-                if (viewModel.leftPanelState.path.absolutePath == path.absolutePath) viewModel.leftPanelState
-                else if (viewModel.rightPanelState.path.absolutePath == path.absolutePath) viewModel.rightPanelState
+            val refreshPosition =
+                if (leftPanelState.path.absolutePath == path.absolutePath) PanelPosition.L
+                else if (rightPanelState.path.absolutePath == path.absolutePath) PanelPosition.R
                 else null
-            panelState?.let {
-                it.highLightFiles = highlights
+            refreshPosition?.let {
                 viewModel.refreshPanel(it)
             }
         }
@@ -590,7 +582,7 @@ fun HomeScreen(
     }
 
     if (dialogsState.pathDialog) {
-        val textFieldState = rememberTextFieldState(initialText = viewModel.currentPanel.path.absolutePath)
+        val textFieldState = rememberTextFieldState(initialText = currentPanel.path.absolutePath)
         AlertDialog(
             onDismissRequest = { viewModel.dialogsViewModel.hidePathDialog() },
             title = { Text(stringResource(R.string.path)) },
@@ -610,7 +602,7 @@ fun HomeScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.currentPanel.path = LocalFile(textFieldState.text.toString())
+                        viewModel.currentPanelViewModel.setPath(LocalFile(textFieldState.text.toString()))
                         viewModel.dialogsViewModel.hidePathDialog()
                     }
                 ) {
@@ -635,7 +627,7 @@ fun HomeScreen(
 
     dialogsState.toolsDialog?.let { files ->
         ToolDialog(
-            files, viewModel.panelPosition,
+            files, uiState.panelPosition,
             onDismiss = { viewModel.dialogsViewModel.hideToolsDialog() },
             onToolAction = { viewModel.onToolAction(context,it, files) },
         )
@@ -684,13 +676,14 @@ fun HomeScreen(
     if (dialogsState.sortDialog) {
         SortOrderDialog(
             onDismiss = { viewModel.dialogsViewModel.hideSortDialog() },
-            viewModel.currentPanel,
-            viewModel.panelPosition
+            onSelect = { viewModel.currentPanelViewModel.setSort(it) },
+            currentPanel,
+            uiState.panelPosition
         )
     }
     dialogsState.searchDialog?.let { file ->
         SearchDialog(onDismiss = { viewModel.dialogsViewModel.hideSearchDialog() }, file) { file ->
-            viewModel.currentPanel.path = file
+            viewModel.currentPanelViewModel.setPath(file)
             viewModel.dialogsViewModel.hideSearchDialog()
         }
     }

@@ -19,9 +19,6 @@ package com.buylan.cryst.ui.screen.home.model
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.buylan.cryst.activity.FontActivity
@@ -38,74 +35,61 @@ import com.buylan.cryst.util.shareFile
 import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HomeViewModel(
-    private val _dialogsViewModel: DialogsViewModel = DialogsViewModel()
+    private val _dialogsViewModel: DialogsViewModel = DialogsViewModel(),
+    private val _leftPanelViewModel: PanelViewModel = PanelViewModel(),
+    private val _rightPanelViewModel: PanelViewModel = PanelViewModel()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    val dialogsViewModel: DialogsViewModel = _dialogsViewModel
+    val dialogsViewModel: DialogsViewModel get() = _dialogsViewModel
     val dialogsState: StateFlow<DialogsState> = _dialogsViewModel.dialogsState
 
-    var panelPosition: PanelPosition by mutableStateOf(PanelPosition.L)
-        private set
+    val leftPanelViewModel: PanelViewModel get() = _leftPanelViewModel
+    val leftPanelState: StateFlow<PanelStates> = _leftPanelViewModel.panelStates
 
-    fun setPanel(panel: PanelPosition) {
-        panelPosition = panel
+    val rightPanelViewModel: PanelViewModel get() = _rightPanelViewModel
+    val rightPanelState: StateFlow<PanelStates> = _rightPanelViewModel.panelStates
+
+    fun setPanel(panelPosition: PanelPosition) {
+        _uiState.update {
+            it.copy(panelPosition = panelPosition)
+        }
     }
 
-    private val _scrollToIndex = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+    val anotherPath: VirtualFile
+        get() =  if (_uiState.value.panelPosition == PanelPosition.R) leftPanelState.value.path else rightPanelState.value.path
 
-    val scrollToIndex = _scrollToIndex.asSharedFlow()
-    val leftPanelState = PanelStates()
-    val rightPanelState = PanelStates()
-    val currentPanel
-        get() =  if (panelPosition == PanelPosition.L) leftPanelState else rightPanelState
-    val anotherPanel
-        get() =  if (panelPosition == PanelPosition.R) leftPanelState else rightPanelState
-    val currentPath
-        get() = currentPanel.path
+    val currentPanelViewModel: PanelViewModel
+        get() = if (_uiState.value.panelPosition == PanelPosition.L) _leftPanelViewModel else _rightPanelViewModel
+    val anotherPanelViewModel: PanelViewModel
+        get() = if (_uiState.value.panelPosition == PanelPosition.R) _leftPanelViewModel else _rightPanelViewModel
 
-    fun onNavigateBack() = currentPanel.navigateBack()
-    fun refreshPanel(panelState: PanelStates) {
+    fun onNavigateBack() = currentPanelViewModel.navigateBack()
+
+    fun refreshPanel(panelPosition: PanelPosition = _uiState.value.panelPosition) {
+        val panel = if (panelPosition == PanelPosition.L) _leftPanelViewModel else _rightPanelViewModel
         viewModelScope.launch {
-            panelState.files = withContext(Dispatchers.IO) {
-                if (!panelState.path.isDirectory) {
-                    panelState.highLightFiles = setOf(panelState.path.name)
-                    panelState.path = panelState.path.parentFile!!
-                }
-                accessFiles(panelState.path, panelState.sortType)
-            }
-
-            if (panelState.highLightFiles.isNotEmpty()) {
-                val index = panelState.files.indexOfFirst { file ->
-                    file.name.equals(
-                        panelState.highLightFiles.first(),
-                        ignoreCase = true
-                    )
-                }
-                if (index != -1) {
-                    _scrollToIndex.tryEmit(index)
+            panel.refresh { path, sortType ->
+                withContext(Dispatchers.IO) {
+                    accessFiles(path, sortType)
                 }
             }
-
-            panelState.resetSelection()
         }
     }
 
     fun handleFileClick(context: Context, file: VirtualFile, type: FileType? = null) {
         if (file.isDirectory) {
-            currentPanel.path = file
-            currentPanel.resetHighLight()
+            currentPanelViewModel.setPath(file)
         } else {
             val actualType = type ?: getFileType(file)
             val actualFile = getActualFile(context, file)
@@ -131,7 +115,7 @@ class HomeViewModel(
                 FileType.AUDIO -> _dialogsViewModel.showAudioDialog(actualFile)
                 FileType.ARCHIVE -> {
                     try {
-                        currentPanel.path = ArchiveFile(entranceFile = actualFile)
+                        currentPanelViewModel.setPath(ArchiveFile(entranceFile = actualFile))
                     } catch (e: Exception) {
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                     }
@@ -146,10 +130,10 @@ class HomeViewModel(
 
         when (action) {
             ToolAction.Move -> {
-                _dialogsViewModel.showMoveDialog(ExtraDialogState(file, anotherPanel.path))
+                _dialogsViewModel.showMoveDialog(ExtraDialogState(file, anotherPath))
             }
             ToolAction.Copy -> {
-                _dialogsViewModel.showCopyDialog(ExtraDialogState(file, anotherPanel.path))
+                _dialogsViewModel.showCopyDialog(ExtraDialogState(file, anotherPath))
             }
             ToolAction.Rename -> {
                 _dialogsViewModel.showRenameDialog(file.singleOrNull() ?: return)

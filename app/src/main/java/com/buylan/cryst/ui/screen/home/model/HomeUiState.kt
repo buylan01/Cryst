@@ -16,6 +16,8 @@
 
 package com.buylan.cryst.ui.screen.home.model
 
+import com.buylan.cryst.util.PanelPosition
+
 data class HomeUiState(
-    val test: Boolean = true
+    var panelPosition: PanelPosition = PanelPosition.L
 )

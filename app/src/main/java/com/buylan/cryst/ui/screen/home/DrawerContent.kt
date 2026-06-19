@@ -160,7 +160,7 @@ fun DrawerContent(
                 },
                 onClick = {
                     scope.launch {
-                        viewModel.currentPanel.path = DefaultPath
+                        viewModel.currentPanelViewModel.setPath(DefaultPath)
                         drawerState.close()
                     }
                 }

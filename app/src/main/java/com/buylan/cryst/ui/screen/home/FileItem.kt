@@ -76,6 +76,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileItem(
+    modifier: Modifier = Modifier,
     file: VirtualFile,
     type: FileType,
     highLight: Boolean = false,
@@ -86,7 +87,7 @@ fun FileItem(
 ) {
     var offsetX by remember { mutableFloatStateOf(0f) }
     Row(
-        modifier = Modifier
+        modifier = modifier
             .background(
                 color = if (!selected) Color.Transparent else MaterialTheme.colorScheme.inversePrimary
             )

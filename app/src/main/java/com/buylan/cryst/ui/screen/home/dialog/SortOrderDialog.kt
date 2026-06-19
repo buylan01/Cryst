@@ -41,6 +41,7 @@ import com.buylan.cryst.util.PanelPosition
 @Composable
 fun SortOrderDialog(
     onDismiss: () -> Unit,
+    onSelect: (type: FileSortType) -> Unit,
     panelStates: PanelStates,
     currentPanel: PanelPosition
 ) {
@@ -75,7 +76,7 @@ fun SortOrderDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    panelStates.sortType = selectedSortOption
+                    onSelect(selectedSortOption)
                     onDismiss()
                 }
             ) {
