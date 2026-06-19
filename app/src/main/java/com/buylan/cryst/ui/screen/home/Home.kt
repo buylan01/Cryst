@@ -422,6 +422,7 @@ fun HomeScreen(
                             items(panelState.files, key = { it.hashCode() }) { file ->
                                 FileItem(
                                     file = file,
+                                    modifier = Modifier.animateItem(), //fuck AnimatedContent
                                     type = getFileType(file),
                                     highLight = file.name in panelState.highLightFiles,
                                     selected = file.path in panelState.selectedFiles,
