@@ -19,7 +19,6 @@ package com.buylan.cryst.ui.screen.home.dialog
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -79,7 +78,7 @@ fun MoveDialog(
             }
         },
         confirmButton = {
-            Button(
+            TextButton(
                 onClick = {
                     scope.launch(Dispatchers.IO) {
                         uiStateFlow.emit(FileOperaUiState.InProgress)
@@ -107,7 +106,7 @@ fun MoveDialog(
                     }
                 }
             ) {
-                Text(stringResource(R.string.confirm))
+                Text(stringResource(R.string.move))
             }
         },
         dismissButton = {

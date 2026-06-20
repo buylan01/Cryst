@@ -63,7 +63,6 @@
     <string name="copy">复制</string>
     <string name="move">移动</string>
     <string name="delete_file_warning">文件将永久丢失</string>
-    <string name="style">外观</string>
     <string name="light">浅色</string>
     <string name="dark">深色</string>
     <string name="settings_dark_mode_title">深色模式</string>

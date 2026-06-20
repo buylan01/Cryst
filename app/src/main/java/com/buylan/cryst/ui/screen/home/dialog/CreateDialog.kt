@@ -20,12 +20,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -75,13 +74,14 @@ fun CreateDialog(
             val isValid = !hasInvalidChar && !isEmpty && !createFail
             val focusRequester = remember { FocusRequester() }
 
-            Column() {
-                TextField(
+            Column {
+                OutlinedTextField(
                     value = fileName,
                     onValueChange = {
                         fileName = it
                         createFail = false
                     },
+                    label = { Text(stringResource(R.string.name)) },
                     shape = MaterialTheme.shapes.small,
                     isError = !isValid,
                     supportingText = {
@@ -125,12 +125,12 @@ fun CreateDialog(
             }
         },
         confirmButton = {
-            Button(
+            TextButton(
                 onClick = {
                     createFile(selectedIndex == 1, fileName)
                 }
             ) {
-                Text(stringResource(R.string.confirm))
+                Text(stringResource(R.string.create))
             }
         },
         dismissButton = {

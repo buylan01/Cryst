@@ -18,11 +18,10 @@ package com.buylan.cryst.ui.screen.home.dialog
 
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,7 +57,7 @@ fun RenameDialog(
             val isValid = !hasInvalidChar && !isEmpty && !renameFail
             val focusRequester = remember { FocusRequester() }
 
-            TextField(
+            OutlinedTextField(
                 state = textFieldState,
                 shape = MaterialTheme.shapes.small,
                 isError = !isValid,
@@ -91,7 +90,7 @@ fun RenameDialog(
             }
         },
         confirmButton = {
-            Button(
+            TextButton(
                 onClick = {
                     val renamer = file.renameTo(LocalFile("${file.parent}/${textFieldState.text}"))
                     if (!renamer) renameFail = true else {

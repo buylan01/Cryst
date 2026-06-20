@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -102,11 +101,11 @@ fun CopyDialog(
             }
         },
         confirmButton = {
-            Button(
+            TextButton(
                 onClick = { viewModel.startCopy(source, target) },
                 enabled = uiState is FileOperaUiState.Idle || uiState is FileOperaUiState.Error
             ) {
-                Text(stringResource(R.string.confirm))
+                Text(stringResource(R.string.copy))
             }
         },
         dismissButton = {

@@ -49,7 +49,6 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -345,7 +344,7 @@ fun AppsScreen(){
                         }
                     },
                     confirmButton = {
-                        Button(
+                        TextButton(
                             onClick = {
                                 viewModel.onExtract(app)
                             }
@@ -409,7 +408,7 @@ fun AppsScreen(){
                 },
 
                 confirmButton = {
-                    Button(
+                    TextButton(
                         onClick = {
                             viewModel.onLocate(path)
                             viewModel.hideLocateDialog()
@@ -458,7 +457,7 @@ fun AppsScreen(){
                     }
                 },
                 confirmButton = {
-                    Button(
+                    TextButton(
                         onClick = {
                             viewModel.setSortType(selectedSortOption)
                             viewModel.hideSortDialog()

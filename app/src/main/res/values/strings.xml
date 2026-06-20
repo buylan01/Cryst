@@ -63,7 +63,6 @@
     <string name="copy">Copy</string>
     <string name="move">Move</string>
     <string name="delete_file_warning">Files cannot be recovered</string>
-    <string name="style">style</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
     <string name="settings_dark_mode_title">DarkMode</string>

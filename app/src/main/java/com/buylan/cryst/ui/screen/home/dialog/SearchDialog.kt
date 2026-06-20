@@ -23,13 +23,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -90,9 +89,10 @@ fun SearchDialog(
         text = {
             Column {
                 val focusRequester = remember { FocusRequester() }
-                TextField(
+                OutlinedTextField(
                     value = searchFileName,
                     onValueChange = { searchFileName = it },
+                    label = { Text(stringResource(R.string.name)) },
                     modifier = Modifier.focusRequester(focusRequester),
                     shape = MaterialTheme.shapes.small,
                 )
@@ -144,7 +144,7 @@ fun SearchDialog(
             }
         },
         confirmButton = {
-            Button(
+            TextButton(
                 onClick = {
                     foundCount = 0
                     tonalCount = 0
@@ -153,13 +153,12 @@ fun SearchDialog(
                 },
                 enabled = !isSearching && searchFileName.isNotEmpty()
             ) {
-                Text(stringResource(R.string.confirm))
+                Text(stringResource(R.string.search))
             }
         },
         dismissButton = {
             TextButton(
-                onClick = { onDismiss() },
-                enabled = !isSearching
+                onClick = { onDismiss() }
             ) {
                 Text(stringResource(R.string.cancel))
             }

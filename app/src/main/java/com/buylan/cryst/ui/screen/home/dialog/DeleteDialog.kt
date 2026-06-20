@@ -19,7 +19,6 @@ package com.buylan.cryst.ui.screen.home.dialog
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -98,10 +97,12 @@ fun DeleteDialog(
             }
         },
         confirmButton = {
-            Button(
+            TextButton(
                 onClick = { viewModel.startDelete(targetFiles.map { File(it.absolutePath) }) },
                 enabled = uiState is FileOperaUiState.Idle || uiState is FileOperaUiState.Error
-            ) { Text(stringResource(R.string.confirm)) }
+            ) {
+                Text(stringResource(R.string.delete))
+            }
         },
         dismissButton = {
             TextButton(
