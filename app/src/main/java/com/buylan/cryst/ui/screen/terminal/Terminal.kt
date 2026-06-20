@@ -18,6 +18,7 @@ package com.buylan.cryst.ui.screen.terminal
 
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.os.Environment
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
@@ -121,11 +122,11 @@ fun Terminal(
                             override fun logStackTrace(tag: String, e: Exception) {}
                         }
 
-                    val envs = mutableListOf<String>()
+                    val envs = mutableListOf("/bin")
 
                     val session = TerminalSession(
                         "/system/bin/sh",
-                        "/bin",
+                        Environment.getExternalStorageDirectory().path,
                         null,
                         envs.toTypedArray(),
                         2000,
