@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -41,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.buylan.cryst.R
@@ -50,7 +48,7 @@ import com.buylan.cryst.util.install
 import com.buylan.cryst.vfs.LocalFile
 
 @Composable
-fun PackageDetail(
+fun ApkDialog(
     context: Context,
     targetFile: LocalFile,
     onDismiss: () -> Unit,
@@ -63,7 +61,7 @@ fun PackageDetail(
             onDismissRequest = { onDismiss() },
             text = {
                 Column(
-                    modifier = Modifier.fillMaxWidth(0.85f)
+                    modifier = Modifier.fillMaxWidth(0.9f)
                 ) {
                     apkInfo.applicationInfo!!.apply {
                         sourceDir = targetFile.absolutePath
@@ -96,10 +94,7 @@ fun PackageDetail(
                         Column {
                             Text(
                                 text = apkInfo.applicationInfo!!.loadLabel(pm).toString(),
-                                style = MaterialTheme.typography.bodyLarge,
-                                softWrap = false,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.widthIn(max = 160.dp)
+                                style = MaterialTheme.typography.bodyLarge
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(

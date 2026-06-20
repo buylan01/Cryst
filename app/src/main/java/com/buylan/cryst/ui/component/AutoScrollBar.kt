@@ -1,0 +1,61 @@
+/*
+ *    Copyright 2026 buylan
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package com.buylan.cryst.ui.component
+
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
+import io.github.oikvpqya.compose.fastscroller.VerticalScrollbar
+import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
+import kotlinx.coroutines.flow.distinctUntilChanged
+
+@Composable
+fun AutoScrollBar(
+    lazyState: LazyListState,
+    modifier: Modifier = Modifier
+) {
+    var showScrollbar by remember { mutableStateOf(false) }
+    LaunchedEffect(lazyState) {
+        snapshotFlow {
+            val layoutInfo = lazyState.layoutInfo
+            val vh = layoutInfo.viewportSize.height
+            if (vh <= 0) false
+            else {
+                val vis = layoutInfo.visibleItemsInfo
+                if (vis.isEmpty()) false
+                else {
+                    val avg = vis.sumOf { it.size } / vis.size
+                    val totalEst = avg * layoutInfo.totalItemsCount
+                    totalEst > 2 * vh
+                }
+            }
+        }.distinctUntilChanged()
+            .collect { showScrollbar = it }
+    }
+    if (showScrollbar)
+        VerticalScrollbar(
+            adapter = rememberScrollbarAdapter(lazyState),
+            style = materialScrollbarStyle(),
+            modifier = modifier
+        )
+}

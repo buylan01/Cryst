@@ -18,14 +18,14 @@ package com.buylan.cryst.ui.component
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -64,20 +64,21 @@ fun ApkInfoColumn(
 
 @Composable
 fun InfoItem(title: Int, summary: String) {
-    Row(modifier = Modifier.width(230.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(stringResource(title))
-        Text(
-            text = summary,
-            softWrap = false,
-            modifier = Modifier
-                .widthIn(max = 160.dp)
-                .combinedClickable(
-                    onClick = {
-
-                    }),
-            overflow = TextOverflow.MiddleEllipsis,
-            textAlign = TextAlign.End
-        )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(stringResource(title), modifier = Modifier.width(64.dp))
+        Spacer(Modifier.width(16.dp))
+        SelectionContainer {
+            Text(
+                text = summary,
+                softWrap = false,
+                modifier = Modifier.fillMaxWidth(),
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Left
+            )
+        }
     }
     Spacer(Modifier.height(4.dp))
 }

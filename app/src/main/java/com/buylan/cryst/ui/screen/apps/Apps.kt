@@ -18,19 +18,12 @@ package com.buylan.cryst.ui.screen.apps
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,6 +40,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -75,11 +71,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -99,16 +94,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.buylan.cryst.R
-import com.buylan.cryst.activity.MainActivity
 import com.buylan.cryst.ui.component.ApkInfoColumn
-import com.buylan.cryst.util.ExtractPath
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.buylan.cryst.ui.component.AutoScrollBar
 import java.io.File
-import java.io.IOException
 
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
@@ -116,55 +107,36 @@ import java.io.IOException
 @Composable
 fun AppsScreen(){
     val context = LocalContext.current
-    var selectedDestination by rememberSaveable { mutableStateOf(Destination.USER) }
-    var sortType by rememberSaveable { mutableStateOf(AppsSortType.UPDATE_TIME) }
-    var userApps by remember { mutableStateOf(emptyList<PackageInfo>()) }
-    var systemApps by remember { mutableStateOf(emptyList<PackageInfo>()) }
-    var checkedApp by remember { mutableStateOf<PackageInfo?>(null) }
-    var showAppDetailDialog by remember { mutableStateOf(false) }
-    var showLocateDialog by remember { mutableStateOf(false) }
-    var outputPath by remember { mutableStateOf("") }
-    var searchActive by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(true) }
+    val viewModel: AppsViewModel = viewModel()
+    val uiState by viewModel.uiState.collectAsState()
     val searchField = rememberTextFieldState()
-    var showMenu by remember { mutableStateOf(false) }
-    var showSortDialog by remember { mutableStateOf(false) }
+    val pagerState = rememberPagerState(
+        initialPage = uiState.selectedDestination.ordinal,
+        pageCount = { AppsDestination.entries.size }
+    )
     val pm = context.packageManager
-    val scope = rememberCoroutineScope()
 
-    val filteredUserApps = remember(userApps,searchField.text, sortType) {
-        val apps = if (!searchActive) {
-            userApps
+    fun getFilteredApps(
+        apps: List<PackageInfo>
+    ): List<PackageInfo> {
+        val apps = if (!uiState.searchActive) {
+            apps
         } else {
             val text = searchField.text
-            userApps.filter { app ->
+            apps.filter { app ->
                 app.applicationInfo!!.loadLabel(pm)
                     .toString()
                     .contains(text, ignoreCase = true) || app.packageName.contains(text)
             }
         }
-        sortApps(apps, sortType, pm)
-    }
-
-    val filteredSystemApps = remember(systemApps,searchField.text, sortType) {
-        val apps = if (!searchActive) {
-            systemApps
-        } else {
-            val text = searchField.text
-            systemApps.filter { app ->
-                app.applicationInfo!!.loadLabel(pm)
-                    .toString()
-                    .contains(text, ignoreCase = true)|| app.packageName.contains(text)
-            }
-        }
-        sortApps(apps, sortType, pm)
+        return sortApps(apps, uiState.sortType, pm)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    if (!searchActive) {
+                    if (!uiState.searchActive) {
                         Text(stringResource(R.string.apps))
                     } else {
                         val focusRequester = remember { FocusRequester() }
@@ -201,21 +173,21 @@ fun AppsScreen(){
                         onClick = {
                             val text = searchField.text
                             if (text.isEmpty()) {
-                                searchActive = !searchActive
+                                viewModel.setSearchActive(!uiState.searchActive)
                             } else {
                                 searchField.clearText()
                             }
                         }
                     ) {
                         Icon(
-                            painter = painterResource(if (searchActive) R.drawable.ic_close else R.drawable.ic_search),
+                            painter = painterResource(if (uiState.searchActive) R.drawable.ic_close else R.drawable.ic_search),
                             contentDescription = null
                         )
                     }
 
                     IconButton(
                         onClick = {
-                            showMenu = true
+                            viewModel.showMenu()
                         }
                     ) {
                         Icon(
@@ -225,14 +197,14 @@ fun AppsScreen(){
                     }
 
                     DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        expanded = uiState.showMenu,
+                        onDismissRequest = { viewModel.hideMenu() }
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.sort)) },
                             onClick = {
-                                showSortDialog = true
-                                showMenu = false
+                                viewModel.showSortDialog()
+                                viewModel.hideMenu()
                             }
                         )
                     }
@@ -243,14 +215,13 @@ fun AppsScreen(){
     ) { contentPadding ->
         Column(modifier = Modifier.padding(contentPadding)) {
             PrimaryTabRow(
-                selectedTabIndex = selectedDestination.ordinal
+                selectedTabIndex = uiState.selectedDestination.ordinal
             ) {
-                Destination.entries.forEachIndexed { index, destination ->
+                AppsDestination.entries.forEachIndexed { index, destination ->
                     Tab(
-                        selected = selectedDestination == Destination.entries[index],
+                        selected = uiState.selectedDestination == AppsDestination.entries[index],
                         onClick = {
-                            Destination.entries
-                            selectedDestination = Destination.entries[index]
+                            viewModel.setDestination(AppsDestination.entries[index])
                         },
                         text = {
                             Text(
@@ -263,68 +234,53 @@ fun AppsScreen(){
                 }
             }
 
-            LaunchedEffect(Unit) {
-                val allApps = withContext(Dispatchers.IO) {
-                    pm.getInstalledPackages(PackageManager.GET_META_DATA)
-                        .sortedByDescending { it.lastUpdateTime }
+            @Composable
+            fun ApksColumn(apps: List<PackageInfo>) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val lazyListState = rememberLazyListState()
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        state = lazyListState
+                    ) {
+                        items(
+                            getFilteredApps(apps),
+                            key = { app -> app.packageName }
+                        ) { app ->
+                            AppItem(app, pm) { viewModel.showAppDialog(app) }
+                        }
+                        item {
+                            Spacer(Modifier.height(16.dp))
+                        }
+                    }
+                    AutoScrollBar(
+                        lazyState = lazyListState,
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    )
                 }
-
-                userApps = allApps.filter {
-                    it.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM == 0
-                }
-                systemApps = allApps.filter {
-                    it.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM != 0
-                }
-                isLoading = false
             }
 
-            fun handleAppClick(
-                app: PackageInfo
-            ) {
-                checkedApp = app
-                showAppDetailDialog = true
+            LaunchedEffect(uiState.selectedDestination) {
+                pagerState.animateScrollToPage(uiState.selectedDestination.ordinal)
             }
 
-            val animation = (fadeIn(animationSpec = tween(220,0)) + scaleIn(
-                initialScale = 0.99f, animationSpec = tween(220,0)
-            )).togetherWith(fadeOut(animationSpec = tween(0,0)))
+            LaunchedEffect(pagerState.currentPage) {
+                viewModel.setDestination(AppsDestination.entries[pagerState.currentPage])
+            }
 
-            if (!isLoading) {
-                AnimatedContent(
-                    targetState = selectedDestination,
-                    transitionSpec = { animation }
-                ) { it ->
-                    when (it) {
-                        Destination.USER -> {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                items(
-                                    filteredUserApps,
-                                    key = { app -> app.packageName }
-                                ) { app ->
-                                    AppItem(app, pm) { handleAppClick(it) }
-                                }
-                                item {
-                                    Spacer(Modifier.height(16.dp))
-                                }
-                            }
+            if (!uiState.isLoading) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { page ->
+                    when (AppsDestination.entries[page]) {
+                        AppsDestination.USER -> {
+                            ApksColumn(getFilteredApps(uiState.userApps))
                         }
 
-                        Destination.SYSTEM -> {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                items(
-                                    filteredSystemApps,
-                                    key = { app -> app.packageName }
-                                ) { app ->
-                                    AppItem(app, pm) { handleAppClick(it) }
-                                }
-                                item {
-                                    Spacer(Modifier.height(16.dp))
-                                }
-                            }
+                        AppsDestination.SYSTEM -> {
+                            ApksColumn(getFilteredApps(uiState.systemApps))
                         }
                     }
                 }
@@ -332,14 +288,13 @@ fun AppsScreen(){
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) { CircularProgressIndicator() }
             }
 
-            if (showAppDetailDialog) {
-                val app = checkedApp!!
+            uiState.appDialog?.let { app ->
                 val appName = pm.getApplicationLabel(app.applicationInfo!!).toString()
                 AlertDialog(
-                    onDismissRequest = { showAppDetailDialog = false },
+                    onDismissRequest = { viewModel.hideAppDialog() },
                     text = {
                         Column(
-                            modifier = Modifier.fillMaxWidth(0.85f)
+                            modifier = Modifier.fillMaxWidth(0.9f)
                         ) {
                             Row(
                                 modifier = Modifier.padding(bottom = 16.dp),
@@ -392,32 +347,7 @@ fun AppsScreen(){
                     confirmButton = {
                         Button(
                             onClick = {
-                                scope.launch(Dispatchers.IO) {
-                                    val target = File(ExtractPath)
-                                    if (!target.exists()) {
-                                        target.mkdir()
-                                    }
-                                    outputPath = "$ExtractPath/${appName}_${app.versionName}.apk"
-
-                                    val copy = try {
-                                        File(app.applicationInfo!!.sourceDir).copyTo(File(outputPath))
-                                        true
-                                    } catch (_: IOException) {
-                                        false
-                                    }
-                                    withContext(Dispatchers.Main) {
-                                        if (copy) {
-                                            showLocateDialog = true
-                                            showAppDetailDialog = false
-                                        } else {
-                                            Toast.makeText(
-                                                context,
-                                                "提取失败",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }
-                                }
+                                viewModel.onExtract(app)
                             }
                         ) {
                             Text(stringResource(R.string.extract))
@@ -464,10 +394,10 @@ fun AppsScreen(){
                 )
             }
         }
-        if (showLocateDialog) {
+        uiState.locateDialog?.let { path ->
             AlertDialog(
                 onDismissRequest = {
-                    showLocateDialog = false
+                    viewModel.hideLocateDialog()
                 },
 
                 title = {
@@ -475,31 +405,14 @@ fun AppsScreen(){
                 },
 
                 text = {
-                    Text(stringResource(R.string.file_saved_to, outputPath))
+                    Text(stringResource(R.string.file_saved_to, path))
                 },
 
                 confirmButton = {
                     Button(
                         onClick = {
-
-                            context.startActivity(
-                                Intent(
-                                    context,
-                                    MainActivity::class.java
-                                ).apply {
-
-                                    putExtra(
-                                        "path",
-                                        outputPath
-                                    )
-
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                                Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                }
-                            )
-
-                            showLocateDialog = false
+                            viewModel.onLocate(path)
+                            viewModel.hideLocateDialog()
                         }
                     ) {
                         Text(stringResource(R.string.locate))
@@ -509,7 +422,7 @@ fun AppsScreen(){
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            showLocateDialog = false
+                            viewModel.hideLocateDialog()
                         }
                     ) {
                         Text(stringResource(R.string.dismiss))
@@ -517,10 +430,10 @@ fun AppsScreen(){
                 }
             )
         }
-        if (showSortDialog) {
-            var selectedSortOption by remember { mutableStateOf(sortType) }
+        if (uiState.showSortDialog) {
+            var selectedSortOption by remember { mutableStateOf(uiState.sortType) }
             AlertDialog(
-                onDismissRequest = { showSortDialog = false },
+                onDismissRequest = { viewModel.hideSortDialog() },
                 title = { Text(text = stringResource(R.string.sort)) },
                 text = {
                     Column(
@@ -547,8 +460,8 @@ fun AppsScreen(){
                 confirmButton = {
                     Button(
                         onClick = {
-                            sortType = selectedSortOption
-                            showSortDialog = false
+                            viewModel.setSortType(selectedSortOption)
+                            viewModel.hideSortDialog()
                         }
                     ) {
                         Text(stringResource(R.string.confirm))
@@ -556,7 +469,7 @@ fun AppsScreen(){
                 },
                 dismissButton = {
                     TextButton(
-                        onClick = { showSortDialog = false }
+                        onClick = { viewModel.hideSortDialog() }
                     ) {
                         Text(stringResource(R.string.dismiss))
                     }
@@ -582,7 +495,7 @@ fun AppItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             val px = LocalDensity.current.run { 48.dp.toPx().toInt() }
-            val appIcon = remember(app.packageName) {
+            val appIcon = remember(app.packageName, px) {
                 try {
                     val drawable = packageManager.getApplicationIcon(app.packageName)
                     drawable.toBitmap(
@@ -631,7 +544,7 @@ fun sortApps(apps: List<PackageInfo>, sortType: AppsSortType, pm: PackageManager
     )
 }
 
-enum class Destination(
+enum class AppsDestination(
     val label: Int
 ) {
     USER(R.string.user),

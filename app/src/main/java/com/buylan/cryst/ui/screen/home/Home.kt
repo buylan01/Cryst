@@ -107,7 +107,8 @@ import com.buylan.cryst.activity.LicensesActivity
 import com.buylan.cryst.activity.SettingsActivity
 import com.buylan.cryst.activity.TerminalActivity
 import com.buylan.cryst.model.AppViewModel
-import com.buylan.cryst.ui.component.materialScrollbarStyle
+import com.buylan.cryst.ui.component.AutoScrollBar
+import com.buylan.cryst.ui.screen.home.dialog.ApkDialog
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
 import com.buylan.cryst.ui.screen.home.dialog.CompressDialog
 import com.buylan.cryst.ui.screen.home.dialog.CopyDialog
@@ -115,7 +116,6 @@ import com.buylan.cryst.ui.screen.home.dialog.CreateDialog
 import com.buylan.cryst.ui.screen.home.dialog.DeleteDialog
 import com.buylan.cryst.ui.screen.home.dialog.MoveDialog
 import com.buylan.cryst.ui.screen.home.dialog.OpenWithDialog
-import com.buylan.cryst.ui.screen.home.dialog.PackageDetail
 import com.buylan.cryst.ui.screen.home.dialog.PropertiesDialog
 import com.buylan.cryst.ui.screen.home.dialog.RenameDialog
 import com.buylan.cryst.ui.screen.home.dialog.SearchDialog
@@ -132,11 +132,8 @@ import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
-import io.github.oikvpqya.compose.fastscroller.VerticalScrollbar
-import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -463,28 +460,8 @@ fun HomeScreen(
                                 )
                             }
                         }
-                        var showScrollbar by remember { mutableStateOf(false) }
-                        LaunchedEffect(lazyState) {
-                            snapshotFlow {
-                                val layoutInfo = lazyState.layoutInfo
-                                val vh = layoutInfo.viewportSize.height
-                                if (vh <= 0) false
-                                else {
-                                    val vis = layoutInfo.visibleItemsInfo
-                                    if (vis.isEmpty()) false
-                                    else {
-                                        val avg = vis.sumOf { it.size } / vis.size
-                                        val totalEst = avg * layoutInfo.totalItemsCount
-                                        totalEst > 2 * vh
-                                    }
-                                }
-                            }.distinctUntilChanged()
-                                .collect { showScrollbar = it }
-                        }
-                        if (showScrollbar)
-                        VerticalScrollbar(
-                            adapter = rememberScrollbarAdapter(lazyState),
-                            style = materialScrollbarStyle(),
+                        AutoScrollBar(
+                            lazyState = lazyState,
                             modifier = Modifier.align(Alignment.TopEnd)
                         )
                     }
@@ -708,7 +685,7 @@ fun HomeScreen(
         }
     }
     dialogsState.apkDialog?.let { file ->
-        PackageDetail(
+        ApkDialog(
             context = context,
             targetFile = file as LocalFile,
             onDismiss = { viewModel.dialogsViewModel.hideApkDialog() },
