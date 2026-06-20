@@ -38,6 +38,7 @@ import kotlin.math.log10
 import kotlin.math.pow
 
 val DefaultPath: VirtualFile = LocalFile("/storage/emulated/0")
+val RootPath: VirtualFile = LocalFile("/")
 const val ExtractPath = "/storage/emulated/0/Cryst/package"
 val invalidChars = listOf('/', '\\', ':', '*', '?', '"', '<', '>', '|')
 

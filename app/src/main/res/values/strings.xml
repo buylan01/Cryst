@@ -102,4 +102,5 @@
     <string name="update_time">Update time</string>
     <string name="settings_dark_mode_description">Choose the app theme appearance</string>
     <string name="settings_group_appearance">Appearance</string>
+    <string name="root">Root</string>
 </resources>
