@@ -49,10 +49,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -86,6 +88,7 @@ fun FileItem(
     onSwipe: () -> Unit
 ) {
     var offsetX by remember { mutableFloatStateOf(0f) }
+    val haptic = LocalHapticFeedback.current
     Row(
         modifier = modifier
             .background(
@@ -106,6 +109,7 @@ fun FileItem(
                     offsetX = 0f
                     var dx = 0f
                     var dy = 0f
+                    var hapticTriggered = false
                     do {
                         val event = awaitPointerEvent()
                         val change = event.changes.first()
@@ -126,6 +130,16 @@ fun FileItem(
                         offsetX = offsetX.coerceIn(
                             -120f, 120f
                         )
+
+                        if (offsetX >= 115f || offsetX <= -115f) {
+                            if (!hapticTriggered) {
+                                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                hapticTriggered = true
+                            }
+                        } else {
+                            hapticTriggered = false
+                        }
+
                     } while (event.changes.any { it.pressed })
                     val isHorizontalSwipe = abs(dx) > 60f && abs(dx) > abs(dy) * 2
                     if (isHorizontalSwipe) {
