@@ -21,7 +21,6 @@ import android.content.Intent
 import android.os.Environment
 import android.os.StatFs
 import android.provider.Settings
-import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -29,6 +28,8 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,11 +71,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -94,7 +95,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -379,10 +381,6 @@ fun HomeScreen(
                     }
                 }
 
-                fun handleFileLongClick(file: List<VirtualFile>) {
-                    viewModel.dialogsViewModel.showToolsDialog(file)
-                }
-
                 @Composable
                 fun Panel(
                     panelState: PanelStates,
@@ -417,11 +415,14 @@ fun HomeScreen(
                                 .drawBehind {
                                     drawRect(backgroundColor)
                                 }
-                                .pointerInteropFilter { event ->
-                                    if (event.action == MotionEvent.ACTION_DOWN) {
+                                .pointerInput(panelPosition) {
+                                    awaitEachGesture {
+                                        awaitFirstDown(
+                                            requireUnconsumed = false,
+                                            pass = PointerEventPass.Initial
+                                        )
                                         viewModel.setPanel(panelPosition)
                                     }
-                                    false
                                 },
                             state = lazyState
                         ) {
@@ -446,9 +447,9 @@ fun HomeScreen(
                                         }
                                     },
                                     onLongClick = {
-                                        val selected =
-                                            panelState.files.filter { it.path in panelState.selectedFiles }
-                                        handleFileLongClick(selected.ifEmpty { listOf(file) })
+                                        viewModel.dialogsViewModel.showToolsDialog(
+                                            panelViewModel.getSelectedFiles(file)
+                                        )
                                     },
                                     onSwipe = {
                                         panelViewModel.swipeSelect(file)

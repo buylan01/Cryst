@@ -190,6 +190,15 @@ class PanelViewModel : ViewModel() {
         }
     }
 
+    fun getSelectedFiles(currentFile: VirtualFile): List<VirtualFile> {
+        val state = _panelStates.value
+        return if (state.selectedFiles.isNotEmpty()) {
+            state.files.filter { it.path in state.selectedFiles }
+        } else {
+            listOf(currentFile)
+        }
+    }
+
     fun setSort(sortType: FileSortType) {
         _panelStates.update {
             it.copy(
