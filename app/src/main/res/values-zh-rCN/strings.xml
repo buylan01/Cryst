@@ -104,4 +104,6 @@
     <string name="compress_success">压缩成功</string>
     <string name="compress_failed">一些文件无法被压缩</string>
     <string name="level">级别</string>
+    <string name="run">运行</string>
+    <string name="script_run_text">是否运行 %1$s ?</string>
 </resources>

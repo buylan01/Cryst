@@ -105,4 +105,6 @@
     <string name="compress_success">Compress Successful</string>
     <string name="compress_failed">Some files cannot be compressed</string>
     <string name="level">Level</string>
+    <string name="run">Run</string>
+    <string name="script_run_text">Run %1$s ?</string>
 </resources>

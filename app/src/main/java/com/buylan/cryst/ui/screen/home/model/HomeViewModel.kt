@@ -120,6 +120,7 @@ class HomeViewModel(
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                     }
                 }
+                FileType.SCRIPT -> _dialogsViewModel.showRunScriptDialog(file)
                 else -> _dialogsViewModel.showOpenWithDialog(actualFile)
             }
         }

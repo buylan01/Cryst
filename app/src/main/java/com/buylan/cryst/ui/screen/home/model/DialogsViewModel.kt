@@ -98,6 +98,15 @@ class DialogsViewModel : ViewModel() {
         _dialogsState.value = _dialogsState.value.copy(createDialog = null)
     }
 
+    // RunScript Dialog
+    fun showRunScriptDialog(data: VirtualFile) {
+        _dialogsState.value = _dialogsState.value.copy(runScriptDialog = data)
+    }
+
+    fun hideRunScriptDialog() {
+        _dialogsState.value = _dialogsState.value.copy(runScriptDialog = null)
+    }
+
     // Search Dialog
     fun showSearchDialog(data: VirtualFile) {
         _dialogsState.value = _dialogsState.value.copy(searchDialog = data)

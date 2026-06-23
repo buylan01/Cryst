@@ -31,6 +31,7 @@ data class DialogsState(
     val searchDialog: VirtualFile? = null,
     val audioDialog: VirtualFile? = null,
     val openWithDialog: VirtualFile? = null,
+    val runScriptDialog: VirtualFile? = null,
 
     val propertiesDialog: List<VirtualFile>? = null,
     val deleteDialog: List<VirtualFile>? = null,

@@ -118,6 +118,7 @@ import com.buylan.cryst.ui.screen.home.dialog.MoveDialog
 import com.buylan.cryst.ui.screen.home.dialog.OpenWithDialog
 import com.buylan.cryst.ui.screen.home.dialog.PropertiesDialog
 import com.buylan.cryst.ui.screen.home.dialog.RenameDialog
+import com.buylan.cryst.ui.screen.home.dialog.ScriptDialog
 import com.buylan.cryst.ui.screen.home.dialog.SearchDialog
 import com.buylan.cryst.ui.screen.home.dialog.SortOrderDialog
 import com.buylan.cryst.ui.screen.home.dialog.ToolDialog
@@ -701,6 +702,9 @@ fun HomeScreen(
     }
     dialogsState.propertiesDialog?.let { files ->
         PropertiesDialog(files) { viewModel.dialogsViewModel.hidePropertiesDialog() }
+    }
+    dialogsState.runScriptDialog?.let { file ->
+        ScriptDialog({ viewModel.dialogsViewModel.hideRunScriptDialog() }, file)
     }
 }
 
