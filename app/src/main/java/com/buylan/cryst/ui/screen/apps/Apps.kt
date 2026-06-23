@@ -547,7 +547,7 @@ enum class AppsDestination(
     val label: Int
 ) {
     USER(R.string.user),
-    SYSTEM(R.string.follow_system),
+    SYSTEM(R.string.system),
 }
 
 enum class AppsSortType(

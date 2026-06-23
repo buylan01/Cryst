@@ -110,4 +110,5 @@
     <string name="title_open_with">Open with…</string>
     <string name="count">Count</string>
     <string name="go_to_path">Go to path</string>
+    <string name="system">System</string>
 </resources>

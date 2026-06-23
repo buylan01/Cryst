@@ -109,4 +109,5 @@
     <string name="title_open_with">打开方式…</string>
     <string name="count">数量</string>
     <string name="go_to_path">转到路径</string>
+    <string name="system">系统</string>
 </resources>
