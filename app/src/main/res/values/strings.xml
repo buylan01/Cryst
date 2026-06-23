@@ -42,7 +42,7 @@
     <string name="exit">Exit</string>
     <string name="user">User</string>
     <string name="follow_system">Follow system</string>
-    <string name="search_subdirectories">Search Subdirectories</string>
+    <string name="search_subdirectories">Subdirectories</string>
     <string name="folder">Folder</string>
     <string name="file">File</string>
     <string name="text">Text</string>
@@ -99,7 +99,7 @@
     <string name="delete_failed">Some files failed to delete</string>
     <string name="install_time">Install time</string>
     <string name="update_time">Update time</string>
-    <string name="settings_dark_mode_description">Choose the app theme appearance</string>
+    <string name="settings_dark_mode_description">Choose the app theme</string>
     <string name="settings_group_appearance">Appearance</string>
     <string name="root">Root</string>
     <string name="compress_success">Compress Successful</string>
@@ -109,4 +109,5 @@
     <string name="script_run_text">Run %1$s ?</string>
     <string name="title_open_with">Open with…</string>
     <string name="count">Count</string>
+    <string name="go_to_path">Go to path</string>
 </resources>

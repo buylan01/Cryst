@@ -578,12 +578,13 @@ fun HomeScreen(
         val textFieldState = rememberTextFieldState(initialText = currentPanel.path.absolutePath)
         AlertDialog(
             onDismissRequest = { viewModel.dialogsViewModel.hidePathDialog() },
-            title = { Text(stringResource(R.string.path)) },
+            title = { Text(stringResource(R.string.go_to_path)) },
             text = {
                 val focusRequester = remember { FocusRequester() }
 
-                TextField(
+                OutlinedTextField(
                     state = textFieldState,
+                    label = { Text(stringResource(R.string.path)) },
                     shape = MaterialTheme.shapes.small,
                     modifier = Modifier.focusRequester(focusRequester)
                 )
@@ -593,7 +594,7 @@ fun HomeScreen(
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = {
                         viewModel.currentPanelViewModel.setPath(LocalFile(textFieldState.text.toString()))
                         viewModel.dialogsViewModel.hidePathDialog()
