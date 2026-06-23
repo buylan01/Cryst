@@ -20,7 +20,7 @@ object FileTypeRegistry {
     private val extensionMap = mutableMapOf<String, FileType>()
 
     init {
-        addAll(listOf("txt", "xml", "prop", "conf", "json", "smali", "cpp", "html", "bat", "log"), FileType.TEXT)
+        addAll(listOf("txt", "xml", "prop", "properties", "conf", "json", "smali", "cpp", "html", "bat", "log", "MF", "md"), FileType.TEXT)
         addAll(listOf("jpg", "jpeg", "png", "gif", "webp", "heif"), FileType.IMAGE)
         addAll(listOf("mp3", "wav", "ogg", "flac"), FileType.AUDIO)
         addAll(listOf("mp4"), FileType.VIDEO)
