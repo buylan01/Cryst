@@ -101,4 +101,7 @@
     <string name="settings_dark_mode_description">选择应用的主题外观</string>
     <string name="settings_group_appearance">外观</string>
     <string name="root">根目录</string>
+    <string name="compress_success">压缩成功</string>
+    <string name="compress_failed">一些文件无法被压缩</string>
+    <string name="level">级别</string>
 </resources>

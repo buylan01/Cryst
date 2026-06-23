@@ -16,42 +16,45 @@
 
 package com.buylan.cryst.ui.screen.home.dialog
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.R
-import com.buylan.cryst.ui.component.Segment
-import com.buylan.cryst.util.createTar
-import com.buylan.cryst.util.createZip
+import com.buylan.cryst.ui.screen.home.model.CompressViewModel
+import com.buylan.cryst.ui.screen.home.model.FileOperaUiState
 import com.buylan.cryst.util.invalidChars
+import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompressDialog(
     source: List<VirtualFile>,
@@ -59,13 +62,44 @@ fun CompressDialog(
     onRefresh: () -> Unit
 ) {
 
-    var fileName by remember { mutableStateOf(
-        (if (source.size == 1) source[0].name else source[0].parentFile?.name) + ".zip"
-    ) }
+    val viewModel: CompressViewModel = viewModel()
+    val uiState by viewModel.uiState.collectAsState()
     var createFail by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
     var archiveFormat by remember { mutableStateOf(ArchiveFormat.ZIP) }
+    var level by rememberSaveable { mutableIntStateOf(6) }
+    val textFieldState = rememberTextFieldState(archiveFormat.name)
+    val levelFieldState = rememberTextFieldState(level.toString())
+    var fileName by remember { mutableStateOf(
+        (if (source.size == 1) source[0].name else source[0].parentFile?.name) + "." + archiveFormat.name.lowercase()
+    ) }
+
+
+    LaunchedEffect(uiState) {
+        if (uiState is FileOperaUiState.Success && (uiState as FileOperaUiState.Success).all) {
+            onDismiss()
+            onRefresh()
+            viewModel.finish()
+        }
+    }
+
+    LaunchedEffect(archiveFormat) {
+        val currentName = fileName
+        val newExt = archiveFormat.name.lowercase()
+        val knownExtensions = ArchiveFormat.entries.map { it.name.lowercase() }
+
+        val lastDotIndex = currentName.lastIndexOf('.')
+        fileName = if (lastDotIndex >= 0) {
+            val possibleExt = currentName.substring(lastDotIndex + 1).lowercase()
+            if (possibleExt in knownExtensions) {
+                currentName.substring(0, lastDotIndex + 1) + newExt
+            } else {
+                currentName
+            }
+        } else {
+            "$currentName.$newExt"
+        }
+    }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -76,7 +110,8 @@ fun CompressDialog(
             }
             val isEmpty = fileName.isBlank()
             val isValid = !hasInvalidChar && !isEmpty && !createFail
-            var showDarkModeMenu by remember { mutableStateOf(false) }
+            var showFormatMenu by remember { mutableStateOf(false) }
+            var showLevelMenu by remember { mutableStateOf(false) }
 
             Column {
                 OutlinedTextField(
@@ -96,7 +131,10 @@ fun CompressDialog(
                             )
 
                             hasInvalidChar -> Text(
-                                text = stringResource(R.string.filename_cannot_contain,invalidChars.joinToString("")),
+                                text = stringResource(
+                                    R.string.filename_cannot_contain,
+                                    invalidChars.joinToString("")
+                                ),
                                 color = MaterialTheme.colorScheme.error
                             )
 
@@ -108,86 +146,116 @@ fun CompressDialog(
                     },
                     singleLine = true
                 )
-                Segment(
-                    modifier = Modifier
-                        .clip(shape = MaterialTheme.shapes.small)
-                        .background(color = MaterialTheme.colorScheme.surfaceContainer)
-                        .height(54.dp),
-                    onClick = { showDarkModeMenu = true },
-                    title = {
-                        Text(
-                            stringResource(R.string.format),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    },
-                    text = {
-                        Text(
-                            text = archiveFormat.name
-                        )
-                        DropdownMenu(
-                            expanded = showDarkModeMenu,
-                            onDismissRequest = { showDarkModeMenu = false }
-                        ) {
-                            ArchiveFormat.entries.forEach {
-                                DropdownMenuItem(
-                                    text = { Text(it.name) },
-                                    onClick = {
-                                        archiveFormat = it
-                                        showDarkModeMenu = false
-                                    }
-                                )
-                            }
+                ExposedDropdownMenuBox(
+                    expanded = showFormatMenu,
+                    onExpandedChange = { showFormatMenu = it }
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        state = textFieldState,
+                        shape = MaterialTheme.shapes.small,
+                        readOnly = true,
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        label = { Text(stringResource(R.string.format)) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showFormatMenu) },
+                    )
+                    ExposedDropdownMenu(
+                        expanded = showFormatMenu,
+                        onDismissRequest = { showFormatMenu = false },
+                        matchAnchorWidth = false
+                    ) {
+                        ArchiveFormat.entries.forEach { option ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        option.name,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
+                                onClick = {
+                                    textFieldState.setTextAndPlaceCursorAtEnd(option.name)
+                                    archiveFormat = option
+                                    showFormatMenu = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
                         }
                     }
-                )
-                Spacer(Modifier.height(16.dp))
-                if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+                }
+                ExposedDropdownMenuBox(
+                    expanded = showLevelMenu,
+                    onExpandedChange = { showLevelMenu = it }
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        state = levelFieldState,
+                        shape = MaterialTheme.shapes.small,
+                        readOnly = true,
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        label = { Text(stringResource(R.string.level)) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showLevelMenu) },
+                    )
+                    ExposedDropdownMenu(
+                        expanded = showLevelMenu,
+                        onDismissRequest = { showLevelMenu = false },
+                        matchAnchorWidth = false
+                    ) {
+                        repeat(9) { index ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        index.toString(),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
+                                onClick = {
+                                    levelFieldState.setTextAndPlaceCursorAtEnd(index.toString())
+                                    level = index
+                                    showLevelMenu = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                when (uiState) {
+                    is FileOperaUiState.InProgress -> LinearProgressIndicator()
+                    is FileOperaUiState.Progress -> {
+                        val prog = uiState as FileOperaUiState.Progress
+                        LinearProgressIndicator(
+                            progress = { prog.percentage / 100f },
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                        Text(
+                            text = "${prog.percentage}%  ${prog.current}/${prog.total} (失败: ${prog.failed})",
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+
+                    is FileOperaUiState.Success -> {
+                        val isAll = (uiState as FileOperaUiState.Success).all
+                        Text(
+                            if (isAll) stringResource(R.string.compress_success) else stringResource(
+                                R.string.compress_failed
+                            ),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    is FileOperaUiState.Error -> Text(
+                        text = stringResource((uiState as FileOperaUiState.Error).messageResId),
+                        color = MaterialTheme.colorScheme.error
+                    )
+
+                    else -> {}
+                }
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    scope.launch {
-                        withContext(Dispatchers.IO) {
-                            loading = true
-
-                            val allFiles = source.flatMap { item ->
-                                val ioFile = item.toFile()
-                                if (item.isDirectory) {
-                                    ioFile.walkTopDown().toList()
-                                } else {
-                                    listOf(ioFile)
-                                }
-                            }
-
-                            val baseDir = if (source.isNotEmpty()) {
-                                val parents = source.map { it.parentFile }.toSet()
-                                if (parents.size == 1) parents.first()!!.toFile()
-                                else source.first().parentFile!!.toFile()
-                            } else {
-                                error("No source files selected")
-                            }
-
-                            val outputPath = File(baseDir, fileName)
-
-                            when (archiveFormat) {
-                                ArchiveFormat.ZIP -> createZip(
-                                    files = allFiles,
-                                    outputPath,
-                                    baseDir
-                                )
-                                ArchiveFormat.TAR -> createTar(
-                                    files = allFiles,
-                                    outputPath,
-                                    baseDir
-                                )
-                            }
-                            loading = false
-                            onRefresh()
-                            onDismiss()
-                        }
-                    }
+                    viewModel.startCompress(archiveFormat, source, LocalFile(source[0].parent + "/" + fileName), level)
                 },
                 enabled = !loading
             ) {
@@ -197,7 +265,6 @@ fun CompressDialog(
         dismissButton = {
             TextButton(
                 onClick = {
-                    scope.cancel()
                     onDismiss()
                 }
             ) {
