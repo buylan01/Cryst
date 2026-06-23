@@ -24,13 +24,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.R
+import com.buylan.cryst.ui.screen.home.model.PropertiesViewModel
 import com.buylan.cryst.util.formatFileDate
-import com.buylan.cryst.util.getFileSize
+import com.buylan.cryst.util.formatSizeDetail
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.vfs.VirtualFile
 
@@ -39,6 +44,17 @@ fun PropertiesDialog(
     files: List<VirtualFile>,
     onDismiss: () -> Unit
 ) {
+
+    val viewModel: PropertiesViewModel = viewModel()
+    val uiState by viewModel.uiState.collectAsState()
+    val singleFile = files.size == 1 && (files.singleOrNull()?.isDirectory == false)
+
+    LaunchedEffect(files) {
+        if (!singleFile) {
+            viewModel.compute(files)
+        }
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -74,11 +90,14 @@ fun PropertiesDialog(
                 }
 
                 PropertyRow(label = R.string.name, value = files.singleOrNull()?.name ?: files.map { it.name }.toString())
-                PropertyRow(label = R.string.path, value = files[0].parent ?: stringResource(R.string.unknown))
-                if (files.size == 1) {
-                    PropertyRow(label = R.string.type, value = stringResource(getFileType(files[0]).label))
-                    PropertyRow(label = R.string.size, value = getFileSize(files[0]))
-                    PropertyRow(label = R.string.time, value = formatFileDate(files[0]))
+                PropertyRow(label = R.string.path, value = files.first().parent ?: stringResource(R.string.unknown))
+                if (singleFile) {
+                    PropertyRow(label = R.string.type, value = stringResource(getFileType(files.first()).label))
+                    PropertyRow(label = R.string.time, value = formatFileDate(files.first()))
+                    PropertyRow(label = R.string.size, value = formatSizeDetail(files.first().length()))
+                } else {
+                    PropertyRow(label = R.string.size, value = formatSizeDetail(uiState.totalSize))
+                    PropertyRow(label = R.string.count, value = uiState.totalCount.toString())
                 }
             }
         },

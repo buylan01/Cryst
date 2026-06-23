@@ -107,4 +107,6 @@
     <string name="level">Level</string>
     <string name="run">Run</string>
     <string name="script_run_text">Run %1$s ?</string>
+    <string name="title_open_with">Open with…</string>
+    <string name="count">Count</string>
 </resources>
