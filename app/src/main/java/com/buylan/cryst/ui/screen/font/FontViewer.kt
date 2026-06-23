@@ -123,7 +123,7 @@ fun FontViewer(
                         TextStyle(fontFamily = fontFamily, fontSize = 24.sp),
                     )
 
-                    val sampleText = "I wandered lonely as a cloud that floats on high o'er vales and hills.\n相恨不如潮有信，相思始觉海非深。"
+                    val sampleText = "The quick brown fox jumps over the lazy dog.\n我能吞下玻璃而不伤身体。"
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
