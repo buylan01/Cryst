@@ -41,7 +41,7 @@
     <string name="apps">应用</string>
     <string name="exit">退出</string>
     <string name="user">用户</string>
-    <string name="system">系统</string>
+    <string name="follow_system">跟随系统</string>
     <string name="search_subdirectories">搜索子目录</string>
     <string name="folder">文件夹</string>
     <string name="file">文件</string>
