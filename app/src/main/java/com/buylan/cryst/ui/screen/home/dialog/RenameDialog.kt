@@ -61,6 +61,7 @@ fun RenameDialog(
                 state = textFieldState,
                 shape = MaterialTheme.shapes.small,
                 isError = !isValid,
+                label = { Text(stringResource(R.string.name)) },
                 supportingText = {
                     when {
                         isEmpty -> Text(

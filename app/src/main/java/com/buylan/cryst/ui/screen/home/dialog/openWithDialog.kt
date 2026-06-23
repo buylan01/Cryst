@@ -45,6 +45,9 @@ fun OpenWithDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(R.string.title_open_with))
+        },
         text = {
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -76,7 +79,8 @@ fun OpenWithDialog(
                 }
             }
         },
-        confirmButton = {
+        confirmButton = { },
+        dismissButton = {
             TextButton(
                 onClick = onDismiss
             ) {

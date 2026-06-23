@@ -85,7 +85,7 @@
     <string name="rename_failed">重命名失败</string>
     <string name="confirm_move_to">是否移动 %1$s 到 %2$s ?</string>
     <string name="move_to_success">移动成功</string>
-    <string name="move_to_failed">Some files failed to move</string>
+    <string name="move_to_failed">一些文件无法移动</string>
     <string name="confirm_delete">是否删除 %1$s ?</string>
     <string name="delete_success">删除成功</string>
     <string name="create">新建</string>

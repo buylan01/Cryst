@@ -372,23 +372,6 @@ fun HomeScreen(
                     .padding(contentPadding)
             ) {
 
-                LaunchedEffect(leftPanelState.path) {
-                    viewModel.refreshPanel(PanelPosition.L)
-                }
-
-                LaunchedEffect(rightPanelState.path) {
-                    viewModel.refreshPanel(PanelPosition.R)
-                }
-
-                LaunchedEffect(Unit) {
-                    viewModel.currentPanelViewModel.scrollToIndex.collect { index ->
-                        val currentState = if (uiState.panelPosition == PanelPosition.L) leftLazyState else rightLazyState
-
-                        snapshotFlow { currentState.layoutInfo.totalItemsCount }.first { it > index }
-                        currentState.scrollToItem(index)
-                    }
-                }
-
                 LaunchedEffect(Unit) {
                     pathFlow.collect { path ->
                         viewModel.currentPanelViewModel.setPath(LocalFile(path))
@@ -407,6 +390,18 @@ fun HomeScreen(
                     lazyState: LazyListState,
                     panelPosition: PanelPosition
                 ) {
+
+                    LaunchedEffect(Unit) {
+                        panelViewModel.scrollToIndex.collect { index ->
+                            snapshotFlow { lazyState.layoutInfo.totalItemsCount }.first { it >= index }
+                            lazyState.scrollToItem(index)
+                        }
+                    }
+
+                    LaunchedEffect(panelState.path) {
+                        viewModel.refreshPanel(panelPosition)
+                    }
+
                     val backgroundColor by animateColorAsState(
                         targetValue = if (panelPosition == uiState.panelPosition) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerLowest,
                         animationSpec = tween(150)

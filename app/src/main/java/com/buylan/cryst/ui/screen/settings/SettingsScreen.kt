@@ -17,11 +17,8 @@
 package com.buylan.cryst.ui.screen.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.DropdownMenu
@@ -71,15 +68,13 @@ fun SettingsScreen(appViewModel: AppViewModel, onBackPressed: () -> Unit) {
         LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .fillMaxSize()
         ) {
-            item { Spacer(Modifier.height(12.dp)) }
             item {
                 Text(
                     text = stringResource(R.string.settings_group_appearance),
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(start = 16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                     style = MaterialTheme.typography.labelLarge
                 )
             }
