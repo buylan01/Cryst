@@ -110,4 +110,6 @@
     <string name="count">数量</string>
     <string name="go_to_path">转到路径</string>
     <string name="system">系统</string>
+    <string name="detail">详情</string>
+    <string name="launch">启动</string>
 </resources>

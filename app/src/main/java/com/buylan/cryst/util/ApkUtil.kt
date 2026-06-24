@@ -19,10 +19,17 @@ package com.buylan.cryst.util
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.provider.Settings
 import android.widget.Toast
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import com.buylan.cryst.ui.screen.apps.model.ApkInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 fun install(context: Context, file: File) {
@@ -50,4 +57,27 @@ fun install(context: Context, file: File) {
     } catch (e: Exception) {
         Toast.makeText(context, "安装失败: ${e.message}", Toast.LENGTH_SHORT).show()
     }
+}
+
+suspend fun PackageInfo.toApkInfo(packageManager: PackageManager, installed: Boolean = true): ApkInfo {
+
+    val icon = withContext(Dispatchers.Default) {
+        applicationInfo!!.loadIcon(packageManager).toBitmap().asImageBitmap()
+    }
+    val label = applicationInfo!!.loadLabel(packageManager).toString()
+    val size = File(applicationInfo!!.sourceDir).length()
+
+    return ApkInfo(
+        icon = icon,
+        label = label,
+        packageName = packageName,
+        versionName = versionName.toString(),
+        versionCode = longVersionCode,
+        size = size,
+        isInstalled = installed,
+        source = applicationInfo!!.sourceDir,
+        dataDir = applicationInfo!!.dataDir,
+        protectedDataDir = applicationInfo!!.deviceProtectedDataDir,
+        uid = applicationInfo!!.uid
+    )
 }

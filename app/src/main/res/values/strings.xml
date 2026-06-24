@@ -72,9 +72,9 @@
     <string name="unknown">Unknown</string>
     <string name="extract">Extract</string>
     <string name="about_libraries">About Libraries</string>
-    <string name="package_name">PackageName</string>
-    <string name="version_code">VersionCode</string>
-    <string name="source_dir">SourceDir</string>
+    <string name="package_name">Package</string>
+    <string name="version_code">Version</string>
+    <string name="source_dir">Source</string>
     <string name="data_dir">DataDir</string>
     <string name="uid" translatable="false">UID</string>
     <string name="installed">Installed</string>
@@ -111,4 +111,6 @@
     <string name="count">Count</string>
     <string name="go_to_path">Go to path</string>
     <string name="system">System</string>
+    <string name="detail">详情</string>
+    <string name="launch">启动</string>
 </resources>

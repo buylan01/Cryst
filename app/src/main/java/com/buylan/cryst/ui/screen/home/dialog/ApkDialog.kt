@@ -19,31 +19,25 @@ package com.buylan.cryst.ui.screen.home.dialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.buylan.cryst.R
-import com.buylan.cryst.ui.component.ApkInfoColumn
+import com.buylan.cryst.ui.component.ApkDialogContent
+import com.buylan.cryst.ui.component.MenuType
+import com.buylan.cryst.ui.screen.apps.model.ApkInfo
 import com.buylan.cryst.util.install
+import com.buylan.cryst.util.toApkInfo
 import com.buylan.cryst.vfs.LocalFile
 
 @Composable
@@ -53,62 +47,40 @@ fun ApkDialog(
     onDismiss: () -> Unit,
     unpack: () -> Unit
 ) {
+
     val pm = context.packageManager
-    val apkInfo = try { pm.getPackageArchiveInfo(targetFile.path, 0) } catch (_: Exception) { null }
-    apkInfo?.let {
+    var apkInfo by remember { mutableStateOf<ApkInfo?>(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            val archive = pm.getPackageArchiveInfo(targetFile.path, 0)
+            if (archive != null) {
+                apkInfo = archive.toApkInfo(pm, installed = false)
+                try {
+                    val installedPkg = pm.getPackageInfo(apkInfo!!.packageName, 0)
+                    installedPkg?.applicationInfo?.let { installedApp ->
+                        apkInfo = apkInfo!!.copy(
+                            isInstalled = true,
+                            source = installedApp.sourceDir,
+                            dataDir = installedApp.dataDir,
+                            uid = installedApp.uid,
+                        )
+                    }
+                } catch (_: PackageManager.NameNotFoundException) {
+
+                }
+            }
+        } catch (_: Exception) {
+            Toast.makeText(context, "无法获取安装包信息", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    apkInfo?.let { info ->
         AlertDialog(
             onDismissRequest = { onDismiss() },
             text = {
-                Column(
-                    modifier = Modifier.fillMaxWidth(0.9f)
-                ) {
-                    apkInfo.applicationInfo!!.apply {
-                        sourceDir = targetFile.absolutePath
-                        publicSourceDir = targetFile.absolutePath
-                    }
-
-                    val installedInfo = try {
-                        pm.getApplicationInfo(apkInfo.packageName, 0)
-                    } catch (_: PackageManager.NameNotFoundException) {
-                        null
-                    }
-
-                    Row(
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        val icon = apkInfo.applicationInfo!!.loadIcon(pm)
-
-                        AsyncImage(
-                            model = icon,
-                            contentDescription = "App icon",
-                            modifier = Modifier.size(48.dp),
-                            contentScale = ContentScale.Fit,
-                            placeholder = ColorPainter(Color.LightGray)
-                        )
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Column {
-                            Text(
-                                text = apkInfo.applicationInfo!!.loadLabel(pm).toString(),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                text = apkInfo.versionName ?: "Unknown",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
-                        }
-                    }
-
-                    HorizontalDivider(modifier = Modifier.fillMaxWidth())
-
-                    Spacer(Modifier.height(8.dp))
-
-                    ApkInfoColumn(apkInfo, false,installedInfo)
+                Box(modifier = Modifier.fillMaxWidth(0.9f)) {
+                    ApkDialogContent(info = info, menuType = MenuType.ApkFile)
                 }
             },
             confirmButton = {
@@ -129,5 +101,5 @@ fun ApkDialog(
                 }
             }
         )
-    } ?: Toast.makeText(context, "无法获取安装包信息", Toast.LENGTH_SHORT).show()
+    }
 }

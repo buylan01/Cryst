@@ -17,15 +17,8 @@
 package com.buylan.cryst.ui.screen.apps
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +46,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -81,24 +73,20 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.buylan.cryst.R
-import com.buylan.cryst.ui.component.ApkInfoColumn
+import com.buylan.cryst.ui.component.ApkDialogContent
 import com.buylan.cryst.ui.component.AutoScrollBar
-import java.io.File
+import com.buylan.cryst.ui.component.MenuType
+import com.buylan.cryst.ui.screen.apps.model.ApkInfo
+import com.buylan.cryst.ui.screen.apps.model.AppsViewModel
 
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
@@ -116,19 +104,18 @@ fun AppsScreen(){
     val pm = context.packageManager
 
     fun getFilteredApps(
-        apps: List<PackageInfo>
-    ): List<PackageInfo> {
+        apps: List<ApkInfo>
+    ): List<ApkInfo> {
         val apps = if (!uiState.searchActive) {
             apps
         } else {
             val text = searchField.text
             apps.filter { app ->
-                app.applicationInfo!!.loadLabel(pm)
-                    .toString()
+                app.label
                     .contains(text, ignoreCase = true) || app.packageName.contains(text)
             }
         }
-        return sortApps(apps, uiState.sortType, pm)
+        return sortApps(apps, uiState.sortType)
     }
 
     Scaffold(
@@ -234,7 +221,7 @@ fun AppsScreen(){
             }
 
             @Composable
-            fun ApksColumn(apps: List<PackageInfo>) {
+            fun ApksColumn(apps: List<ApkInfo>) {
                 Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -247,7 +234,7 @@ fun AppsScreen(){
                             getFilteredApps(apps),
                             key = { app -> app.packageName }
                         ) { app ->
-                            AppItem(app, pm) { viewModel.showAppDialog(app) }
+                            AppItem(app) { viewModel.showAppDialog(app) }
                         }
                         item {
                             Spacer(Modifier.height(16.dp))
@@ -288,106 +275,26 @@ fun AppsScreen(){
             }
 
             uiState.appDialog?.let { app ->
-                val appName = pm.getApplicationLabel(app.applicationInfo!!).toString()
                 AlertDialog(
                     onDismissRequest = { viewModel.hideAppDialog() },
                     text = {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(0.9f)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(bottom = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val appIcon = remember(app.packageName) {
-                                    try {
-                                        pm.getApplicationIcon(app.packageName)
-                                    } catch (_: Exception) {
-                                        null
-                                    }
-                                }
-
-                                appIcon?.let { icon ->
-                                    AsyncImage(
-                                        model = icon,
-                                        contentDescription = "App icon",
-                                        modifier = Modifier.size(48.dp),
-                                        contentScale = ContentScale.Fit,
-                                        placeholder = ColorPainter(Color.LightGray)
-                                    )
-                                } ?: Box(
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .background(Color.LightGray)
-                                )
-
-                                Spacer(modifier = Modifier.width(16.dp))
-
-                                Column {
-                                    Text(
-                                        text = appName,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        softWrap = false,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        text = app.versionName.toString(),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                    )
-                                }
-                            }
-                            HorizontalDivider(modifier = Modifier.fillMaxWidth())
-                            Spacer(Modifier.height(8.dp))
-                            ApkInfoColumn(app, true,null)
-                        }
+                        ApkDialogContent(
+                            info = app,
+                            menuType = MenuType.Installed
+                        )
                     },
                     confirmButton = {
                         TextButton(
-                            onClick = {
-                                viewModel.onExtract(app)
-                            }
+                            onClick = { viewModel.onExtract(app) }
                         ) {
                             Text(stringResource(R.string.extract))
                         }
                     },
                     dismissButton = {
-                        Row {
-                            IconButton(
-                                onClick = {
-                                    context.startActivity(Intent(Intent.ACTION_DELETE)
-                                        .apply {
-                                            data = Uri.fromParts("package", app.packageName, null)
-                                        }
-                                    )
-                                }
-                            ) {
-                                Icon(painter = painterResource(R.drawable.ic_delete), contentDescription = null)
-                            }
-                            IconButton(
-                                onClick = {
-                                    context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                        .apply {
-                                            data = Uri.fromParts("package", app.packageName, null)
-                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                        }
-                                    )
-                                }
-                            ) {
-                                Icon(painter = painterResource(R.drawable.ic_info), contentDescription = null)
-                            }
-                            IconButton(
-                                onClick = {
-                                    try {
-                                        context.startActivity(pm.getLaunchIntentForPackage(app.packageName))
-                                    } catch (_: NullPointerException) {
-                                        Toast.makeText(context, "应用没有主活动", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            ) {
-                                Icon(painter = painterResource(R.drawable.ic_open_in_new), contentDescription = null)
-                            }
+                        TextButton(
+                            onClick = { viewModel.hideAppDialog() }
+                        ) {
+                            Text(stringResource(R.string.cancel))
                         }
                     }
                 )
@@ -481,49 +388,34 @@ fun AppsScreen(){
 
 @Composable
 fun AppItem(
-    app: PackageInfo,
-    packageManager: PackageManager,
-    onClick: (PackageInfo) -> Unit
+    info: ApkInfo,
+    onClick: (ApkInfo) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        onClick = { onClick(app) }
+        onClick = { onClick(info) }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val px = LocalDensity.current.run { 48.dp.toPx().toInt() }
-            val appIcon = remember(app.packageName, px) {
-                try {
-                    val drawable = packageManager.getApplicationIcon(app.packageName)
-                    drawable.toBitmap(
-                        width = px,
-                        height = px
-                    ).asImageBitmap()
-                } catch (_: Exception) {
-                    null
-                }
-            }
 
-            appIcon?.let { icon ->
-                Image(
-                    bitmap = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
+            Image(
+                bitmap = info.icon,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp)
+            )
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Column {
                 Text(
-                    text = packageManager.getApplicationLabel(app.applicationInfo!!).toString(),
+                    text = info.label,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(Modifier.padding(vertical = 2.dp))
                 Text(
-                    text = app.packageName,
+                    text = info.packageName,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
@@ -532,11 +424,11 @@ fun AppItem(
     }
 }
 
-fun sortApps(apps: List<PackageInfo>, sortType: AppsSortType, pm: PackageManager): List<PackageInfo> {
+fun sortApps(apps: List<ApkInfo>, sortType: AppsSortType): List<ApkInfo> {
     return apps.sortedWith(
         when (sortType) {
-            AppsSortType.LABEL -> compareBy { it.applicationInfo!!.loadLabel(pm).toString().lowercase() }
-            AppsSortType.SIZE -> compareBy { File(it.applicationInfo!!.sourceDir).length() }
+            AppsSortType.LABEL -> compareBy { it.label.lowercase() }
+            AppsSortType.SIZE -> compareBy { it.size }
             AppsSortType.UPDATE_TIME -> compareByDescending { it.lastUpdateTime }
             AppsSortType.INSTALL_TIME -> compareBy { it.firstInstallTime }
         }
