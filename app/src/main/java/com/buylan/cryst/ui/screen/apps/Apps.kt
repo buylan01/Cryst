@@ -18,7 +18,6 @@ package com.buylan.cryst.ui.screen.apps
 
 import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,6 +80,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.component.ApkDialogContent
 import com.buylan.cryst.ui.component.AutoScrollBar
@@ -101,7 +101,6 @@ fun AppsScreen(){
         initialPage = uiState.selectedDestination.ordinal,
         pageCount = { AppsDestination.entries.size }
     )
-    val pm = context.packageManager
 
     fun getFilteredApps(
         apps: List<ApkInfo>
@@ -400,8 +399,8 @@ fun AppItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Image(
-                bitmap = info.icon,
+            AsyncImage(
+                model = info.icon,
                 contentDescription = null,
                 modifier = Modifier.size(48.dp)
             )

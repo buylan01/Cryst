@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.apps.model.ApkInfo
 import com.buylan.cryst.util.formatFileSize
@@ -60,8 +60,8 @@ fun ApkDialogContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                bitmap = info.icon,
+            AsyncImage(
+                model = info.icon,
                 contentDescription = null,
                 modifier = Modifier.size(48.dp),
                 contentScale = ContentScale.Fit

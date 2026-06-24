@@ -23,9 +23,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.provider.Settings
 import android.widget.Toast
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.buylan.cryst.ui.screen.apps.model.ApkInfo
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +60,7 @@ fun install(context: Context, file: File) {
 suspend fun PackageInfo.toApkInfo(packageManager: PackageManager, installed: Boolean = true): ApkInfo {
 
     val icon = withContext(Dispatchers.Default) {
-        applicationInfo!!.loadIcon(packageManager).toBitmap().asImageBitmap()
+        applicationInfo!!.loadIcon(packageManager)
     }
     val label = applicationInfo!!.loadLabel(packageManager).toString()
     val size = File(applicationInfo!!.sourceDir).length()

@@ -1,9 +1,9 @@
 package com.buylan.cryst.ui.screen.apps.model
 
-import androidx.compose.ui.graphics.ImageBitmap
+import android.graphics.drawable.Drawable
 
 data class ApkInfo (
-    val icon: ImageBitmap,
+    val icon: Drawable,
     val label: String,
     val packageName: String,
     val versionName: String,
