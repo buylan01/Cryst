@@ -16,10 +16,12 @@
 
 package com.buylan.cryst.ui.screen.home.dialog
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,6 +29,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +44,7 @@ import com.buylan.cryst.util.formatSizeDetail
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.vfs.VirtualFile
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PropertiesDialog(
     files: List<VirtualFile>,
@@ -47,10 +53,12 @@ fun PropertiesDialog(
 
     val viewModel: PropertiesViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
-    val singleFile = files.size == 1 && (files.singleOrNull()?.isDirectory == false)
+    val isSingleDir = files.singleOrNull()?.isDirectory == true
+    val isSingleSelection = files.size == 1
+    var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(files) {
-        if (!singleFile) {
+        if (!(isSingleDir || isSingleSelection)) {
             viewModel.compute(files)
         }
     }
@@ -69,10 +77,16 @@ fun PropertiesDialog(
                 @Composable
                 fun PropertyRow(
                     label: Int,
-                    value: String
+                    value: String,
+                    onClick: (() -> Unit)? = null
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(
+                                enabled = onClick != null,
+                                onClick = onClick ?: {}
+                            ),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
@@ -89,12 +103,30 @@ fun PropertiesDialog(
                     }
                 }
 
-                PropertyRow(label = R.string.name, value = files.singleOrNull()?.name ?: files.map { it.name }.toString())
-                PropertyRow(label = R.string.path, value = files.first().parent ?: stringResource(R.string.unknown))
-                if (singleFile) {
-                    PropertyRow(label = R.string.type, value = stringResource(getFileType(files.first()).label))
-                    PropertyRow(label = R.string.time, value = formatFileDate(files.first()))
-                    PropertyRow(label = R.string.size, value = formatSizeDetail(files.first().length()))
+                PropertyRow(
+                    label = R.string.name,
+                    value = files.singleOrNull()?.name ?: files.map { it.name }.toString()
+                )
+                PropertyRow(
+                    label = R.string.path,
+                    value = files.first().parent ?: stringResource(R.string.unknown)
+                )
+                if (isSingleSelection) {
+                    PropertyRow(
+                        label = R.string.time,
+                        value = formatFileDate(files.first()),
+                        onClick = { showDatePicker = true }
+                    )
+                }
+                if (isSingleSelection && !isSingleDir) {
+                    PropertyRow(
+                        label = R.string.type,
+                        value = stringResource(getFileType(files.first()).label)
+                    )
+                    PropertyRow(
+                        label = R.string.size,
+                        value = formatSizeDetail(files.first().length())
+                    )
                 } else {
                     PropertyRow(label = R.string.size, value = formatSizeDetail(uiState.totalSize))
                     PropertyRow(label = R.string.count, value = uiState.totalCount.toString())
