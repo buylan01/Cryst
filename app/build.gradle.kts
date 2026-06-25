@@ -14,6 +14,16 @@
  *    limitations under the License.
  */
 
+/*
+* ~~~~~~~~Talisman~~~~~~~~
+* 😁 HOPE NO BUG, NO DIFFICULTY
+* 😋 BUGS GET OUT OF MY PROJECT
+* 🤪 NO MORE COMPILE ERROR
+* 🤤 MAKE STAR INCREASE DAY AND DAY
+* 😭 PLEEEEEEEEEEEEEEEEEASE!!!!!!!!
+* (X3)
+*/
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
