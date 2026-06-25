@@ -18,6 +18,7 @@ package com.buylan.cryst.ui.screen.home.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -32,6 +33,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -53,6 +55,7 @@ import com.buylan.cryst.ui.screen.home.model.FileOperaUiState
 import com.buylan.cryst.util.invalidChars
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +72,6 @@ fun CompressDialog(
     var archiveFormat by remember { mutableStateOf(ArchiveFormat.ZIP) }
     var level by rememberSaveable { mutableIntStateOf(6) }
     val textFieldState = rememberTextFieldState(archiveFormat.name)
-    val levelFieldState = rememberTextFieldState(level.toString())
     var fileName by remember { mutableStateOf(
         (if (source.size == 1) source[0].name else source[0].parentFile?.name) + "." + archiveFormat.name.lowercase()
     ) }
@@ -111,7 +113,6 @@ fun CompressDialog(
             val isEmpty = fileName.isBlank()
             val isValid = !hasInvalidChar && !isEmpty && !createFail
             var showFormatMenu by remember { mutableStateOf(false) }
-            var showLevelMenu by remember { mutableStateOf(false) }
 
             Column {
                 OutlinedTextField(
@@ -182,41 +183,22 @@ fun CompressDialog(
                         }
                     }
                 }
-                ExposedDropdownMenuBox(
-                    expanded = showLevelMenu,
-                    onExpandedChange = { showLevelMenu = it }
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                 ) {
-                    OutlinedTextField(
-                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                        state = levelFieldState,
-                        shape = MaterialTheme.shapes.small,
-                        readOnly = true,
-                        lineLimits = TextFieldLineLimits.SingleLine,
-                        label = { Text(stringResource(R.string.level)) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showLevelMenu) },
+                    Text(
+                        text = stringResource(R.string.level) + ": " + level,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
-                    ExposedDropdownMenu(
-                        expanded = showLevelMenu,
-                        onDismissRequest = { showLevelMenu = false },
-                        matchAnchorWidth = false
-                    ) {
-                        repeat(9) { index ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        index.toString(),
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                },
-                                onClick = {
-                                    levelFieldState.setTextAndPlaceCursorAtEnd(index.toString())
-                                    level = index
-                                    showLevelMenu = false
-                                },
-                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                            )
-                        }
-                    }
+                    Slider(
+                        value = level.toFloat(),
+                        onValueChange = { level = it.roundToInt() },
+                        valueRange = 0f..9f,
+                        steps = 7,
+                        enabled = archiveFormat != ArchiveFormat.TAR,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
                 Spacer(Modifier.height(8.dp))
                 when (uiState) {
