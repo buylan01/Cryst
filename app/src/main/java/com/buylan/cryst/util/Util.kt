@@ -41,6 +41,7 @@ val DefaultPath: VirtualFile = LocalFile("/storage/emulated/0")
 val RootPath: VirtualFile = LocalFile("/")
 const val ExtractPath = "/storage/emulated/0/Cryst/package"
 val invalidChars = listOf('/', '\\', ':', '*', '?', '"', '<', '>', '|')
+var ShellExecutor = "sh -c"
 
 @SuppressLint("SdCardPath")
 private val VIRTUAL_DIRS_MAP = mapOf(
@@ -51,7 +52,7 @@ private val VIRTUAL_DIRS_MAP = mapOf(
 
 fun accessFiles(path: VirtualFile, sortType: FileSortType): List<VirtualFile> {
     try {
-        val files = path.listFiles()?.toList()!!
+        val files = path.listFiles()?.toList() ?: throw Exception()
         return files.sortedWith(
             compareBy<VirtualFile> { !it.isDirectory }
                 .then(
@@ -94,14 +95,6 @@ fun formatFileSize(sizeInBytes: Long): String {
         sizeInBytes < 0x100000 -> "%.1f KB".format(sizeInBytes / 1024.0)
         sizeInBytes < 0x40000000 -> "%.1f MB".format(sizeInBytes / (1024.0 * 1024.0))
         else -> "%.1f GB".format(sizeInBytes / (1024.0 * 1024.0 * 1024.0))
-    }
-}
-
-fun getFileSize(file: VirtualFile): String {
-    return if (file.isDirectory) {
-        "未知"
-    } else {
-        formatSizeDetail(file.length())
     }
 }
 
