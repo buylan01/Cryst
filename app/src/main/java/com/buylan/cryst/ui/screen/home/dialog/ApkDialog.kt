@@ -49,25 +49,24 @@ fun ApkDialog(
     var apkInfo by remember { mutableStateOf<ApkInfo?>(null) }
 
     LaunchedEffect(Unit) {
-        try {
-            val archive = pm.getPackageArchiveInfo(targetFile.path, 0)
-            if (archive != null) {
-                apkInfo = archive.toApkInfo(pm, installed = false)
-                try {
-                    val installedPkg = pm.getPackageInfo(apkInfo!!.packageName, 0)
-                    installedPkg?.applicationInfo?.let { installedApp ->
-                        apkInfo = apkInfo!!.copy(
-                            isInstalled = true,
-                            source = installedApp.sourceDir,
-                            dataDir = installedApp.dataDir,
-                            uid = installedApp.uid,
-                        )
-                    }
-                } catch (_: PackageManager.NameNotFoundException) {
-
+        val archive = pm.getPackageArchiveInfo(targetFile.path, 0)
+        if (archive != null) {
+            apkInfo = archive.toApkInfo(pm, installed = false)
+            try {
+                val installedPkg = pm.getPackageInfo(apkInfo!!.packageName, 0)
+                installedPkg?.applicationInfo?.let { installedApp ->
+                    apkInfo = apkInfo!!.copy(
+                        isInstalled = true,
+                        source = installedApp.sourceDir,
+                        dataDir = installedApp.dataDir,
+                        uid = installedApp.uid,
+                    )
                 }
+            } catch (_: PackageManager.NameNotFoundException) {
+
             }
-        } catch (_: Exception) {
+        } else {
+            onDismiss()
             Toast.makeText(context, "无法获取安装包信息", Toast.LENGTH_SHORT).show()
         }
     }
