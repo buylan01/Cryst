@@ -32,7 +32,7 @@ fun materialScrollbarStyle() = ScrollbarStyle(
     thickness = 10.dp,
     hoverDurationMillis = 300,
     thumbStyle = ThumbStyle(
-        shape = RoundedCornerShape(4.dp),
+        shape = RoundedCornerShape(8.dp),
         unhoverColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
         hoverColor = MaterialTheme.colorScheme.outline,
     ),
