@@ -57,7 +57,7 @@ fun ApkDialog(
                 installedPkg?.applicationInfo?.let { installedApp ->
                     apkInfo = apkInfo!!.copy(
                         isInstalled = true,
-                        source = installedApp.sourceDir,
+                        installedSource = installedApp.sourceDir,
                         dataDir = installedApp.dataDir,
                         uid = installedApp.uid,
                     )

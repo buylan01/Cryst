@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,9 +37,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.android.apksig.ApkVerifier
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.apps.model.ApkInfo
 import com.buylan.cryst.util.formatFileSize
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
 
 enum class MenuType {
     Installed,
@@ -52,6 +57,7 @@ fun ApkDialogContent(
 ) {
     val context = LocalContext.current
     val pm = context.packageManager
+    var signResult by remember { mutableStateOf("Loading") }
     Column(
         modifier = Modifier.fillMaxWidth(0.9f)
     ) {
@@ -190,14 +196,41 @@ fun ApkDialogContent(
             }
         }
 
+        LaunchedEffect(Unit) {
+            withContext(Dispatchers.IO) {
+                val result = ApkVerifier.Builder(File(info.source))
+                    .setMinCheckedPlatformVersion(21)
+                    .build()
+                    .verify()
+                val isVerified = result.isVerified
+                val hasV1 =
+                    result.isVerifiedUsingV1Scheme || result.v1SchemeIgnoredSigners.isNotEmpty()
+                val hasV2 = result.isVerifiedUsingV2Scheme
+                val hasV3 = result.isVerifiedUsingV3Scheme
+                val hasV31 = result.isVerifiedUsingV31Scheme
+                val hasV4 = result.isVerifiedUsingV4Scheme
+
+                val schemes = mutableListOf<String>()
+                if (hasV1) schemes.add("v1")
+                if (hasV2) schemes.add("v2")
+                if (hasV3) schemes.add("v3")
+                if (hasV31) schemes.add("v3.1")
+                if (hasV4) schemes.add("v4")
+
+                signResult = if (isVerified) "通过 " else "失效 "
+                signResult += "(${schemes.joinToString("+")})"
+            }
+        }
+
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             InfoItem(title = R.string.package_name, summary = info.packageName)
             InfoItem(title = R.string.version_code, summary = info.versionCode.toString())
             InfoItem(title = R.string.size, summary = formatFileSize(info.size))
+            InfoItem(title = R.string.sign, summary = signResult)
             if (info.isInstalled) {
-                InfoItem(R.string.source_dir, info.source.toString())
+                InfoItem(R.string.source_dir, info.installedSource.toString())
                 InfoItem(R.string.data_dir, info.dataDir.toString())
                 InfoItem(R.string.uid, info.uid.toString())
             }

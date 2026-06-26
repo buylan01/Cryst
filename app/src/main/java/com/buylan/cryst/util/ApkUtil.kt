@@ -74,6 +74,7 @@ suspend fun PackageInfo.toApkInfo(packageManager: PackageManager, installed: Boo
         size = size,
         isInstalled = installed,
         source = applicationInfo!!.sourceDir,
+        installedSource = applicationInfo!!.sourceDir,
         dataDir = applicationInfo!!.dataDir,
         protectedDataDir = applicationInfo!!.deviceProtectedDataDir,
         uid = applicationInfo!!.uid

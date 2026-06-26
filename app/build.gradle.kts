@@ -90,6 +90,7 @@ dependencies {
     implementation(libs.aboutlibraries.compose.m3)
     implementation(libs.fastscroller.material3)
     implementation(libs.commons.compress)
+    implementation(libs.apksig)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

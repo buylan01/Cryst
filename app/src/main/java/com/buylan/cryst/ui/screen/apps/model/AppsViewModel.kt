@@ -99,7 +99,7 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
 
             val copy = try {
-                File(source.source!!).copyTo(File(outPath))
+                File(source.installedSource!!).copyTo(File(outPath))
                 true
             } catch (_: IOException) {
                 false
