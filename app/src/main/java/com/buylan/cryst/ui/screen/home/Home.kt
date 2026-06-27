@@ -96,6 +96,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
@@ -128,10 +129,8 @@ import com.buylan.cryst.ui.screen.home.dialog.ToolDialog
 import com.buylan.cryst.ui.screen.home.model.HomeViewModel
 import com.buylan.cryst.ui.screen.home.model.PanelStates
 import com.buylan.cryst.ui.screen.home.model.PanelViewModel
-import com.buylan.cryst.util.DefaultPath
 import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.PanelPosition
-import com.buylan.cryst.util.RootPath
 import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.LocalFile
@@ -710,13 +709,20 @@ fun DrawerContent(
     context: Context,
     viewModel: HomeViewModel,
     appViewModel: AppViewModel,
-    drawerState: DrawerState,
-    modifier: Modifier = Modifier
+    drawerState: DrawerState
 ) {
     val isSystemInDark = isSystemInDarkTheme()
     val scope = rememberCoroutineScope()
+
+    val storageItemList = mapOf(
+        Environment.getRootDirectory() to stringResource(R.string.root),
+        Environment.getExternalStorageDirectory() to stringResource(R.string.storage)
+    )
+
     ModalDrawerSheet(
-        modifier = Modifier.widthIn(max = 360.dp).fillMaxWidth(0.8f),
+        modifier = Modifier
+            .widthIn(max = 360.dp)
+            .fillMaxWidth(0.8f),
         drawerShape = MaterialTheme.shapes.extraLarge.copy(
             topStart = CornerSize(0.dp),
             bottomStart = CornerSize(0.dp)
@@ -765,108 +771,39 @@ fun DrawerContent(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            NavigationDrawerItem(
-                label = {
-                    var usage by remember { mutableFloatStateOf(0f) }
+            storageItemList.forEach { (path, label) ->
+                var fsUsage by remember { mutableFloatStateOf(0f) }
 
-                    LaunchedEffect(Unit) {
-                        val progress = withContext(Dispatchers.IO) {
-                            try {
-                                val stat = StatFs(Environment.getRootDirectory().path)
-                                val totalBytes = stat.totalBytes
-                                val availableBytes = stat.availableBytes
-                                if (totalBytes > 0) (totalBytes - availableBytes).toFloat() / totalBytes else 0f
-                            } catch (_: Exception) {
-                                0f
-                            }
+                LaunchedEffect(Unit) {
+                    val progress = withContext(Dispatchers.IO) {
+                        try {
+                            val stat = StatFs(path.path)
+                            val totalBytes = stat.totalBytes
+                            val availableBytes = stat.availableBytes
+                            if (totalBytes > 0) (totalBytes - availableBytes).toFloat() / totalBytes else 0f
+                        } catch (_: Exception) {
+                            0f
                         }
-                        usage = progress
                     }
-                    Column {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(stringResource(R.string.root))
-                            Text("${(usage * 100).toInt()}%")
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        LinearProgressIndicator(
-                            progress = { usage },
-                            drawStopIndicator = {},
-                            gapSize = (-2).dp,
-                            trackColor = MaterialTheme.colorScheme.surface
-                        )
-                    }
-                },
-                selected = true,
-                icon = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_storage),
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    scope.launch {
-                        viewModel.currentPanelViewModel.setPath(RootPath)
-                        drawerState.close()
-                    }
+                    fsUsage = progress
                 }
-            )
 
-            Spacer(Modifier.height(12.dp))
-
-            NavigationDrawerItem(
-                label = {
-                    var storageProgress by remember { mutableFloatStateOf(0f) }
-
-                    LaunchedEffect(Unit) {
-                        val progress = withContext(Dispatchers.IO) {
-                            try {
-                                val stat =
-                                    StatFs(Environment.getExternalStorageDirectory().path)
-                                val totalBytes = stat.totalBytes
-                                val availableBytes = stat.availableBytes
-                                if (totalBytes > 0) (totalBytes - availableBytes).toFloat() / totalBytes else 0f
-                            } catch (_: Exception) {
-                                0f
-                            }
+                DrawerStorageItem(
+                    label = label,
+                    icon = painterResource(R.drawable.ic_storage),
+                    usage = fsUsage,
+                    onClick = {
+                        scope.launch {
+                            viewModel.currentPanelViewModel.setPath(LocalFile(path.path))
+                            drawerState.close()
                         }
-                        storageProgress = progress
                     }
-                    Column {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(stringResource(R.string.storage))
-                            Text("${(storageProgress * 100).toInt()}%")
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        LinearProgressIndicator(
-                            progress = { storageProgress },
-                            drawStopIndicator = {},
-                            gapSize = (-2).dp,
-                            trackColor = MaterialTheme.colorScheme.surface
-                        )
-                    }
-                },
-                selected = true,
-                icon = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_storage),
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    scope.launch {
-                        viewModel.currentPanelViewModel.setPath(DefaultPath)
-                        drawerState.close()
-                    }
-                }
-            )
+                )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
 
             Text(
                 stringResource(R.string.tools),
@@ -902,4 +839,41 @@ fun DrawerContent(
             Spacer(Modifier.height(12.dp))
         }
     }
+}
+
+@Composable
+fun DrawerStorageItem(
+    label: String,
+    icon: Painter,
+    usage: Float,
+    onClick: () -> Unit
+) {
+    NavigationDrawerItem(
+        label = {
+            Column {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(label)
+                    Text("${(usage * 100).toInt()}%")
+                }
+                Spacer(Modifier.height(4.dp))
+                LinearProgressIndicator(
+                    progress = { usage },
+                    drawStopIndicator = {},
+                    gapSize = (-2).dp,
+                    trackColor = MaterialTheme.colorScheme.surface
+                )
+            }
+        },
+        selected = true,
+        icon = {
+            Icon(
+                painter = icon,
+                contentDescription = null
+            )
+        },
+        onClick = onClick
+    )
 }
