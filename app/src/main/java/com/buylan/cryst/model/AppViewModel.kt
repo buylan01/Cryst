@@ -17,6 +17,7 @@
 package com.buylan.cryst.model
 
 import android.app.Application
+import android.content.res.Configuration
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -50,18 +51,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun isDarkMode(isSystemDarkMode: Boolean = false): Boolean {
+    fun isDarkMode(): Boolean {
         return when (darkMode) {
-            DarkMode.System -> isSystemDarkMode
+            DarkMode.System -> isSystemInDark()
             DarkMode.Light  -> false
             DarkMode.Dark   -> true
         }
     }
 
-    fun toggleDarkMode(isSystemInDark: Boolean) {
+    fun toggleDarkMode() {
         when (darkMode) {
             DarkMode.System -> {
-                if (isSystemInDark) {
+                if (isSystemInDark()) {
                     setDarkTheme(DarkMode.Light)
                 } else {
                     setDarkTheme(DarkMode.Dark)
@@ -93,6 +94,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         } catch (_: IllegalArgumentException) {
             DarkMode.System
         }
+    }
+
+    private fun isSystemInDark(): Boolean {
+        val uiMode = getApplication<Application>().resources.configuration.uiMode
+        return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
     }
 
     companion object {

@@ -30,7 +30,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -111,6 +110,7 @@ import com.buylan.cryst.activity.LicensesActivity
 import com.buylan.cryst.activity.SettingsActivity
 import com.buylan.cryst.activity.TerminalActivity
 import com.buylan.cryst.model.AppViewModel
+import com.buylan.cryst.model.DarkMode
 import com.buylan.cryst.ui.component.AutoScrollBar
 import com.buylan.cryst.ui.screen.home.dialog.ApkDialog
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
@@ -140,6 +140,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
     ExperimentalLayoutApi::class
@@ -178,10 +179,12 @@ fun HomeScreen(
     ModalNavigationDrawer(
         drawerContent = {
             DrawerContent(
-                context,
-                viewModel,
-                appViewModel,
-                drawerState
+                context = context,
+                drawerState = drawerState,
+                darkMode = appViewModel.darkMode,
+                onShowAbout = { viewModel.dialogsViewModel.showAboutDialog() },
+                onToggleDark = { appViewModel.toggleDarkMode() },
+                onStorageItemClick = { viewModel.currentPanelViewModel.setPath(LocalFile(it.path)) }
             )
         },
         drawerState = drawerState,
@@ -707,13 +710,13 @@ fun HomeScreen(
 @Composable
 fun DrawerContent(
     context: Context,
-    viewModel: HomeViewModel,
-    appViewModel: AppViewModel,
-    drawerState: DrawerState
+    drawerState: DrawerState,
+    darkMode: DarkMode,
+    onStorageItemClick: (path: File) -> Unit,
+    onShowAbout: () -> Unit,
+    onToggleDark: () -> Unit
 ) {
-    val isSystemInDark = isSystemInDarkTheme()
     val scope = rememberCoroutineScope()
-
     val storageItemList = mapOf(
         Environment.getRootDirectory() to stringResource(R.string.root),
         Environment.getExternalStorageDirectory() to stringResource(R.string.storage)
@@ -745,12 +748,10 @@ fun DrawerContent(
                 selected = false,
                 badge = {
                     IconButton(
-                        onClick = {
-                            appViewModel.toggleDarkMode(isSystemInDark)
-                        }
+                        onClick = onToggleDark
                     ) {
                         Icon(
-                            painter = painterResource(appViewModel.darkMode.icon),
+                            painter = painterResource(darkMode.icon),
                             contentDescription = null
                         )
                     }
@@ -759,9 +760,7 @@ fun DrawerContent(
                         contentDescription = null
                     )
                 },
-                onClick = {
-                    viewModel.dialogsViewModel.showAboutDialog()
-                }
+                onClick = onShowAbout
             )
             HorizontalDivider()
 
@@ -793,8 +792,8 @@ fun DrawerContent(
                     icon = painterResource(R.drawable.ic_storage),
                     usage = fsUsage,
                     onClick = {
+                        onStorageItemClick(path)
                         scope.launch {
-                            viewModel.currentPanelViewModel.setPath(LocalFile(path.path))
                             drawerState.close()
                         }
                     }
