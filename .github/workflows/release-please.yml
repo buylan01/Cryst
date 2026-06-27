@@ -33,6 +33,7 @@ jobs:
         with:
           token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
           release-type: simple
+          initial-version: "0.1.0"
 
       - name: Inject version into build.gradle
         if: ${{ steps.release.outputs.release_created }}
