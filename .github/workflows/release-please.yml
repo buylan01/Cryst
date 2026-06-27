@@ -1,0 +1,54 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.0
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v5.4.0
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build APK (debug)
+        run: ./gradlew assembleRelease
+
+      - id: release
+        uses: googleapis/release-please-action@v5.0.0
+        with:
+          token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
+          release-type: simple
+
+      - name: Inject version into build.gradle
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          NEW_VERSION="${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }}"
+          sed -i "s/versionName = \".*\"/versionName = \"$NEW_VERSION\"/g" app/build.gradle
+          NEW_CODE=$(date +%s)
+          sed -i "s/versionCode = .*/versionCode = $NEW_CODE/g" app/build.gradle
+          cat app/build.gradle | grep versionName
+          cat app/build.gradle | grep versionCode
+
+      - name: Upload APK to Release
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ steps.release.outputs.tag_name }}"
+          APK_PATH="app/build/outputs/apk/release/app-release.apk"
+          gh release upload "$TAG_NAME" "$APK_PATH" --clobber
