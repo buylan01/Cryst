@@ -19,6 +19,8 @@ package com.buylan.cryst.ui.screen.text
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -152,7 +154,8 @@ fun TextEditor(
                     }
                 }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.displayCutout
     ) { innerPadding ->
         Column(
             modifier = Modifier

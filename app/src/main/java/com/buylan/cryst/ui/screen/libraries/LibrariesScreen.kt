@@ -17,6 +17,7 @@
 package com.buylan.cryst.ui.screen.libraries
 
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,7 +54,7 @@ fun LibrariesScreen(onBackPressed: () -> Unit) {
                 scrollBehavior = scrollBehavior
             )
         },
-        contentWindowInsets = WindowInsets(0,0,0,0)
+        contentWindowInsets = WindowInsets.displayCutout
     ) { innerPadding ->
         val libraries by produceLibraries(R.raw.aboutlibraries)
         LibrariesContainer(

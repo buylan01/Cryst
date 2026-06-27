@@ -18,6 +18,7 @@ package com.buylan.cryst.ui.screen.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,7 +64,7 @@ fun SettingsScreen(appViewModel: AppViewModel, onBackPressed: () -> Unit) {
                 scrollBehavior = scrollBehavior
             )
         },
-        contentWindowInsets = WindowInsets(0,0,0,0)
+        contentWindowInsets = WindowInsets.displayCutout
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
