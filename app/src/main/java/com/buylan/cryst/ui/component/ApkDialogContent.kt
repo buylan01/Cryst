@@ -199,12 +199,12 @@ fun ApkDialogContent(
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {
                 val result = ApkVerifier.Builder(File(info.source))
-                    .setMinCheckedPlatformVersion(21)
+                    .setMinCheckedPlatformVersion(18)
                     .build()
                     .verify()
                 val isVerified = result.isVerified
                 val hasV1 =
-                    result.isVerifiedUsingV1Scheme || result.v1SchemeIgnoredSigners.isNotEmpty()
+                    result.v1SchemeSigners.isNotEmpty() || result.v1SchemeIgnoredSigners.isNotEmpty()
                 val hasV2 = result.isVerifiedUsingV2Scheme
                 val hasV3 = result.isVerifiedUsingV3Scheme
                 val hasV31 = result.isVerifiedUsingV31Scheme

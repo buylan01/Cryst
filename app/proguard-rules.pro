@@ -21,3 +21,6 @@
 #-renamesourcefileattribute SourceFile
 -dontwarn com.github.luben.zstd.**
 -dontwarn org.tukaani.xz.**
+
+-keep @interface com.android.apksig.internal.asn1.Asn1Class
+-keep @com.android.apksig.internal.asn1.Asn1Class class * { *; }
