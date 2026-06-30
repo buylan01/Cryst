@@ -2,7 +2,8 @@
 
 A Compose File-manager, with double files panel.
 
-![GitHub Release](https://img.shields.io/github/v/release/buylan01/Cryst) ![GitHub Actions CI Status](https://img.shields.io/github/actions/workflow/status/buylan01/Cryst/android.yml) ![License](https://img.shields.io/github/license/buylan01/Cryst)
+![GitHub Release](https://img.shields.io/github/v/release/buylan01/Cryst?include_prereleases)
+ ![GitHub Actions CI Status](https://img.shields.io/github/actions/workflow/status/buylan01/Cryst/android.yml) ![License](https://img.shields.io/github/license/buylan01/Cryst)
 
 
 
