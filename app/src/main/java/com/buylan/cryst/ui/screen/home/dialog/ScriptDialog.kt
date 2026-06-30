@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.buylan.cryst.R
 import com.buylan.cryst.activity.TerminalActivity
+import com.buylan.cryst.activity.TerminalActivity.Companion.EXTRA_SCRIPT_PATH
 import com.buylan.cryst.vfs.VirtualFile
 
 @Composable
@@ -29,7 +30,9 @@ fun ScriptDialog(
             TextButton(
                 onClick = {
                     context.startActivity(
-                        Intent(context, TerminalActivity::class.java)
+                        Intent(context, TerminalActivity::class.java).apply {
+                            putExtra(EXTRA_SCRIPT_PATH, target.absolutePath)
+                        }
                     )
                 }
             ) {

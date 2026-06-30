@@ -17,11 +17,9 @@
 package com.buylan.cryst.ui.screen.terminal
 
 import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Environment
 import android.view.KeyEvent
 import android.view.MotionEvent
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -50,7 +48,8 @@ import com.termux.view.TerminalViewClient
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Terminal(
-    context: Context
+    context: Context,
+    scriptPath: String?
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -82,8 +81,6 @@ fun Terminal(
         ) {
             AndroidView(
                 factory = { ctx ->
-                    val imm =
-                        ctx.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     val view = TerminalView(ctx, null)
                     val sessionClient =
                         object : com.termux.terminal.TerminalSessionClient {
@@ -124,11 +121,12 @@ fun Terminal(
                         }
 
                     val envs = mutableListOf("/bin")
+                    val args = scriptPath?.let { arrayOf("-c", scriptPath) } ?: arrayOf()
 
                     val session = TerminalSession(
                         "/system/bin/sh",
                         Environment.getExternalStorageDirectory().path,
-                        null,
+                        args,
                         envs.toTypedArray(),
                         2000,
                         sessionClient

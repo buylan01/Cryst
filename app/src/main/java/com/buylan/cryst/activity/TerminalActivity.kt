@@ -27,15 +27,19 @@ import com.buylan.cryst.ui.screen.terminal.Terminal
 import com.buylan.cryst.ui.theme.CrystTheme
 
 class TerminalActivity : ComponentActivity() {
+
+    companion object {
+        const val EXTRA_SCRIPT_PATH = "script_path"
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.isNavigationBarContrastEnforced = false
+
+        val scriptPath = intent.getStringExtra(EXTRA_SCRIPT_PATH)
+
         setContent {
-            //val appViewModel = (applicationContext as Application).appViewModel
-
-            //val isDark = appViewModel.isDarkMode(isSystemInDarkTheme())
-
             enableEdgeToEdge(
                 statusBarStyle = SystemBarStyle.auto(
                 lightScrim = Color.TRANSPARENT,
@@ -44,7 +48,7 @@ class TerminalActivity : ComponentActivity() {
             ))
 
             CrystTheme(true) {
-                Terminal(this)
+                Terminal(this, scriptPath)
             }
         }
     }
