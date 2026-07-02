@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -126,23 +127,20 @@ fun FontViewer(
                         TextStyle(fontFamily = fontFamily, fontSize = 24.sp),
                     )
 
-                    val sampleText = "The quick brown fox jumps over the lazy dog.\n我能吞下玻璃而不伤身体。"
-
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp)
                     ) {
                         item {
-                            @Suppress("SpellCheckingInspection")
                             Text(
-                                text = "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                                text = stringResource(R.string.font_sample_letter),
                                 style = TextStyle(fontFamily = fontFamily, fontSize = 16.sp)
                             )
                         }
 
                         item {
                             Text(
-                                text = "1234567890\n . : , ; ' \" ( ! ? ) + - * / = < \n> { } $ [ ] | \\ ~ ` @ # % ^ & _",
+                                text = stringResource(R.string.font_sample_symbols),
                                 style = TextStyle(fontFamily = fontFamily, fontSize = 16.sp)
                             )
                         }
@@ -151,7 +149,7 @@ fun FontViewer(
                             Column {
                                 textStyles.forEach { style ->
                                     Text(
-                                        text = sampleText,
+                                        text = stringResource(R.string.font_sample_text),
                                         style = style,
                                         modifier = Modifier.padding(vertical = 8.dp)
                                     )
