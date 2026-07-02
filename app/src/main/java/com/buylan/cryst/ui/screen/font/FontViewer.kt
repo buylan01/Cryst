@@ -38,8 +38,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -59,9 +61,9 @@ fun FontViewer(
 ) {
     val file = File(filePath)
 
-    val fontFamily = remember { mutableStateOf<FontFamily?>(null) }
-    val isLoading = remember { mutableStateOf(true) }
-    val error = remember { mutableStateOf<String?>(null) }
+    var fontFamily by remember { mutableStateOf<FontFamily?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(filePath) {
         val typeface = try {
@@ -71,11 +73,11 @@ fun FontViewer(
         }
 
         if (typeface != null) {
-            fontFamily.value = FontFamily(typeface)
-            isLoading.value = false
+            fontFamily = FontFamily(typeface)
+            isLoading = false
         } else {
-            error.value = "无法加载字体"
-            isLoading.value = false
+            error = "无法加载字体"
+            isLoading = false
         }
     }
 
@@ -108,14 +110,14 @@ fun FontViewer(
             contentAlignment = Alignment.Center
         ) {
             when {
-                isLoading.value -> {
+                isLoading -> {
                     CircularProgressIndicator()
                 }
-                error.value != null -> {
-                    Text(text = error.value!!, color = MaterialTheme.colorScheme.error)
+                error != null -> {
+                    Text(text = error!!, color = MaterialTheme.colorScheme.error)
                 }
                 else -> {
-                    val fontFamily = fontFamily.value
+                    val fontFamily = fontFamily
                     val textStyles = listOf(
                         TextStyle(fontFamily = fontFamily, fontSize = 12.sp),
                         TextStyle(fontFamily = fontFamily),
