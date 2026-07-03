@@ -73,7 +73,7 @@ fun BytesEditor(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Bytes Editor") },
+                title = { Text(file.name) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -112,7 +112,9 @@ fun BytesEditor(
             }
             AutoScrollBar(
                 lazyState = lazyListState,
-                modifier = Modifier.padding(end = 4.dp).align(Alignment.TopEnd)
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .align(Alignment.TopEnd)
             )
         }
     }
