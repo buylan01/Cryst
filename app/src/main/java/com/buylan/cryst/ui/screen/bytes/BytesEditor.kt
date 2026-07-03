@@ -1,5 +1,6 @@
 package com.buylan.cryst.ui.screen.bytes
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -107,7 +108,7 @@ fun BytesEditor(
                     val row = remember(index) {
                         cache.getOrPut(index) { readRow(raf, index) }
                     }
-                    HexRowItem(row)
+                    HexRowItem(row, index)
                 }
             }
             AutoScrollBar(
@@ -134,13 +135,15 @@ private fun readRow(raf: RandomAccessFile, index: Int): HexRow {
 }
 
 @Composable
-private fun HexRowItem(row: HexRow) {
+private fun HexRowItem(row: HexRow, index: Int) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 12.dp, vertical = 2.dp)
+            .background(if (index % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "%04X".format(row.offset),
+            text = "%07X".format(row.offset),
             fontFamily = FontFamily.Monospace,
             style = MaterialTheme.typography.bodySmall
         )
@@ -152,7 +155,9 @@ private fun HexRowItem(row: HexRow) {
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f)
         ) {
             repeat(BYTES_PER_ROW) { index ->
                 val text = if (index < row.bytes.size)
@@ -171,7 +176,7 @@ private fun HexRowItem(row: HexRow) {
                     VerticalDivider(
                         modifier = Modifier
                             .height(18.dp)
-                            .padding(horizontal = 2.dp)
+                            .padding(end = 6.dp)
                     )
                 }
             }
@@ -189,6 +194,7 @@ private fun HexRowItem(row: HexRow) {
             style = MaterialTheme.typography.bodySmall,
             softWrap = false,
             maxLines = 1,
+            modifier = Modifier.weight(0.3f),
             overflow = TextOverflow.Clip
         )
     }
