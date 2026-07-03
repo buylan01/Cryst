@@ -76,7 +76,6 @@
     <string name="version_code">版本</string>
     <string name="source_dir">安装位置</string>
     <string name="data_dir">数据目录</string>
-    <string name="installed">已安装</string>
     <string name="locate">定位</string>
     <string name="tip">提示</string>
     <string name="file_saved_to">文件已保存到 %1$s</string>

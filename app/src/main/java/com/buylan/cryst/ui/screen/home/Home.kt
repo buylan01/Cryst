@@ -131,6 +131,7 @@ import com.buylan.cryst.ui.screen.home.dialog.ToolDialog
 import com.buylan.cryst.ui.screen.home.model.HomeViewModel
 import com.buylan.cryst.ui.screen.home.model.PanelStates
 import com.buylan.cryst.ui.screen.home.model.PanelViewModel
+import com.buylan.cryst.ui.screen.home.model.StorageItem
 import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.PanelPosition
 import com.buylan.cryst.util.getFileType
@@ -720,9 +721,17 @@ fun DrawerContent(
     onToggleDark: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val storageItemList = mapOf(
-        Environment.getRootDirectory() to stringResource(R.string.root),
-        Environment.getExternalStorageDirectory() to stringResource(R.string.storage)
+    val storageItemList = listOf(
+        StorageItem(
+            Environment.getRootDirectory(),
+            painterResource(R.drawable.ic_memory),
+            stringResource(R.string.root)
+        ),
+        StorageItem(
+            Environment.getExternalStorageDirectory(),
+            painterResource(R.drawable.ic_sd_card),
+            stringResource(R.string.storage)
+        )
     )
 
     ModalDrawerSheet(
@@ -773,13 +782,13 @@ fun DrawerContent(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            storageItemList.forEach { (path, label) ->
+            storageItemList.forEach { item ->
                 var fsUsage by remember { mutableFloatStateOf(0f) }
 
                 LaunchedEffect(Unit) {
                     val progress = withContext(Dispatchers.IO) {
                         try {
-                            val stat = StatFs(path.path)
+                            val stat = StatFs(item.path.absolutePath)
                             val totalBytes = stat.totalBytes
                             val availableBytes = stat.availableBytes
                             if (totalBytes > 0) (totalBytes - availableBytes).toFloat() / totalBytes else 0f
@@ -791,11 +800,11 @@ fun DrawerContent(
                 }
 
                 DrawerStorageItem(
-                    label = label,
-                    icon = painterResource(R.drawable.ic_storage),
+                    label = item.name ?: item.path.absolutePath,
+                    icon = item.icon,
                     usage = fsUsage,
                     onClick = {
-                        onStorageItemClick(path)
+                        onStorageItemClick(item.path)
                         scope.launch {
                             drawerState.close()
                         }

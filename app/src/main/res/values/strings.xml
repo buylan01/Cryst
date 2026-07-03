@@ -77,7 +77,6 @@
     <string name="source_dir">Source</string>
     <string name="data_dir">DataDir</string>
     <string name="uid" translatable="false">UID</string>
-    <string name="installed">Installed</string>
     <string name="locate">Locate</string>
     <string name="tip">Tip</string>
     <string name="file_saved_to">The file has been saved to %1$s</string>
