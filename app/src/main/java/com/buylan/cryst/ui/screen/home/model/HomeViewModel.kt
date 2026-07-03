@@ -21,6 +21,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.buylan.cryst.activity.BytesEditorActivity
 import com.buylan.cryst.activity.FontActivity
 import com.buylan.cryst.activity.ImageActivity
 import com.buylan.cryst.activity.TextEditorActivity
@@ -121,6 +122,10 @@ class HomeViewModel(
                     }
                 }
                 FileType.SCRIPT -> _dialogsViewModel.showRunScriptDialog(file)
+                FileType.BYTES -> context.startActivity(
+                    Intent(context, BytesEditorActivity::class.java)
+                        .putExtra(BytesEditorActivity.EXTRA_FILE_PATH, actualFile.path)
+                )
                 else -> _dialogsViewModel.showOpenWithDialog(actualFile)
             }
         }

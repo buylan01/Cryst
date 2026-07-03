@@ -31,5 +31,6 @@ enum class FileType(
     ARCHIVE(R.string.archive, R.drawable.ic_folder_zip),
     APK(R.string.installable, R.drawable.ic_apk_document),
     SCRIPT(R.string.script, R.drawable.ic_terminal_2),
-    FONT(R.string.font, R.drawable.ic_font_download)
+    FONT(R.string.font, R.drawable.ic_font_download),
+    BYTES(R.string.bytes, R.drawable.ic_draft)
 }
