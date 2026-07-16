@@ -1,6 +1,6 @@
 [versions]
 agp = "9.2.1"
-apksig = "9.2.1"
+apksig = "9.3.0"
 coilCompose = "2.7.0"
 commonsCompress = "1.28.0"
 coreKtx = "1.19.0"
