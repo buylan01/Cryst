@@ -478,11 +478,10 @@ fun HomeScreen(
 
     fun handleRefresh(path: VirtualFile?) {
         path?.let {
-            val refreshPosition =
-                if (leftPanelState.path.absolutePath == path.absolutePath) PanelPosition.L
-                else if (rightPanelState.path.absolutePath == path.absolutePath) PanelPosition.R
-                else null
-            refreshPosition?.let {
+            val refreshPosition: MutableList<PanelPosition> = mutableListOf()
+            if (leftPanelState.path.absolutePath == path.absolutePath) refreshPosition += PanelPosition.L
+            if (rightPanelState.path.absolutePath == path.absolutePath) refreshPosition += PanelPosition.R
+            refreshPosition.forEach {
                 viewModel.refreshPanel(it)
             }
         }
