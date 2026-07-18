@@ -87,7 +87,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.terminal.view)
     implementation(libs.terminal.emulator)
-    implementation(libs.aboutlibraries.compose.m3)
+    implementation(libs.aboutlibraries.core)
     implementation(libs.fastscroller.material3)
     implementation(libs.commons.compress)
     implementation(libs.apksig)

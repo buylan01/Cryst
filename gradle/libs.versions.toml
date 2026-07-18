@@ -19,7 +19,7 @@ media3Exoplayer = "1.10.1"
 media3UiComposeMaterial3 = "1.10.1"
 scale = "1.1.1-beta.3"
 termux = "v0.118.3"
-aboutLibraries = "14.2.1"
+aboutLibraries = "15.0.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -50,7 +50,7 @@ language-textmate = { module = "io.github.rosemoe:language-textmate" }
 rosemoe-editor = { module = "io.github.rosemoe:editor" }
 terminal-view = { module = "com.github.termux.termux-app:terminal-view", version.ref = "termux" }
 terminal-emulator = { module = "com.github.termux.termux-app:terminal-emulator", version.ref = "termux" }
-aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
