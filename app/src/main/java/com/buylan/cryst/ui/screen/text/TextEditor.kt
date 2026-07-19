@@ -66,7 +66,13 @@ fun TextEditor(
     val file = remember { File(filePath) }
     val scope = rememberCoroutineScope()
 
-    viewModel.editorState.content = Content(file.readText())
+    viewModel.editorState.content = Content(
+        try {
+            file.readText()
+        } catch (e: Exception) {
+            e.message
+        }
+    )
     val state = viewModel.editorState
     val editor = remember {
         setCodeEditorFactory(
