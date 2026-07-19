@@ -91,4 +91,6 @@ class LocalFile(
     override fun mkdirs() {
         delegate.mkdirs()
     }
+
+    override fun canRead(): Boolean = delegate.canRead()
 }

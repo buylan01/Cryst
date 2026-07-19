@@ -43,4 +43,5 @@ interface VirtualFile {
     fun relativeTo(source: VirtualFile): String
     fun mkdirs()
     fun copyTo(target: LocalFile, overwrite: Boolean)
+    fun canRead(): Boolean
 }

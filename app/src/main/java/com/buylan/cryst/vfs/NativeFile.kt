@@ -158,4 +158,7 @@ class NativeFile(
         process.waitFor()
         return process.exitValue()
     }
+
+    override fun canRead(): Boolean = false
+
 }

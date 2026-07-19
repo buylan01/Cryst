@@ -176,4 +176,7 @@ class ArchiveFile(
         val bytes = this.readBytes() ?: throw IOException("Failed to read archive entry: $absolutePath")
         target.toFile().outputStream().use { it.write(bytes) }
     }
+
+    override fun canRead(): Boolean = true
+
 }
