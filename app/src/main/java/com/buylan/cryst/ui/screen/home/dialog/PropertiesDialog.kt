@@ -53,12 +53,12 @@ fun PropertiesDialog(
 
     val viewModel: PropertiesViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
-    val isSingleDir = files.singleOrNull()?.isDirectory == true
-    val isSingleSelection = files.size == 1
+    val shouldComputeSize = files.size > 1 || files.first().isDirectory
+    val showTime = files.size == 1 && files.first().isDirectory
     var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(files) {
-        if (!(isSingleDir || isSingleSelection)) {
+        if (shouldComputeSize) {
             viewModel.compute(files)
         }
     }
@@ -111,14 +111,14 @@ fun PropertiesDialog(
                     label = R.string.path,
                     value = files.first().parent ?: stringResource(R.string.unknown)
                 )
-                if (isSingleSelection) {
+                if (showTime) {
                     PropertyRow(
                         label = R.string.time,
                         value = formatFileDate(files.first()),
                         onClick = { showDatePicker = true }
                     )
                 }
-                if (isSingleSelection && !isSingleDir) {
+                if (!shouldComputeSize) {
                     PropertyRow(
                         label = R.string.type,
                         value = stringResource(getFileType(files.first()).label)
