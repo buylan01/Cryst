@@ -169,7 +169,7 @@ fun FileItem(
                     text = formatFileDate(file, "yy-MM-dd HH:mm"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline,
-                    maxLines = 1
+                    softWrap = false
                 )
                 Spacer(Modifier.width(4.dp))
                 if (!file.isDirectory) {
@@ -177,6 +177,7 @@ fun FileItem(
                         text = formatFileSize(file.length()),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.outline,
+                        softWrap = false
                     )
                 }
             }
