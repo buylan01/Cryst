@@ -110,11 +110,12 @@
     <string name="count">Count</string>
     <string name="go_to_path">Go to path</string>
     <string name="system">System</string>
-    <string name="detail">详情</string>
-    <string name="launch">启动</string>
+    <string name="detail">Detail</string>
+    <string name="launch">Launch</string>
     <string name="sign">Sign</string>
     <string name="font_sample_text" translatable="false">The quick brown fox jumps over the lazy dog.\n我能吞下玻璃而不伤身体。</string>
     <string name="font_sample_symbols" translatable="false"><![CDATA[1234567890\n . : , ; \' \" ( ! ? ) + - * / = < \n> { } $ [ ] | \\ ~ ` @ # % ^ & _]]></string>
     <string name="font_sample_letter" translatable="false">abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <string name="bytes">Bytes</string>
+    <string name="image_corrupted">Image is corrupted</string>
 </resources>

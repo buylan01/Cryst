@@ -27,6 +27,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,8 +46,9 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.buylan.cryst.R
 import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableView
@@ -138,12 +140,28 @@ fun ImageViewer(
                 .build()
             val state = rememberZoomableState(contentSize = imageSize)
             ZoomableView(state = state) {
-                AsyncImage(
+                SubcomposeAsyncImage(
                     model = builder,
                     contentDescription = file.name,
                     contentScale = ContentScale.Fit,
                     filterQuality = FilterQuality.High,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    onError = {
+                        loaded = true
+                        state.allowGestureInput = false
+                    },
+                    error = {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.image_corrupted),
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                        }
+                    }
                 )
             }
             if (!loaded) CircularProgressIndicator()
