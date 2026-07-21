@@ -54,7 +54,7 @@ fun PropertiesDialog(
     val viewModel: PropertiesViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
     val shouldComputeSize = files.size > 1 || files.first().isDirectory
-    val showTime = files.size == 1 && files.first().isDirectory
+    val showTime = files.size == 1
     var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(files) {
