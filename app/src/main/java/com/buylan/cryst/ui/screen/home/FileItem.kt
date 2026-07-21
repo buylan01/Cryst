@@ -22,13 +22,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,20 +45,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.buylan.cryst.R
+import com.buylan.cryst.ui.component.swipeToSelect
 import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.formatFileDate
 import com.buylan.cryst.util.formatFileSize
@@ -72,8 +63,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.Path
-import kotlin.math.abs
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -87,8 +76,6 @@ fun FileItem(
     onLongClick: () -> Unit,
     onSwipe: () -> Unit
 ) {
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    val haptic = LocalHapticFeedback.current
     Row(
         modifier = modifier
             .background(
@@ -98,56 +85,11 @@ fun FileItem(
                 onClick = onClick, onLongClick = onLongClick
             )
             .fillMaxWidth()
-            .padding(6.dp)
-            .zIndex(-1f)
-            .offset {
-                IntOffset(offsetX.roundToInt(), 0)
-            }
-            .pointerInput(Unit) {
-                awaitEachGesture {
-                    awaitFirstDown()
-                    offsetX = 0f
-                    var dx = 0f
-                    var dy = 0f
-                    var hapticTriggered = false
-                    do {
-                        val event = awaitPointerEvent()
-                        val change = event.changes.first()
-                        val deltaX = change.positionChange().x
-                        val deltaY = change.positionChange().y
-                        when {
-                            abs(dy) > 20f && abs(dy) > abs(dx) -> {
-                                break
-                            }
-
-                            abs(dx) > 20f && abs(dx) > abs(dy) -> {
-                                change.consume()
-                            }
-                        }
-                        dx += deltaX
-                        dy += deltaY
-                        offsetX += deltaX
-                        offsetX = offsetX.coerceIn(
-                            -120f, 120f
-                        )
-
-                        if (offsetX >= 115f || offsetX <= -115f) {
-                            if (!hapticTriggered) {
-                                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                                hapticTriggered = true
-                            }
-                        } else {
-                            hapticTriggered = false
-                        }
-
-                    } while (event.changes.any { it.pressed })
-                    val isHorizontalSwipe = abs(dx) > 60f && abs(dx) > abs(dy) * 2
-                    if (isHorizontalSwipe) {
-                        onSwipe()
-                    }
-                    offsetX = 0f
-                }
-            },
+            .swipeToSelect(
+                onSwipe = { onSwipe() },
+                applyOffset = true
+            )
+            .padding(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val context = LocalContext.current
@@ -235,7 +177,6 @@ fun FileItem(
                         text = formatFileSize(file.length()),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.outline,
-                        maxLines = 1
                     )
                 }
             }
