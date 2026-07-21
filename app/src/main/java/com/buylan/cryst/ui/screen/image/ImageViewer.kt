@@ -35,12 +35,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
@@ -51,8 +49,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.buylan.cryst.R
-import com.jvziyaoyao.scale.zoomable.zoomable.ZoomableView
-import com.jvziyaoyao.scale.zoomable.zoomable.rememberZoomableState
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 import java.io.File
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -62,23 +60,23 @@ fun ImageViewer(
     context: Context,
     filePath: String
 ) {
-    val file = File(filePath)
 
+    val imageFile = File(filePath)
     val backgroundColors = listOf(
         Color.Black,
         Color.Gray,
         Color.White
     )
-
     var currentBgColorIndex by remember { mutableIntStateOf(0) }
     val currentBgColor = backgroundColors[currentBgColorIndex]
+
     Scaffold(
         contentWindowInsets = WindowInsets.displayCutout,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = file.name,
+                        text = imageFile.name,
                         maxLines = 1,
                         softWrap = false,
                         overflow = TextOverflow.StartEllipsis
@@ -118,53 +116,45 @@ fun ImageViewer(
         },
         containerColor = currentBgColor
     ) {
-        Box(
+
+        val builder = ImageRequest.Builder(LocalContext.current)
+            .data(imageFile)
+            .size(coil.size.Size.ORIGINAL)
+            .build()
+
+        val zoomState = rememberZoomState(maxScale = 8f)
+
+        SubcomposeAsyncImage(
+            model = builder,
+            contentDescription = imageFile.name,
+            contentScale = ContentScale.Fit,
+            filterQuality = FilterQuality.High,
             modifier = Modifier
+                .zoomable(zoomState, enableOneFingerZoom = false)
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            var loaded by remember { mutableStateOf(false) }
-            var imageSize by remember { mutableStateOf(Size(100f, 100f)) }
-            val builder = ImageRequest.Builder(LocalContext.current)
-                .data(file)
-                .size(coil.size.Size.ORIGINAL)
-                .listener(
-                    onSuccess = { _, result ->
-                        imageSize = Size(
-                            width = result.drawable.intrinsicWidth.toFloat(),
-                            height = result.drawable.intrinsicHeight.toFloat()
-                        )
-                        loaded = true
-                    }
-                )
-                .build()
-            val state = rememberZoomableState(contentSize = imageSize)
-            ZoomableView(state = state) {
-                SubcomposeAsyncImage(
-                    model = builder,
-                    contentDescription = file.name,
-                    contentScale = ContentScale.Fit,
-                    filterQuality = FilterQuality.High,
+            onSuccess = { state ->
+                zoomState.setContentSize(state.painter.intrinsicSize)
+            },
+            loading = {
+                Box(
                     modifier = Modifier.fillMaxSize(),
-                    onError = {
-                        loaded = true
-                        state.allowGestureInput = false
-                    },
-                    error = {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.image_corrupted),
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-                        }
-                    }
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            },
+            error = {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.image_corrupted),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                }
             }
-            if (!loaded) CircularProgressIndicator()
-        }
+        )
     }
 }

@@ -17,9 +17,9 @@ composeBom = "2026.06.01"
 lifecycleViewmodelCompose = "2.11.0"
 media3Exoplayer = "1.10.1"
 media3UiComposeMaterial3 = "1.10.1"
-scale = "1.1.1-beta.3"
 termux = "v0.118.3"
 aboutLibraries = "15.0.4"
+zoomableVersion = "2.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,7 +32,6 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commonsCompress" }
 editor-bom = { module = "io.github.rosemoe:editor-bom", version.ref = "editor" }
 fastscroller-material3 = { module = "io.github.oikvpqya.compose.fastscroller:fastscroller-material3", version.ref = "fastscrollerMaterial3" }
-image-viewer = { module = "com.jvziyaoyao.scale:image-viewer", version.ref = "scale" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -47,6 +46,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 language-textmate = { module = "io.github.rosemoe:language-textmate" }
+lib-zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomableVersion" }
 rosemoe-editor = { module = "io.github.rosemoe:editor" }
 terminal-view = { module = "com.github.termux.termux-app:terminal-view", version.ref = "termux" }
 terminal-emulator = { module = "com.github.termux.termux-app:terminal-emulator", version.ref = "termux" }

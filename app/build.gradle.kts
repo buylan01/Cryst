@@ -81,7 +81,7 @@ dependencies {
     implementation(platform(libs.editor.bom))
     implementation(libs.rosemoe.editor)
     implementation(libs.language.textmate)
-    implementation(libs.image.viewer)
+    implementation(libs.lib.zoomable)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui.compose.material3)
     implementation(libs.androidx.datastore.preferences)
