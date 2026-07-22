@@ -195,7 +195,6 @@ private fun setCodeEditorFactory(
 ): CodeEditor {
     val editor = CodeEditor(context)
     val languageScopeName = when(File(filePath).extension.lowercase()) {
-        "cpp" -> "source.cpp"
         "xml" -> "text.xml"
         "json" -> "source.json"
         "bat" -> "source.batchfile"
