@@ -20,6 +20,7 @@ media3UiComposeMaterial3 = "1.10.1"
 termux = "v0.118.3"
 aboutLibraries = "15.0.4"
 zoomableVersion = "2.13.0"
+material3 = "1.5.0-alpha24"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,7 +45,7 @@ androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 language-textmate = { module = "io.github.rosemoe:language-textmate" }
 lib-zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomableVersion" }
 rosemoe-editor = { module = "io.github.rosemoe:editor" }
