@@ -104,6 +104,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.BuildConfig
 import com.buylan.cryst.R
@@ -164,6 +165,25 @@ fun HomeScreen(
     val leftLazyState = rememberLazyListState()
     val rightLazyState = rememberLazyListState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    val menuItemLabels = remember {
+        listOf(
+            R.string.refresh,
+            R.string.search,
+            R.string.sort,
+            R.string.settings,
+            R.string.exit
+        )
+    }
+    val menuItemIcons = remember {
+        listOf(
+            R.drawable.ic_refresh,
+            R.drawable.ic_search,
+            R.drawable.ic_sort,
+            R.drawable.ic_settings,
+            R.drawable.ic_exit_to_app
+        )
+    }
 
     BackHandler(
         enabled = !currentPanel.path.isRootPath() || currentPanel.selectedFiles.isNotEmpty()
@@ -232,6 +252,7 @@ fun HomeScreen(
                     actions = {
                         Box {
                             var expanded by remember { mutableStateOf(false) }
+
                             IconButton(
                                 onClick = {
                                     expanded = true
@@ -246,74 +267,27 @@ fun HomeScreen(
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }
                             ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.refresh)) },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_refresh),
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        viewModel.refreshPanel()
-                                        expanded = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.search)) },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_search),
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        viewModel.dialogsViewModel.showSearchDialog(currentPanel.path)
-                                        expanded = false
-                                    }
-                                )
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.sort)) },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_sort),
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        viewModel.dialogsViewModel.showSortDialog()
-                                        expanded = false
-                                    }
-                                )
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.settings)) },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_settings),
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        context.startActivity(
-                                            Intent(
-                                                context,
-                                                SettingsActivity::class.java
+                                menuItemLabels.fastForEachIndexed { itemIndex, itemLabel ->
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(itemLabel)) },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(menuItemIcons[itemIndex]),
+                                                contentDescription = null
                                             )
-                                        )
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.exit)) },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_exit_to_app),
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = { (context as ComponentActivity).finishAffinity() }
-                                )
+                                        },
+                                        onClick = {
+                                            expanded = false
+                                            when(itemIndex) {
+                                                0 -> { viewModel.refreshPanel() }
+                                                1 -> { viewModel.dialogsViewModel.showSearchDialog(currentPanel.path) }
+                                                2 -> { viewModel.dialogsViewModel.showSortDialog() }
+                                                3 -> { context.startActivity(Intent(context, SettingsActivity::class.java)) }
+                                                4 -> { (context as ComponentActivity).finishAffinity() }
+                                            }
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
