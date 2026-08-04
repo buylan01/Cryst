@@ -53,7 +53,6 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     val dialogsViewModel: DialogsViewModel get() = _dialogsViewModel
-    val dialogsState: StateFlow<DialogsState> = _dialogsViewModel.dialogsState
 
     val leftPanelViewModel: PanelViewModel get() = _leftPanelViewModel
     val leftPanelState: StateFlow<PanelStates> = _leftPanelViewModel.panelStates
@@ -112,8 +111,9 @@ class HomeViewModel(
                     Intent(context, VideoActivity::class.java)
                         .putExtra("filePath", actualFile.path)
                 )
-                FileType.APK -> _dialogsViewModel.showApkDialog(actualFile)
-                FileType.AUDIO -> _dialogsViewModel.showAudioDialog(actualFile)
+
+                FileType.APK -> _dialogsViewModel.show(DialogsEvent.ApkDialog(actualFile))
+                FileType.AUDIO -> _dialogsViewModel.show(DialogsEvent.AudioDialog(actualFile))
                 FileType.ARCHIVE -> {
                     try {
                         currentPanelViewModel.setPath(ArchiveFile(entranceFile = actualFile))
@@ -121,43 +121,45 @@ class HomeViewModel(
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                     }
                 }
-                FileType.SCRIPT -> _dialogsViewModel.showRunScriptDialog(file)
+                FileType.SCRIPT -> _dialogsViewModel.show(DialogsEvent.RunScriptDialog(file))
                 FileType.BYTES -> context.startActivity(
                     Intent(context, BytesEditorActivity::class.java)
                         .putExtra(BytesEditorActivity.EXTRA_FILE_PATH, actualFile.path)
                 )
-                else -> _dialogsViewModel.showOpenWithDialog(actualFile)
+                else -> _dialogsViewModel.show(DialogsEvent.OpenWithDialog(actualFile))
             }
         }
     }
 
     fun onToolAction(context: Context, action: ToolAction, file: List<VirtualFile>) {
-        _dialogsViewModel.hideToolsDialog()
+        _dialogsViewModel.dismiss()
 
         when (action) {
             ToolAction.Move -> {
-                _dialogsViewModel.showMoveDialog(ExtraDialogState(file, anotherPath))
+                _dialogsViewModel.show(DialogsEvent.MoveDialog(ExtraDialogState(file, anotherPath)))
             }
             ToolAction.Copy -> {
-                _dialogsViewModel.showCopyDialog(ExtraDialogState(file, anotherPath))
+                _dialogsViewModel.show(DialogsEvent.CopyDialog(ExtraDialogState(file, anotherPath)))
             }
             ToolAction.Rename -> {
-                _dialogsViewModel.showRenameDialog(file.singleOrNull() ?: return)
+                val f = file.singleOrNull() ?: return
+                _dialogsViewModel.show(DialogsEvent.RenameDialog(f))
             }
             ToolAction.Delete -> {
-                _dialogsViewModel.showDeleteDialog(file)
+                _dialogsViewModel.show(DialogsEvent.DeleteDialog(file))
             }
             ToolAction.Properties -> {
-                _dialogsViewModel.showPropertiesDialog(file)
+                _dialogsViewModel.show(DialogsEvent.PropertiesDialog(file))
             }
             ToolAction.OpenWith -> {
-                _dialogsViewModel.showOpenWithDialog(file.singleOrNull() ?: return)
+                val f = file.singleOrNull() ?: return
+                _dialogsViewModel.show(DialogsEvent.OpenWithDialog(f))
             }
             ToolAction.Share -> {
                 context.shareFile(file.singleOrNull() ?: return)
             }
             ToolAction.Compress -> {
-                _dialogsViewModel.showCompressDialog(file)
+                _dialogsViewModel.show(DialogsEvent.CompressDialog(file))
             }
         }
     }

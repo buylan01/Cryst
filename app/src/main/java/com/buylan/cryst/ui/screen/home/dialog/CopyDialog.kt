@@ -68,7 +68,7 @@ fun CopyDialog(
                     is FileOperaUiState.Idle -> Text(
                         stringResource(
                             R.string.confirm_copy_to,
-                            source.map { it.name },
+                            source.joinToString(", ") { it.name },
                             target.absolutePath
                         )
                     )

@@ -129,7 +129,7 @@ fun ToolDialog(
                         text = stringResource(R.string.rename),
                         icon = R.drawable.ic_edit,
                         onClick = { onToolAction(ToolAction.Rename) },
-                        enabled = files.singleOrNull() !is ArchiveFile
+                        enabled = files.singleOrNull() !is ArchiveFile && files.size == 1
                     )
 
                     ToolItem(

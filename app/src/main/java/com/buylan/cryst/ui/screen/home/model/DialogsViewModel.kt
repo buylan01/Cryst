@@ -17,165 +17,27 @@
 package com.buylan.cryst.ui.screen.home.model
 
 import androidx.lifecycle.ViewModel
-import com.buylan.cryst.vfs.VirtualFile
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 class DialogsViewModel : ViewModel() {
-    private val _dialogsState = MutableStateFlow(DialogsState())
-    val dialogsState: StateFlow<DialogsState> = _dialogsState.asStateFlow()
+    private val _eventQueue = MutableStateFlow<List<DialogsEvent>>(emptyList())
+    val currentEvent: StateFlow<DialogsEvent?> = _eventQueue
+        .map { it.firstOrNull() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    // Path Dialog
-    fun showPathDialog() {
-        _dialogsState.value = _dialogsState.value.copy(pathDialog = true)
+    fun show(event: DialogsEvent) {
+        _eventQueue.value += event
     }
 
-    fun hidePathDialog() {
-        _dialogsState.value = _dialogsState.value.copy(pathDialog = false)
-    }
-
-    // About Dialog
-    fun showAboutDialog() {
-        _dialogsState.value = _dialogsState.value.copy(aboutDialog = true)
-    }
-
-    fun hideAboutDialog() {
-        _dialogsState.value = _dialogsState.value.copy(aboutDialog = false)
-    }
-
-    // Sort Dialog
-    fun showSortDialog() {
-        _dialogsState.value = _dialogsState.value.copy(sortDialog = true)
-    }
-
-    fun hideSortDialog() {
-        _dialogsState.value = _dialogsState.value.copy(sortDialog = false)
-    }
-
-    // Permission Request
-    fun showPermissionRequest() {
-        _dialogsState.value = _dialogsState.value.copy(permissionRequest = true)
-    }
-
-    fun hidePermissionRequest() {
-        _dialogsState.value = _dialogsState.value.copy(permissionRequest = false)
-    }
-
-    // APK Dialog
-    fun showApkDialog(data: VirtualFile) {
-        _dialogsState.value = _dialogsState.value.copy(apkDialog = data)
-    }
-
-    fun hideApkDialog() {
-        _dialogsState.value = _dialogsState.value.copy(apkDialog = null)
-    }
-
-    // Delete Dialog
-    fun showDeleteDialog(data: List<VirtualFile>) {
-        _dialogsState.value = _dialogsState.value.copy(deleteDialog = data)
-    }
-
-    fun hideDeleteDialog() {
-        _dialogsState.value = _dialogsState.value.copy(deleteDialog = null)
-    }
-
-    // Rename Dialog
-    fun showRenameDialog(data: VirtualFile) {
-        _dialogsState.value = _dialogsState.value.copy(renameDialog = data)
-    }
-
-    fun hideRenameDialog() {
-        _dialogsState.value = _dialogsState.value.copy(renameDialog = null)
-    }
-
-    // Create Dialog
-    fun showCreateDialog(data: VirtualFile) {
-        _dialogsState.value = _dialogsState.value.copy(createDialog = data)
-    }
-
-    fun hideCreateDialog() {
-        _dialogsState.value = _dialogsState.value.copy(createDialog = null)
-    }
-
-    // RunScript Dialog
-    fun showRunScriptDialog(data: VirtualFile) {
-        _dialogsState.value = _dialogsState.value.copy(runScriptDialog = data)
-    }
-
-    fun hideRunScriptDialog() {
-        _dialogsState.value = _dialogsState.value.copy(runScriptDialog = null)
-    }
-
-    // Search Dialog
-    fun showSearchDialog(data: VirtualFile) {
-        _dialogsState.value = _dialogsState.value.copy(searchDialog = data)
-    }
-
-    fun hideSearchDialog() {
-        _dialogsState.value = _dialogsState.value.copy(searchDialog = null)
-    }
-
-    // Audio Dialog
-    fun showAudioDialog(data: VirtualFile) {
-        _dialogsState.value = _dialogsState.value.copy(audioDialog = data)
-    }
-
-    fun hideAudioDialog() {
-        _dialogsState.value = _dialogsState.value.copy(audioDialog = null)
-    }
-
-    // Properties Dialog
-    fun showPropertiesDialog(data: List<VirtualFile>) {
-        _dialogsState.value = _dialogsState.value.copy(propertiesDialog = data)
-    }
-
-    fun hidePropertiesDialog() {
-        _dialogsState.value = _dialogsState.value.copy(propertiesDialog = null)
-    }
-
-    // Open With Dialog
-    fun showOpenWithDialog(data: VirtualFile) {
-        _dialogsState.value = _dialogsState.value.copy(openWithDialog = data)
-    }
-
-    fun hideOpenWithDialog() {
-        _dialogsState.value = _dialogsState.value.copy(openWithDialog = null)
-    }
-
-    // Compress Dialog
-    fun showCompressDialog(data: List<VirtualFile>) {
-        _dialogsState.value = _dialogsState.value.copy(compressDialog = data)
-    }
-
-    fun hideCompressDialog() {
-        _dialogsState.value = _dialogsState.value.copy(compressDialog = null)
-    }
-
-    // Tools Dialog
-    fun showToolsDialog(data: List<VirtualFile>) {
-        _dialogsState.value = _dialogsState.value.copy(toolsDialog = data)
-    }
-
-    fun hideToolsDialog() {
-        _dialogsState.value = _dialogsState.value.copy(toolsDialog = null)
-    }
-
-    // Copy Dialog
-    fun showCopyDialog(data: ExtraDialogState) {
-        _dialogsState.value = _dialogsState.value.copy(copyDialog = data)
-    }
-
-    fun hideCopyDialog() {
-        _dialogsState.value = _dialogsState.value.copy(copyDialog = null)
-    }
-
-    // Move Dialog
-    fun showMoveDialog(data: ExtraDialogState) {
-        _dialogsState.value = _dialogsState.value.copy(moveDialog = data)
-    }
-
-    fun hideMoveDialog() {
-        _dialogsState.value = _dialogsState.value.copy(moveDialog = null)
+    fun dismiss() {
+        val queue = _eventQueue.value
+        if (queue.isNotEmpty()) {
+            _eventQueue.value = queue.drop(1)
+        }
     }
 }

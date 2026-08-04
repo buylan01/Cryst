@@ -64,7 +64,7 @@ fun DeleteDialog(
             Column {
                 when (uiState) {
                     is FileOperaUiState.Idle -> {
-                        Text(stringResource(R.string.confirm_delete, targetFiles.map { it.name }), modifier = Modifier.padding(vertical = 8.dp))
+                        Text(stringResource(R.string.confirm_delete, targetFiles.joinToString(", ") { it.name }), modifier = Modifier.padding(vertical = 8.dp))
                         Text(
                             stringResource(R.string.delete_file_warning),
                             color = MaterialTheme.colorScheme.error

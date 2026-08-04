@@ -60,7 +60,7 @@ fun MoveDialog(
                     is FileOperaUiState.Idle -> Text(
                         stringResource(
                             R.string.confirm_move_to,
-                            source.map { it.name },
+                            source.joinToString(", ") { it.name },
                             target.absolutePath
                         ))
                     is FileOperaUiState.InProgress -> LinearProgressIndicator()
