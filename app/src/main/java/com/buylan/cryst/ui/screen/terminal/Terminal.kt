@@ -19,7 +19,6 @@ package com.buylan.cryst.ui.screen.terminal
 import android.os.Environment
 import android.view.KeyEvent
 import android.view.MotionEvent
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
@@ -35,7 +34,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,18 +46,17 @@ import com.termux.view.TerminalViewClient
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Terminal(
-    scriptPath: String?
+    scriptPath: String?,
+    onBack: () -> Unit
 ) {
-    val context = LocalContext.current
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.terminal), maxLines = 1, softWrap = false, overflow = TextOverflow.StartEllipsis) },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        (context as ComponentActivity).finish()
-                    }) {
+                    IconButton(onBack) {
                         Icon(
                             painter = painterResource(R.drawable.ic_arrow_back),
                             contentDescription = null

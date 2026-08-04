@@ -85,7 +85,7 @@ fun HomeScreen(
     }
 
     BackHandler(
-        enabled = !drawerState.isClosed
+        enabled = isBackHandlerEnabled && !drawerState.isClosed
     ) {
         scope.launch {
             drawerState.close()
@@ -187,9 +187,26 @@ fun HomeScreen(
         }
     }
 
-    HomeDialogs(dialogsViewModel, viewModel, context, currentPanel, uiState) {
-        handleRefresh(it)
-    }
+    HomeDialogs(
+        dialogsViewModel,
+        viewModel,
+        context, currentPanel,
+        uiState,
+        handleRefresh = {
+            handleRefresh(it)
+        },
+        onNavigate = onNavigate,
+        handleFileClick = { type, file ->
+            handleFileClick(
+                context,
+                onNavigate,
+                viewModel.currentPanelViewModel,
+                viewModel.dialogsViewModel,
+                file,
+                type
+            )
+        }
+    )
 }
 
 fun handleFileClick(

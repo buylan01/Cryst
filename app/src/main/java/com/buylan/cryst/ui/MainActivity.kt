@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
 
                     entry<Screen.Terminal> {
                         CrystTheme(true) {
-                            Terminal(null)
+                            Terminal(null, onBack = { backStack.removeLastOrNull() })
                         }
                     }
 
