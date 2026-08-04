@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -59,7 +61,8 @@ class MainActivity : ComponentActivity() {
                             onNavigate = {
                                 backStack.add(it)
                             },
-                            pathFlow = pathFlow
+                            pathFlow = pathFlow,
+                            isBackHandlerEnabled = backStack.size == 1
                         )
                     }
 
@@ -125,7 +128,19 @@ class MainActivity : ComponentActivity() {
                     backStack = backStack,
                     entryProvider = entryProvider,
                     transitionSpec = {
-                        slideInHorizontally{ it } togetherWith slideOutHorizontally{ -it / 3 }
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = spring(
+                                dampingRatio = 1f,
+                                stiffness = Spring.StiffnessMediumLow
+                            )
+                        ) togetherWith slideOutHorizontally(
+                            targetOffsetX = { -it / 3 },
+                            animationSpec = spring(
+                                dampingRatio = 1f,
+                                stiffness = Spring.StiffnessMediumLow
+                            )
+                        )
                     },
                     popTransitionSpec = {
                         slideInHorizontally { -it / 3 } togetherWith slideOutHorizontally { it }

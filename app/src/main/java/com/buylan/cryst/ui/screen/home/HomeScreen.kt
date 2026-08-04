@@ -65,7 +65,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
     appViewModel: AppViewModel = viewModel(),
     onNavigate: (Screen) -> Unit,
-    pathFlow: SharedFlow<String>
+    pathFlow: SharedFlow<String>,
+    isBackHandlerEnabled: Boolean = true
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val dialogsViewModel = viewModel.dialogsViewModel
@@ -78,7 +79,7 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     BackHandler(
-        enabled = !currentPanel.path.isRootPath() || currentPanel.selectedFiles.isNotEmpty()
+        enabled = isBackHandlerEnabled && (!currentPanel.path.isRootPath() || currentPanel.selectedFiles.isNotEmpty())
     ) {
         viewModel.onNavigateBack()
     }
