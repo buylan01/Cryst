@@ -49,7 +49,7 @@ import com.buylan.cryst.model.DarkMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(appViewModel: AppViewModel, onBackPressed: () -> Unit) {
+fun SettingsScreen(appViewModel: AppViewModel, onBack: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -57,7 +57,7 @@ fun SettingsScreen(appViewModel: AppViewModel, onBackPressed: () -> Unit) {
             LargeTopAppBar(
                 title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
+                    IconButton(onClick = onBack) {
                         Icon(painter = painterResource(R.drawable.ic_arrow_back), contentDescription = "返回")
                     }
                 },

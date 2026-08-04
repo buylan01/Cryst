@@ -17,9 +17,7 @@
 package com.buylan.cryst.ui.screen.video
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.net.Uri
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -43,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.media3.common.MediaItem
@@ -57,11 +56,11 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoViewer(
-    context: Context,
-    filePath: String
+    filePath: String,
+    onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     val file = File(filePath)
-    val activity = context as ComponentActivity
 
     val backgroundColors = listOf(
         Color.Black,
@@ -100,7 +99,7 @@ fun VideoViewer(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { activity.finish() }) {
+                        IconButton(onClick = onBack) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_arrow_back),
                                 contentDescription = "返回"

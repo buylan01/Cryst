@@ -59,7 +59,7 @@ import com.mikepenz.aboutlibraries.util.withJson
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibrariesScreen(onBackPressed: () -> Unit) {
+fun LibrariesScreen(onBack: () -> Unit) {
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val context = LocalContext.current
@@ -74,7 +74,7 @@ fun LibrariesScreen(onBackPressed: () -> Unit) {
             MediumTopAppBar(
                 title = { Text(stringResource(R.string.about_libraries)) },
                 navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
+                    IconButton(onClick = onBack) {
                         Icon(painter = painterResource(R.drawable.ic_arrow_back), contentDescription = "返回")
                     }
                 },

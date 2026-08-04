@@ -36,7 +36,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cryst">
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Cryst">
             <intent-filter>
@@ -45,33 +45,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.ImageActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity.SettingsActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity.AppsActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity.LicensesActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity.TextEditorActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity.FontActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity.VideoActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activity.TerminalActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.BytesEditorActivity"
-            android:exported="true" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"

@@ -44,7 +44,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.BuildConfig
 import com.buylan.cryst.R
-import com.buylan.cryst.activity.LicensesActivity
 import com.buylan.cryst.ui.screen.home.dialog.ApkDialog
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
 import com.buylan.cryst.ui.screen.home.dialog.CompressDialog
@@ -64,7 +63,6 @@ import com.buylan.cryst.ui.screen.home.model.DialogsViewModel
 import com.buylan.cryst.ui.screen.home.model.HomeUiState
 import com.buylan.cryst.ui.screen.home.model.HomeViewModel
 import com.buylan.cryst.ui.screen.home.model.PanelStates
-import com.buylan.cryst.util.FileType
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 
@@ -132,8 +130,9 @@ fun HomeDialogs(
                                 }
                                 FilledTonalButton(
                                     onClick = {
-                                        val intent = Intent(context, LicensesActivity::class.java)
-                                        context.startActivity(intent)
+                                        //todo
+//                                        val intent = Intent(context, LicensesActivity::class.java)
+//                                        context.startActivity(intent)
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
@@ -232,11 +231,12 @@ fun HomeDialogs(
                     targetFile = dialog.file as LocalFile,
                     onDismiss = viewModel::dismiss,
                     unpack = {
-                        homeViewModel.handleFileClick(
-                            context,
-                            dialog.file,
-                            type = FileType.ARCHIVE
-                        )
+                        //TODO
+//                        homeViewModel.handleFileClick(
+//                            context,
+//                            dialog.file,
+//                            type = FileType.ARCHIVE
+//                        )
                     }
                 )
             }
@@ -294,7 +294,10 @@ fun HomeDialogs(
             is DialogsEvent.OpenWithDialog -> {
                 OpenWithDialog(
                     onDismiss = viewModel::dismiss
-                ) { homeViewModel.handleFileClick(context, dialog.file, it) }
+                ) {
+                    //TODO
+                    //homeViewModel.handleFileClick(context, dialog.file, it)
+                }
             }
 
             is DialogsEvent.PropertiesDialog -> {

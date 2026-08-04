@@ -17,8 +17,6 @@
 package com.buylan.cryst.ui.screen.image
 
 import android.annotation.SuppressLint
-import android.content.Context
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
@@ -57,8 +55,8 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageViewer(
-    context: Context,
-    filePath: String
+    filePath: String,
+    onBack: () -> Unit
 ) {
 
     val imageFile = File(filePath)
@@ -84,9 +82,7 @@ fun ImageViewer(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            (context as ComponentActivity).finish()
-                        }
+                        onClick = onBack
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_arrow_back),

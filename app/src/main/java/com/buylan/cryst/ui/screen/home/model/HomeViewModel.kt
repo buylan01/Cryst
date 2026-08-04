@@ -17,31 +17,17 @@
 package com.buylan.cryst.ui.screen.home.model
 
 import android.content.Context
-import android.content.Intent
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.buylan.cryst.activity.BytesEditorActivity
-import com.buylan.cryst.activity.FontActivity
-import com.buylan.cryst.activity.ImageActivity
-import com.buylan.cryst.activity.TextEditorActivity
-import com.buylan.cryst.activity.VideoActivity
-import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.PanelPosition
 import com.buylan.cryst.util.ToolAction
-import com.buylan.cryst.util.accessFiles
-import com.buylan.cryst.util.getActualFile
-import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.shareFile
-import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.VirtualFile
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class HomeViewModel(
     private val _dialogsViewModel: DialogsViewModel = DialogsViewModel(),
@@ -79,55 +65,7 @@ class HomeViewModel(
     fun refreshPanel(panelPosition: PanelPosition = _uiState.value.panelPosition) {
         val panel = if (panelPosition == PanelPosition.L) _leftPanelViewModel else _rightPanelViewModel
         viewModelScope.launch {
-            panel.refresh { path, sortType ->
-                withContext(Dispatchers.IO) {
-                    accessFiles(path, sortType)
-                }
-            }
-        }
-    }
-
-    fun handleFileClick(context: Context, file: VirtualFile, type: FileType? = null) {
-        if (file.isDirectory) {
-            currentPanelViewModel.setPath(file)
-        } else {
-            val actualType = type ?: getFileType(file)
-            val actualFile = getActualFile(context, file)
-
-            when (actualType) {
-                FileType.TEXT -> context.startActivity(
-                    Intent(context, TextEditorActivity::class.java)
-                        .putExtra("filePath", actualFile.path)
-                )
-                FileType.IMAGE -> context.startActivity(
-                    Intent(context, ImageActivity::class.java)
-                        .putExtra("filePath", actualFile.path)
-                )
-                FileType.FONT -> context.startActivity(
-                    Intent(context, FontActivity::class.java)
-                        .putExtra("filePath", actualFile.path)
-                )
-                FileType.VIDEO -> context.startActivity(
-                    Intent(context, VideoActivity::class.java)
-                        .putExtra("filePath", actualFile.path)
-                )
-
-                FileType.APK -> _dialogsViewModel.show(DialogsEvent.ApkDialog(actualFile))
-                FileType.AUDIO -> _dialogsViewModel.show(DialogsEvent.AudioDialog(actualFile))
-                FileType.ARCHIVE -> {
-                    try {
-                        currentPanelViewModel.setPath(ArchiveFile(entranceFile = actualFile))
-                    } catch (e: Exception) {
-                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-                FileType.SCRIPT -> _dialogsViewModel.show(DialogsEvent.RunScriptDialog(file))
-                FileType.BYTES -> context.startActivity(
-                    Intent(context, BytesEditorActivity::class.java)
-                        .putExtra(BytesEditorActivity.EXTRA_FILE_PATH, actualFile.path)
-                )
-                else -> _dialogsViewModel.show(DialogsEvent.OpenWithDialog(actualFile))
-            }
+            panel.refresh()
         }
     }
 

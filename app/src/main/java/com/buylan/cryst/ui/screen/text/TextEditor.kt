@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,7 +58,6 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextEditor(
-    context: Context,
     filePath: String,
     isDark: Boolean,
     viewModel: EditorViewModel = viewModel(),
@@ -65,6 +65,7 @@ fun TextEditor(
 ) {
     val file = remember { File(filePath) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     viewModel.editorState.content = Content(
         try {

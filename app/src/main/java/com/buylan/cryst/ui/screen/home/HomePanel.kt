@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import com.buylan.cryst.ui.component.AutoScrollBar
 import com.buylan.cryst.ui.screen.home.model.DialogsEvent
 import com.buylan.cryst.ui.screen.home.model.HomeUiState
@@ -29,6 +28,7 @@ import com.buylan.cryst.ui.screen.home.model.PanelStates
 import com.buylan.cryst.ui.screen.home.model.PanelViewModel
 import com.buylan.cryst.util.PanelPosition
 import com.buylan.cryst.util.getFileType
+import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.flow.first
 
 @Composable
@@ -39,20 +39,15 @@ fun HomePanel(
     lazyState: LazyListState,
     panelPosition: PanelPosition,
     viewModel: HomeViewModel,
-    uiState: HomeUiState
+    uiState: HomeUiState,
+    onClickFile: (VirtualFile) -> Unit
 ) {
-
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         panelViewModel.scrollToIndex.collect { index ->
             snapshotFlow { lazyState.layoutInfo.totalItemsCount }.first { it >= index }
             lazyState.scrollToItem(index)
         }
-    }
-
-    LaunchedEffect(panelState.path) {
-        viewModel.refreshPanel(panelPosition)
     }
 
     val backgroundColor by animateColorAsState(
@@ -97,7 +92,7 @@ fun HomePanel(
                         if (panelViewModel.selectionMode) {
                             panelViewModel.toggleSelection(file)
                         } else {
-                            viewModel.handleFileClick(context, file)
+                            onClickFile(file)
                         }
                     },
                     onLongClick = {

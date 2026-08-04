@@ -1,7 +1,5 @@
 package com.buylan.cryst.ui.screen.home
 
-import android.content.Context
-import android.content.Intent
 import android.os.Environment
 import android.os.StatFs
 import androidx.compose.foundation.layout.Arrangement
@@ -37,9 +35,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
-import com.buylan.cryst.activity.AppsActivity
-import com.buylan.cryst.activity.TerminalActivity
 import com.buylan.cryst.model.DarkMode
+import com.buylan.cryst.ui.Screen
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.Dispatchers
@@ -48,12 +45,12 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeDrawer(
-    context: Context,
     drawerState: DrawerState,
     darkMode: DarkMode,
     onStorageItemClick: (VirtualFile) -> Unit,
     onShowAbout: () -> Unit,
-    onToggleDark: () -> Unit
+    onToggleDark: () -> Unit,
+    onNavigate: (Screen) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val storageItemList = listOf(
@@ -166,7 +163,7 @@ fun HomeDrawer(
                     )
                 },
                 onClick = {
-                    context.startActivity(Intent(context, AppsActivity::class.java))
+                    onNavigate(Screen.Apps)
                 }
             )
             NavigationDrawerItem(
@@ -179,7 +176,7 @@ fun HomeDrawer(
                     )
                 },
                 onClick = {
-                    context.startActivity(Intent(context, TerminalActivity::class.java))
+                    onNavigate(Screen.Terminal)
                 }
             )
             Spacer(Modifier.height(12.dp))

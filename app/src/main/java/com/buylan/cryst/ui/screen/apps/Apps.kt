@@ -17,7 +17,6 @@
 package com.buylan.cryst.ui.screen.apps
 
 import android.annotation.SuppressLint
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -96,7 +95,7 @@ import com.buylan.cryst.ui.screen.apps.model.AppsViewModel
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun AppsScreen(){
+fun AppsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val viewModel: AppsViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
@@ -152,7 +151,7 @@ fun AppsScreen(){
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { (context as ComponentActivity).finish() }
+                        onClick = onBack
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_arrow_back),

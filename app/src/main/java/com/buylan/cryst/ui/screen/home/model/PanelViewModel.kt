@@ -17,16 +17,21 @@
 package com.buylan.cryst.ui.screen.home.model
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.buylan.cryst.util.DefaultPath
 import com.buylan.cryst.util.FileSortType
+import com.buylan.cryst.util.accessFiles
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.VirtualFile
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PanelViewModel : ViewModel() {
 
@@ -59,6 +64,9 @@ class PanelViewModel : ViewModel() {
                     path = path
                 )
             }
+            viewModelScope.launch {
+                refresh()
+            }
         }
     }
 
@@ -81,6 +89,9 @@ class PanelViewModel : ViewModel() {
                     rangeAnchorPath = null
                 )
             }
+        }
+        viewModelScope.launch {
+            refresh()
         }
     }
 
@@ -106,7 +117,7 @@ class PanelViewModel : ViewModel() {
         }
     }
 
-    suspend fun refresh(fileLoader: suspend (path: VirtualFile, sortType: FileSortType) -> List<VirtualFile>) {
+    suspend fun refresh() {
         val currentState = _panelStates.value
         if (!currentState.path.isDirectory) {
             val highlightName = currentState.path.name
@@ -120,7 +131,9 @@ class PanelViewModel : ViewModel() {
         }
 
         val state = _panelStates.value
-        val files = fileLoader(state.path, state.sortType)
+        val files = withContext(Dispatchers.IO) {
+            accessFiles(state.path, state.sortType)
+        }
 
         _panelStates.update {
             it.copy(
@@ -204,6 +217,12 @@ class PanelViewModel : ViewModel() {
             it.copy(
                 sortType = sortType
             )
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            refresh()
         }
     }
 }

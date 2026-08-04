@@ -16,9 +16,7 @@
 
 package com.buylan.cryst.ui.screen.font
 
-import android.content.Context
 import android.graphics.Typeface
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -57,8 +55,8 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FontViewer(
-    context: Context,
-    filePath: String
+    filePath: String,
+    onBack: () -> Unit
 ) {
     val file = File(filePath)
 
@@ -88,9 +86,7 @@ fun FontViewer(
             TopAppBar(
                 title = { Text(file.name, maxLines = 1, softWrap = false, overflow = TextOverflow.StartEllipsis) },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        (context as ComponentActivity).finish()
-                    }) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             painter = painterResource(R.drawable.ic_arrow_back),
                             contentDescription = null

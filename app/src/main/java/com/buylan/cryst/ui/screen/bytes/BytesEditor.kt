@@ -46,9 +46,10 @@ data class HexRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BytesEditor(
-    file: File,
+    filePath: String,
     onBack: () -> Unit
 ) {
+    val file = File(filePath)
     val rowCount = remember(file) {
         ceil(file.length() / BYTES_PER_ROW.toDouble()).toInt()
     }

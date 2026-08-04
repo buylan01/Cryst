@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
-import com.buylan.cryst.activity.MainActivity
+import com.buylan.cryst.ui.MainActivity
 import com.buylan.cryst.ui.screen.apps.AppsDestination
 import com.buylan.cryst.ui.screen.apps.AppsSortType
 import com.buylan.cryst.util.ExtractPath

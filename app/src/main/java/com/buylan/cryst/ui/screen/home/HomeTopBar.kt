@@ -1,7 +1,6 @@
 package com.buylan.cryst.ui.screen.home
 
 import android.content.Context
-import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import com.buylan.cryst.R
-import com.buylan.cryst.activity.SettingsActivity
+import com.buylan.cryst.ui.Screen
 import com.buylan.cryst.ui.screen.home.model.DialogsEvent
 import com.buylan.cryst.ui.screen.home.model.HomeViewModel
 import com.buylan.cryst.ui.screen.home.model.PanelStates
@@ -39,7 +38,8 @@ fun HomeTopAppBar(
     viewModel: HomeViewModel,
     scope: CoroutineScope,
     drawerState: DrawerState,
-    context: Context
+    context: Context,
+    onNavigate: (Screen) -> Unit
 ) {
 
     val menuItemLabels = remember {
@@ -138,12 +138,7 @@ fun HomeTopAppBar(
                                     }
 
                                     3 -> {
-                                        context.startActivity(
-                                            Intent(
-                                                context,
-                                                SettingsActivity::class.java
-                                            )
-                                        )
+                                        onNavigate(Screen.Settings)
                                     }
 
                                     4 -> {
