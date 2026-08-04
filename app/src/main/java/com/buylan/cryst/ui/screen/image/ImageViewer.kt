@@ -44,8 +44,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
 import com.buylan.cryst.R
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -115,7 +115,7 @@ fun ImageViewer(
 
         val builder = ImageRequest.Builder(LocalContext.current)
             .data(imageFile)
-            .size(coil.size.Size.ORIGINAL)
+            .size(coil3.size.Size.ORIGINAL)
             .build()
 
         val zoomState = rememberZoomState(maxScale = 8f)

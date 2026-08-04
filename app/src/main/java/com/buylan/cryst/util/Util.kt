@@ -70,7 +70,7 @@ fun accessFiles(path: VirtualFile, sortType: FileSortType): List<VirtualFile> {
     }
 }
 
-fun getActualFile(context: Context, f: VirtualFile): VirtualFile {
+fun extractFile(context: Context, f: VirtualFile): VirtualFile {
     if (f is ArchiveFile) {
         val tmpDir = File(File(context.cacheDir.absolutePath + "/archive_cache"), f.entranceFile.hashCode().toString())
         if (!tmpDir.exists()) tmpDir.mkdirs()

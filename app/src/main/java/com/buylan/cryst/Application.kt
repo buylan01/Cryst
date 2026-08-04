@@ -17,6 +17,13 @@
 package com.buylan.cryst
 
 import android.app.Application
+import coil3.ImageLoader
+import coil3.disk.DiskCache
+import coil3.disk.directory
+import coil3.request.CachePolicy
+import coil3.util.DebugLogger
+import com.buylan.cryst.coli.ApkIconFetcher
+import com.buylan.cryst.coli.ApkIconKeyer
 import com.buylan.cryst.model.AppViewModel
 import java.io.File
 
@@ -24,10 +31,28 @@ class Application : Application() {
     lateinit var appViewModel: AppViewModel
         private set
 
+    lateinit var apkImageLoader: ImageLoader
+        private set
+
     override fun onCreate() {
         super.onCreate()
         appViewModel = AppViewModel(this)
         clearArchiveCache()
+
+        apkImageLoader = ImageLoader.Builder(applicationContext)
+            .components {
+                add(ApkIconFetcher.Factory(packageManager))
+                add(ApkIconKeyer())
+            }
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(applicationContext.cacheDir.resolve("coil_apk_icon"))
+                    .maxSizePercent(0.03)
+                    .build()
+            }
+            .logger(DebugLogger())
+            .build()
     }
 
     private fun clearArchiveCache() {

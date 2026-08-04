@@ -78,7 +78,6 @@ fun HomeDialogs(
     uiState: HomeUiState,
     handleRefresh: (VirtualFile?) -> Unit,
     onNavigate: (Screen) -> Unit,
-    handleFileClick: (FileType, VirtualFile) -> Unit
 ) {
 
     val event by viewModel.currentEvent.collectAsState()
@@ -233,7 +232,12 @@ fun HomeDialogs(
                     targetFile = dialog.file as LocalFile,
                     onDismiss = viewModel::dismiss,
                     unpack = {
-                        handleFileClick(FileType.ARCHIVE, dialog.file)
+                        homeViewModel.handleFileClick(
+                            context = context,
+                            onNavigate = onNavigate,
+                            file = dialog.file,
+                            type = FileType.ARCHIVE
+                        )
                     }
                 )
             }
@@ -292,7 +296,12 @@ fun HomeDialogs(
                 OpenWithDialog(
                     onDismiss = viewModel::dismiss
                 ) {
-                    handleFileClick(it, dialog.file)
+                    homeViewModel.handleFileClick(
+                        context = context,
+                        onNavigate = onNavigate,
+                        file = dialog.file,
+                        type = it
+                    )
                 }
             }
 

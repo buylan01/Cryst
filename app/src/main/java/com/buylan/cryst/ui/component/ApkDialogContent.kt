@@ -36,7 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.android.apksig.ApkVerifier
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.apps.model.ApkInfo

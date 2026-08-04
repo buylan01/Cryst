@@ -83,7 +83,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.component.ApkDialogContent
 import com.buylan.cryst.ui.component.AutoScrollBar

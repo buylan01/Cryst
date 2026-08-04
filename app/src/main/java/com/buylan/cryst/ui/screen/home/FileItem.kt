@@ -16,9 +16,7 @@
 
 package com.buylan.cryst.ui.screen.home
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -34,32 +32,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import com.buylan.cryst.Application
 import com.buylan.cryst.R
+import com.buylan.cryst.coli.ApkIconRequest
 import com.buylan.cryst.ui.component.swipeToSelect
 import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.formatFileDate
 import com.buylan.cryst.util.formatFileSize
 import com.buylan.cryst.vfs.VirtualFile
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.Path
@@ -92,69 +85,8 @@ fun FileItem(
             .padding(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val context = LocalContext.current
 
-        when(type) {
-            FileType.IMAGE -> {
-                val imageRequest = ImageRequest.Builder(context)
-                    .data(File(file.path))
-                    .size(64)
-                    .crossfade(true)
-                    .build()
-
-                SubcomposeAsyncImage(
-                    model = imageRequest,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(MaterialTheme.shapes.small),
-                    contentScale = ContentScale.Crop,
-                    filterQuality = FilterQuality.Low,
-                    loading = {
-                        FileIcon(R.drawable.ic_image)
-                    },
-                    error = {
-                        FileIcon(R.drawable.ic_broken_image)
-                    }
-                )
-            }
-
-            FileType.APK -> {
-                var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-                LaunchedEffect(file.path) {
-                    withContext(Dispatchers.Default) {
-                        val pm = context.packageManager
-                        try {
-                            pm.getPackageArchiveInfo(file.path, 0)
-                        } catch (_: Exception) {
-                            null
-                        }?.let {
-                            it.applicationInfo!!.apply {
-                                sourceDir = file.absolutePath
-                                publicSourceDir = file.absolutePath
-                            }
-                            bitmap = it.applicationInfo!!.loadIcon(pm).toBitmap()
-                        }
-                    }
-                }
-                if (bitmap != null) {
-                    Image(
-                        bitmap = bitmap!!.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(MaterialTheme.shapes.small),
-                        contentScale = ContentScale.Fit
-                    )
-                } else {
-                    FileIcon(R.drawable.ic_apk_document)
-                }
-            }
-
-            else -> {
-                FileIcon(type.icon)
-            }
-        }
+        FileThumbnail(type, file)
 
         Spacer(modifier = Modifier.width(8.dp))
 
@@ -191,6 +123,65 @@ fun FileItem(
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.outline
             )
+        }
+    }
+}
+
+@Composable
+private fun FileThumbnail(
+    type: FileType,
+    file: VirtualFile
+) {
+
+    val context = LocalContext.current
+
+    when (type) {
+        FileType.IMAGE -> {
+            val imageRequest = ImageRequest.Builder(context)
+                .data(File(file.path))
+                .size(64)
+                .crossfade(true)
+                .build()
+
+            SubcomposeAsyncImage(
+                model = imageRequest,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(MaterialTheme.shapes.small),
+                contentScale = ContentScale.Crop,
+                filterQuality = FilterQuality.Low,
+                loading = {
+                    FileIcon(R.drawable.ic_image)
+                },
+                error = {
+                    FileIcon(R.drawable.ic_broken_image)
+                }
+            )
+        }
+
+        FileType.APK -> {
+
+            val apkImageLoader = (context.applicationContext as Application).apkImageLoader
+
+            val request = remember(file.path, file.lastModified()) {
+                ApkIconRequest(file.path, file.lastModified())
+            }
+
+            SubcomposeAsyncImage(
+                model = request,
+                contentDescription = null,
+                imageLoader = apkImageLoader,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(MaterialTheme.shapes.small),
+                loading = { FileIcon(R.drawable.ic_apk_document) },
+                error = { FileIcon(R.drawable.ic_apk_document) }
+            )
+        }
+
+        else -> {
+            FileIcon(type.icon)
         }
     }
 }

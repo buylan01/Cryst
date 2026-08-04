@@ -1,7 +1,7 @@
 [versions]
 agp = "9.3.1"
 apksig = "9.3.1"
-coilCompose = "2.7.0"
+coilComposeVersion = "3.5.0"
 commonsCompress = "1.28.0"
 coreKtx = "1.19.0"
 datastorePreferences = "1.2.1"
@@ -34,7 +34,7 @@ androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", versi
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3Runtime" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3Ui" }
 apksig = { module = "com.android.tools.build:apksig", version.ref = "apksig" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+coil3-coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilComposeVersion" }
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commonsCompress" }
 editor-bom = { module = "io.github.rosemoe:editor-bom", version.ref = "editor" }
 fastscroller-material3 = { module = "io.github.oikvpqya.compose.fastscroller:fastscroller-material3", version.ref = "fastscrollerMaterial3" }

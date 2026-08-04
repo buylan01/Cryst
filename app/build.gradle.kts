@@ -79,7 +79,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.coil.compose)
+    implementation(libs.coil3.coil.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(platform(libs.editor.bom))
     implementation(libs.rosemoe.editor)

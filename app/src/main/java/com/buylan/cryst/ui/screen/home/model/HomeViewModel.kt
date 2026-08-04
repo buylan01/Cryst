@@ -17,11 +17,17 @@
 package com.buylan.cryst.ui.screen.home.model
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.buylan.cryst.ui.Screen
+import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.PanelPosition
 import com.buylan.cryst.util.ToolAction
+import com.buylan.cryst.util.extractFile
+import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.shareFile
+import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -98,6 +104,41 @@ class HomeViewModel(
             }
             ToolAction.Compress -> {
                 _dialogsViewModel.show(DialogsEvent.CompressDialog(file))
+            }
+        }
+    }
+
+    fun handleFileClick(
+        context: Context,
+        onNavigate: (Screen) -> Unit,
+        file: VirtualFile,
+        type: FileType? = null
+    ) {
+        if (file.isDirectory) {
+            currentPanelViewModel.setPath(file)
+        } else {
+            val actualType = type ?: getFileType(file)
+            val extractedFile = extractFile(context, file)
+            val encodedPath = extractedFile.absolutePath
+
+            when (actualType) {
+                FileType.TEXT -> onNavigate(Screen.TextEditor(encodedPath))
+                FileType.IMAGE -> onNavigate(Screen.ImageViewer(encodedPath))
+                FileType.FONT -> onNavigate(Screen.FontViewer(encodedPath))
+                FileType.VIDEO -> onNavigate(Screen.VideoPlayer(encodedPath))
+
+                FileType.APK -> dialogsViewModel.show(DialogsEvent.ApkDialog(extractedFile))
+                FileType.AUDIO -> dialogsViewModel.show(DialogsEvent.AudioDialog(extractedFile))
+                FileType.ARCHIVE -> {
+                    try {
+                        currentPanelViewModel.setPath(ArchiveFile(entranceFile = extractedFile))
+                    } catch (e: Exception) {
+                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                FileType.SCRIPT -> dialogsViewModel.show(DialogsEvent.RunScriptDialog(file))
+                FileType.BYTES -> onNavigate(Screen.BytesEditor(encodedPath))
+                else -> dialogsViewModel.show(DialogsEvent.OpenWithDialog(extractedFile))
             }
         }
     }

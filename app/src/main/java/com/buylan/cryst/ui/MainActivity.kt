@@ -57,7 +57,6 @@ class MainActivity : ComponentActivity() {
 
                     entry<Screen.Home> {
                         HomeScreen(
-                            context = this@MainActivity,
                             onNavigate = {
                                 backStack.add(it)
                             },

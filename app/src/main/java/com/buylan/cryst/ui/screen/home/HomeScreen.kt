@@ -16,8 +16,6 @@
 
 package com.buylan.cryst.ui.screen.home
 
-import android.content.Context
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -38,19 +36,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.Screen
 import com.buylan.cryst.ui.screen.home.model.DialogsEvent
-import com.buylan.cryst.ui.screen.home.model.DialogsViewModel
 import com.buylan.cryst.ui.screen.home.model.HomeViewModel
-import com.buylan.cryst.ui.screen.home.model.PanelViewModel
-import com.buylan.cryst.util.FileType
 import com.buylan.cryst.util.PanelPosition
-import com.buylan.cryst.util.getActualFile
-import com.buylan.cryst.util.getFileType
 import com.buylan.cryst.util.isRootPath
-import com.buylan.cryst.vfs.ArchiveFile
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
 import kotlinx.coroutines.flow.SharedFlow
@@ -61,18 +54,19 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun HomeScreen(
-    context: Context,
     viewModel: HomeViewModel = viewModel(),
     appViewModel: AppViewModel = viewModel(),
     onNavigate: (Screen) -> Unit,
     pathFlow: SharedFlow<String>,
     isBackHandlerEnabled: Boolean = true
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val dialogsViewModel = viewModel.dialogsViewModel
     val leftPanelState by viewModel.leftPanelState.collectAsState()
     val rightPanelState by viewModel.rightPanelState.collectAsState()
-    val currentPanel = if (uiState.panelPosition == PanelPosition.L) leftPanelState else rightPanelState
+    val currentPanel =
+        if (uiState.panelPosition == PanelPosition.L) leftPanelState else rightPanelState
     val scope = rememberCoroutineScope()
     val leftLazyState = rememberLazyListState()
     val rightLazyState = rememberLazyListState()
@@ -144,12 +138,10 @@ fun HomeScreen(
                     viewModel = viewModel,
                     uiState = uiState,
                     onClickFile = {
-                        handleFileClick(
-                            context,
-                            onNavigate,
-                            viewModel.currentPanelViewModel,
-                            viewModel.dialogsViewModel,
-                            it
+                        viewModel.handleFileClick(
+                            context = context,
+                            onNavigate = onNavigate,
+                            file = it
                         )
                     }
                 )
@@ -163,12 +155,10 @@ fun HomeScreen(
                     viewModel = viewModel,
                     uiState = uiState,
                     onClickFile = {
-                        handleFileClick(
-                            context,
-                            onNavigate,
-                            viewModel.currentPanelViewModel,
-                            viewModel.dialogsViewModel,
-                            it
+                        viewModel.handleFileClick(
+                            context = context,
+                            onNavigate = onNavigate,
+                            file = it
                         )
                     }
                 )
@@ -195,53 +185,6 @@ fun HomeScreen(
         handleRefresh = {
             handleRefresh(it)
         },
-        onNavigate = onNavigate,
-        handleFileClick = { type, file ->
-            handleFileClick(
-                context,
-                onNavigate,
-                viewModel.currentPanelViewModel,
-                viewModel.dialogsViewModel,
-                file,
-                type
-            )
-        }
+        onNavigate = onNavigate
     )
-}
-
-fun handleFileClick(
-    context: Context,
-    onNavigate: (Screen) -> Unit,
-    panelViewModel: PanelViewModel,
-    dialogsViewModel: DialogsViewModel,
-    file: VirtualFile,
-    type: FileType? = null
-) {
-    if (file.isDirectory) {
-        panelViewModel.setPath(file)
-    } else {
-        val actualType = type ?: getFileType(file)
-        val actualFile = getActualFile(context, file)
-        val encodedPath = file.path
-
-        when (actualType) {
-            FileType.TEXT -> onNavigate(Screen.TextEditor(encodedPath))
-            FileType.IMAGE -> onNavigate(Screen.ImageViewer(encodedPath))
-            FileType.FONT -> onNavigate(Screen.FontViewer(encodedPath))
-            FileType.VIDEO -> onNavigate(Screen.VideoPlayer(encodedPath))
-
-            FileType.APK -> dialogsViewModel.show(DialogsEvent.ApkDialog(actualFile))
-            FileType.AUDIO -> dialogsViewModel.show(DialogsEvent.AudioDialog(actualFile))
-            FileType.ARCHIVE -> {
-                try {
-                    panelViewModel.setPath(ArchiveFile(entranceFile = actualFile))
-                } catch (e: Exception) {
-                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-            FileType.SCRIPT -> dialogsViewModel.show(DialogsEvent.RunScriptDialog(file))
-            FileType.BYTES -> onNavigate(Screen.BytesEditor(encodedPath))
-            else -> dialogsViewModel.show(DialogsEvent.OpenWithDialog(actualFile))
-        }
-    }
 }
