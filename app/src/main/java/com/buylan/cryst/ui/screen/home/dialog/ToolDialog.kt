@@ -29,10 +29,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
 import com.buylan.cryst.R
 import com.buylan.cryst.util.PanelPosition
 import com.buylan.cryst.util.ToolAction
@@ -47,6 +49,62 @@ fun ToolDialog(
     onDismiss: () -> Unit,
     onToolAction: (action: ToolAction) -> Unit
 ) {
+
+    val toolItems = remember(files, position) {
+        val isArchive = files.singleOrNull() is ArchiveFile
+        val isNotDirectory = files.singleOrNull()?.isDirectory == false
+        val isSingleFile = files.size == 1
+
+        listOf(
+            ToolItemConfig(
+                text = if (position == PanelPosition.R) R.string.copy_to_left else R.string.copy_to_right,
+                icon = R.drawable.ic_file_copy,
+                onClick = { onToolAction(ToolAction.Copy) }
+            ),
+            ToolItemConfig(
+                text = R.string.delete,
+                icon = R.drawable.ic_delete,
+                onClick = { onToolAction(ToolAction.Delete) },
+                enabled = !isArchive
+            ),
+            ToolItemConfig(
+                text = R.string.open_with,
+                icon = R.drawable.ic_open_with,
+                onClick = { onToolAction(ToolAction.OpenWith) },
+                enabled = isNotDirectory
+            ),
+            ToolItemConfig(
+                text = R.string.info,
+                icon = R.drawable.ic_info,
+                onClick = { onToolAction(ToolAction.Properties) }
+            ),
+            ToolItemConfig(
+                text = if (position == PanelPosition.R) R.string.move_to_left else R.string.move_to_right,
+                icon = R.drawable.ic_content_cut,
+                onClick = { onToolAction(ToolAction.Move) },
+                enabled = !isArchive
+            ),
+            ToolItemConfig(
+                text = R.string.rename,
+                icon = R.drawable.ic_edit,
+                onClick = { onToolAction(ToolAction.Rename) },
+                enabled = !isArchive && isSingleFile
+            ),
+            ToolItemConfig(
+                text = R.string.compress,
+                icon = R.drawable.ic_archive,
+                onClick = { onToolAction(ToolAction.Compress) },
+                enabled = !isArchive
+            ),
+            ToolItemConfig(
+                text = R.string.share,
+                icon = R.drawable.ic_share,
+                onClick = { onToolAction(ToolAction.Share) },
+                enabled = isNotDirectory
+            )
+        )
+    }
+
     BasicAlertDialog(
         onDismissRequest = onDismiss,
         content = {
@@ -59,16 +117,11 @@ fun ToolDialog(
                         .padding(12.dp),
                     maxItemsInEachColumn = 4
                 ) {
-                    @Composable
-                    fun ToolItem(
-                        text: String,
-                        icon: Int,
-                        onClick: () -> Unit,
-                        enabled: Boolean = true
-                    ) {
+
+                    toolItems.fastForEach { action ->
                         TextButton(
-                            enabled = enabled,
-                            onClick = onClick,
+                            enabled = action.enabled,
+                            onClick = action.onClick,
                             colors = ButtonDefaults.buttonColors(
                                 contentColor = MaterialTheme.colorScheme.onSurface,
                                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -76,77 +129,22 @@ fun ToolDialog(
                             )
                         ) {
                             Icon(
-                                painter = painterResource(icon),
+                                painter = painterResource(action.icon),
                                 contentDescription = null
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text)
+                            Text(stringResource(action.text))
                         }
                     }
-
-                    ToolItem(
-                        text = if (position == PanelPosition.R)
-                            stringResource(R.string.copy_to_left)
-                        else
-                            stringResource(R.string.copy_to_right),
-                        icon = R.drawable.ic_file_copy,
-                        onClick = { onToolAction(ToolAction.Copy) }
-                    )
-
-                    ToolItem(
-                        text = stringResource(R.string.delete),
-                        icon = R.drawable.ic_delete,
-                        onClick = { onToolAction(ToolAction.Delete) },
-                        enabled = files.singleOrNull() !is ArchiveFile
-                    )
-
-                    ToolItem(
-                        text = stringResource(R.string.open_with),
-                        enabled = files.singleOrNull()?.isDirectory == false,
-                        icon = R.drawable.ic_open_with,
-                        onClick = { onToolAction(ToolAction.OpenWith) }
-                    )
-
-                    ToolItem(
-                        text = stringResource(R.string.info),
-                        icon = R.drawable.ic_info,
-                        onClick = {
-                            onToolAction(ToolAction.Properties)
-                        }
-                    )
-
-                    ToolItem(
-                        text = if (position == PanelPosition.R)
-                            stringResource(R.string.move_to_left)
-                        else
-                            stringResource(R.string.move_to_right),
-                        icon = R.drawable.ic_content_cut,
-                        onClick = { onToolAction(ToolAction.Move) },
-                        enabled = files.singleOrNull() !is ArchiveFile
-                    )
-
-                    ToolItem(
-                        text = stringResource(R.string.rename),
-                        icon = R.drawable.ic_edit,
-                        onClick = { onToolAction(ToolAction.Rename) },
-                        enabled = files.singleOrNull() !is ArchiveFile && files.size == 1
-                    )
-
-                    ToolItem(
-                        text = stringResource(R.string.compress),
-                        icon = R.drawable.ic_archive,
-                        onClick = { onToolAction(ToolAction.Compress) },
-                        enabled = files.singleOrNull() !is ArchiveFile
-                    )
-
-                    ToolItem(
-                        text = stringResource(R.string.share),
-                        icon = R.drawable.ic_share,
-                        onClick = { onToolAction(ToolAction.Share) },
-                        enabled = files.singleOrNull()?.isDirectory == false
-                    )
                 }
             }
         }
     )
 }
+
+private data class ToolItemConfig(
+    val text: Int,
+    val icon: Int,
+    val onClick: () -> Unit,
+    val enabled: Boolean = true
+)
