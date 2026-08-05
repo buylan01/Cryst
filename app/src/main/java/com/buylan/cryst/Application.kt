@@ -24,6 +24,8 @@ import coil3.request.CachePolicy
 import coil3.util.DebugLogger
 import com.buylan.cryst.coli.ApkIconFetcher
 import com.buylan.cryst.coli.ApkIconKeyer
+import com.buylan.cryst.coli.AppIconFetcher
+import com.buylan.cryst.coli.AppIconKeyer
 import com.buylan.cryst.model.AppViewModel
 import java.io.File
 
@@ -32,6 +34,9 @@ class Application : Application() {
         private set
 
     lateinit var apkImageLoader: ImageLoader
+        private set
+
+    lateinit var appImageLoader: ImageLoader
         private set
 
     override fun onCreate() {
@@ -47,8 +52,23 @@ class Application : Application() {
             .diskCachePolicy(CachePolicy.ENABLED)
             .diskCache {
                 DiskCache.Builder()
-                    .directory(applicationContext.cacheDir.resolve("coil_apk_icon"))
                     .maxSizePercent(0.03)
+                    .directory(applicationContext.cacheDir.resolve("coil"))
+                    .build()
+            }
+            .logger(DebugLogger())
+            .build()
+
+        appImageLoader = ImageLoader.Builder(applicationContext)
+            .components {
+                add(AppIconFetcher.Factory(packageManager))
+                add(AppIconKeyer())
+            }
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .diskCache {
+                DiskCache.Builder()
+                    .maxSizePercent(0.03)
+                    .directory(applicationContext.cacheDir.resolve("coil"))
                     .build()
             }
             .logger(DebugLogger())

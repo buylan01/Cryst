@@ -16,7 +16,6 @@
 
 package com.buylan.cryst.ui.screen.home.dialog
 
-import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.compose.material3.AlertDialog
@@ -28,8 +27,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.buylan.cryst.Application
 import com.buylan.cryst.R
+import com.buylan.cryst.coli.ApkIconRequest
 import com.buylan.cryst.ui.component.ApkDialogContent
 import com.buylan.cryst.ui.component.MenuType
 import com.buylan.cryst.ui.screen.apps.model.ApkInfo
@@ -39,12 +41,16 @@ import com.buylan.cryst.vfs.LocalFile
 
 @Composable
 fun ApkDialog(
-    context: Context,
     targetFile: LocalFile,
     onDismiss: () -> Unit,
     unpack: () -> Unit
 ) {
 
+    val context = LocalContext.current
+    val imageLoader = (context.applicationContext as Application).apkImageLoader
+    val request = remember(targetFile.path, targetFile.lastModified()) {
+        ApkIconRequest(targetFile.path, targetFile.lastModified())
+    }
     val pm = context.packageManager
     var apkInfo by remember { mutableStateOf<ApkInfo?>(null) }
 
@@ -75,7 +81,12 @@ fun ApkDialog(
         AlertDialog(
             onDismissRequest = { onDismiss() },
             text = {
-                ApkDialogContent(info = info, menuType = MenuType.ApkFile)
+                ApkDialogContent(
+                    info = info,
+                    menuType = MenuType.ApkFile,
+                    imageRequest = request,
+                    imageLoader = imageLoader
+                )
             },
             confirmButton = {
                 TextButton(

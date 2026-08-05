@@ -83,9 +83,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil3.compose.AsyncImage
+import coil3.ImageLoader
+import coil3.compose.SubcomposeAsyncImage
+import com.buylan.cryst.Application
 import com.buylan.cryst.R
+import com.buylan.cryst.coli.AppIconRequest
 import com.buylan.cryst.ui.component.ApkDialogContent
+import com.buylan.cryst.ui.component.AppIconPlaceholder
 import com.buylan.cryst.ui.component.AutoScrollBar
 import com.buylan.cryst.ui.component.MenuType
 import com.buylan.cryst.ui.screen.apps.model.ApkInfo
@@ -97,6 +101,7 @@ import com.buylan.cryst.ui.screen.apps.model.AppsViewModel
 @Composable
 fun AppsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
+    val imageLoader = (context.applicationContext as Application).appImageLoader
     val viewModel: AppsViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
     val searchField = rememberTextFieldState()
@@ -240,7 +245,11 @@ fun AppsScreen(onBack: () -> Unit) {
                             getFilteredApps(apps),
                             key = { app -> app.packageName }
                         ) { app ->
-                            AppItem(app) { viewModel.showAppDialog(app) }
+                            AppItem(
+                                info = app,
+                                onClick = { viewModel.showAppDialog(app) },
+                                imageLoader = imageLoader
+                            )
                         }
                     }
                     AutoScrollBar(
@@ -281,9 +290,14 @@ fun AppsScreen(onBack: () -> Unit) {
                 AlertDialog(
                     onDismissRequest = { viewModel.hideAppDialog() },
                     text = {
+                        val request = remember(app.packageName, app.lastUpdateTime) {
+                            AppIconRequest(app.packageName, app.lastUpdateTime ?: 0)
+                        }
                         ApkDialogContent(
                             info = app,
-                            menuType = MenuType.Installed
+                            menuType = MenuType.Installed,
+                            imageRequest = request,
+                            imageLoader = imageLoader
                         )
                     },
                     confirmButton = {
@@ -392,7 +406,8 @@ fun AppsScreen(onBack: () -> Unit) {
 @Composable
 fun AppItem(
     info: ApkInfo,
-    onClick: (ApkInfo) -> Unit
+    onClick: (ApkInfo) -> Unit,
+    imageLoader: ImageLoader
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -403,10 +418,17 @@ fun AppItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            AsyncImage(
-                model = info.icon,
+            val request = remember(info.packageName, info.lastUpdateTime) {
+                AppIconRequest(info.packageName, info.lastUpdateTime ?: 0)
+            }
+
+            SubcomposeAsyncImage(
+                model = request,
+                imageLoader = imageLoader,
                 contentDescription = null,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
+                loading = { AppIconPlaceholder() },
+                error = { AppIconPlaceholder() }
             )
 
             Spacer(modifier = Modifier.width(16.dp))

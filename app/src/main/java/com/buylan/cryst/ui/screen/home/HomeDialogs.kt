@@ -228,7 +228,6 @@ fun HomeDialogs(
 
             is DialogsEvent.ApkDialog -> {
                 ApkDialog(
-                    context = context,
                     targetFile = dialog.file as LocalFile,
                     onDismiss = viewModel::dismiss,
                     unpack = {

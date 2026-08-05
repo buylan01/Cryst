@@ -26,8 +26,6 @@ import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.buylan.cryst.ui.screen.apps.model.ApkInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 
 fun install(context: Context, file: File) {
@@ -57,20 +55,17 @@ fun install(context: Context, file: File) {
     }
 }
 
-suspend fun PackageInfo.toApkInfo(packageManager: PackageManager, installed: Boolean = true): ApkInfo {
+fun PackageInfo.toApkInfo(packageManager: PackageManager, installed: Boolean = true): ApkInfo {
 
-    val icon = withContext(Dispatchers.Default) {
-        applicationInfo!!.loadIcon(packageManager)
-    }
     val label = applicationInfo!!.loadLabel(packageManager).toString()
     val size = File(applicationInfo!!.sourceDir).length()
 
     return ApkInfo(
-        icon = icon,
         label = label,
         packageName = packageName,
         versionName = versionName.toString(),
         versionCode = longVersionCode,
+        lastUpdateTime = lastUpdateTime,
         size = size,
         isInstalled = installed,
         source = applicationInfo!!.sourceDir,

@@ -161,13 +161,22 @@ class MainActivity : ComponentActivity() {
 sealed class Screen : NavKey {
     @Serializable
     data object Home : Screen()
+    @Serializable
     data object Settings : Screen()
+    @Serializable
     data object Apps : Screen()
+    @Serializable
     data object Terminal : Screen()
+    @Serializable
     data object Licenses : Screen()
+    @Serializable
     data class TextEditor(val filePath: String) : Screen()
+    @Serializable
     data class ImageViewer(val filePath: String) : Screen()
+    @Serializable
     data class FontViewer(val filePath: String) : Screen()
+    @Serializable
     data class VideoPlayer(val filePath: String) : Screen()
+    @Serializable
     data class BytesEditor(val filePath: String) : Screen()
 }

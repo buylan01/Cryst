@@ -1,9 +1,6 @@
 package com.buylan.cryst.ui.screen.apps.model
 
-import android.graphics.drawable.Drawable
-
 data class ApkInfo (
-    val icon: Drawable,
     val label: String,
     val packageName: String,
     val versionName: String,

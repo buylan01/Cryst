@@ -36,7 +36,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import coil3.ImageLoader
+import coil3.compose.SubcomposeAsyncImage
 import com.android.apksig.ApkVerifier
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.screen.apps.model.ApkInfo
@@ -53,7 +54,9 @@ enum class MenuType {
 @Composable
 fun ApkDialogContent(
     info: ApkInfo,
-    menuType: MenuType
+    menuType: MenuType,
+    imageRequest: Any,
+    imageLoader: ImageLoader
 ) {
     val context = LocalContext.current
     val pm = context.packageManager
@@ -66,11 +69,14 @@ fun ApkDialogContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            AsyncImage(
-                model = info.icon,
+            SubcomposeAsyncImage(
+                model = imageRequest,
+                imageLoader = imageLoader,
                 contentDescription = null,
                 modifier = Modifier.size(48.dp),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Fit,
+                loading = { AppIconPlaceholder() },
+                error = { AppIconPlaceholder() }
             )
 
             Spacer(modifier = Modifier.width(16.dp))

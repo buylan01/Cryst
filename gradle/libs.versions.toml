@@ -22,8 +22,8 @@ navigation3Runtime = "1.0.1"
 termux = "v0.118.3"
 aboutLibraries = "15.0.4"
 zoomableVersion = "2.13.0"
-kotlinSerialization = "2.2.21"
-kotlinxSerializationCore = "1.9.0"
+kotlinSerialization = "2.4.10"
+kotlinxSerializationCore = "1.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
