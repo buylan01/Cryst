@@ -35,7 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
-import com.buylan.cryst.model.DarkMode
+import com.buylan.cryst.ui.model.DarkMode
 import com.buylan.cryst.ui.Screen
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile

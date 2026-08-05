@@ -99,7 +99,7 @@ import com.buylan.cryst.ui.screen.apps.model.AppsViewModel
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun AppsScreen(onBack: () -> Unit) {
+fun AppsScreen(onBack: (String?) -> Unit) {
     val context = LocalContext.current
     val imageLoader = (context.applicationContext as Application).appImageLoader
     val viewModel: AppsViewModel = viewModel()
@@ -156,7 +156,7 @@ fun AppsScreen(onBack: () -> Unit) {
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = onBack
+                        onClick = { onBack(null) }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_arrow_back),
@@ -334,7 +334,7 @@ fun AppsScreen(onBack: () -> Unit) {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            viewModel.onLocate(path)
+                            onBack(path)
                             viewModel.hideLocateDialog()
                         }
                     ) {

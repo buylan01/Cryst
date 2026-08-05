@@ -28,12 +28,9 @@ import com.buylan.cryst.ui.screen.text.TextEditor
 import com.buylan.cryst.ui.screen.video.VideoViewer
 import com.buylan.cryst.ui.theme.CrystTheme
 import com.buylan.cryst.util.textEditorStartup
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
-
-    private val pathFlow = MutableSharedFlow<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,8 +38,8 @@ class MainActivity : ComponentActivity() {
         window.isNavigationBarContrastEnforced = false
 
         setContent {
-            val appViewModel = (applicationContext as Application).appViewModel
-            val isDark = appViewModel.isDarkMode()
+            val sharedViewModel = (applicationContext as Application).sharedViewModel
+            val isDark = sharedViewModel.isDarkMode()
             val backStack = rememberNavBackStack(Screen.Home)
 
             enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(
@@ -60,20 +57,25 @@ class MainActivity : ComponentActivity() {
                             onNavigate = {
                                 backStack.add(it)
                             },
-                            pathFlow = pathFlow,
+                            sharedViewModel = sharedViewModel,
                             isBackHandlerEnabled = backStack.size == 1
                         )
                     }
 
                     entry<Screen.Settings> {
                         SettingsScreen(
-                            appViewModel = appViewModel,
+                            sharedViewModel = sharedViewModel,
                             onBack = { backStack.removeLastOrNull() }
                         )
                     }
 
                     entry<Screen.Apps> {
-                        AppsScreen(onBack = { backStack.removeLastOrNull() })
+                        AppsScreen(onBack = { path ->
+                            backStack.removeLastOrNull()
+                            path?.let {
+                                sharedViewModel.setResult(it)
+                            }
+                        })
                     }
 
                     entry<Screen.Licenses> {

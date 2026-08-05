@@ -4,25 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -35,16 +30,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.BuildConfig
 import com.buylan.cryst.R
 import com.buylan.cryst.ui.Screen
+import com.buylan.cryst.ui.component.CrystIcon
 import com.buylan.cryst.ui.screen.home.dialog.ApkDialog
 import com.buylan.cryst.ui.screen.home.dialog.AudioPlayer
 import com.buylan.cryst.ui.screen.home.dialog.CompressDialog
@@ -98,20 +92,7 @@ fun HomeDialogs(
                                     modifier = Modifier.padding(bottom = 16.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .clip(CircleShape)
-                                            .background(color = MaterialTheme.colorScheme.primaryContainer),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_folder),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(32.dp),
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                                        )
-                                    }
+                                    CrystIcon()
 
                                     Spacer(modifier = Modifier.width(16.dp))
 
@@ -133,6 +114,7 @@ fun HomeDialogs(
                                 }
                                 FilledTonalButton(
                                     onClick = {
+                                        viewModel.dismiss()
                                         onNavigate(Screen.Licenses)
                                     },
                                     modifier = Modifier.fillMaxWidth()

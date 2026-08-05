@@ -44,12 +44,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.buylan.cryst.R
-import com.buylan.cryst.model.AppViewModel
-import com.buylan.cryst.model.DarkMode
+import com.buylan.cryst.ui.model.SharedViewModel
+import com.buylan.cryst.ui.model.DarkMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(appViewModel: AppViewModel, onBack: () -> Unit) {
+fun SettingsScreen(sharedViewModel: SharedViewModel, onBack: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -87,7 +87,7 @@ fun SettingsScreen(appViewModel: AppViewModel, onBack: () -> Unit) {
                     leadingContent = { Icon(painter = painterResource(R.drawable.ic_dark_mode), contentDescription = null) },
                     supportingContent = { Text(stringResource(R.string.settings_dark_mode_description)) },
                     trailingContent = {
-                        Text(text = stringResource(appViewModel.darkMode.label))
+                        Text(text = stringResource(sharedViewModel.darkMode.label))
                         DropdownMenu(
                             expanded = showDarkModeMenu,
                             onDismissRequest = { showDarkModeMenu = false }
@@ -96,7 +96,7 @@ fun SettingsScreen(appViewModel: AppViewModel, onBack: () -> Unit) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(it.label)) },
                                     onClick = {
-                                        appViewModel.setDarkTheme(it)
+                                        sharedViewModel.setDarkTheme(it)
                                         showDarkModeMenu = false
                                     }
                                 )

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.buylan.cryst.model
+package com.buylan.cryst.ui.model
 
 import android.app.Application
 import android.content.res.Configuration
@@ -27,16 +27,30 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.buylan.cryst.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 private val Application.dataStore by preferencesDataStore(name = "settings")
 
-class AppViewModel(application: Application) : AndroidViewModel(application) {
+class SharedViewModel(application: Application) : AndroidViewModel(application) {
 
     var darkMode: DarkMode by mutableStateOf(DarkMode.System)
         private set
+
+    private val _result = MutableStateFlow<String?>(null)
+    val result: StateFlow<String?> = _result.asStateFlow()
+
+    fun setResult(value: String) {
+        _result.value = value
+    }
+
+    fun consumeResult() {
+        _result.value = null
+    }
 
     init {
         viewModelScope.launch {

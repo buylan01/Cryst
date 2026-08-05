@@ -26,11 +26,11 @@ import com.buylan.cryst.coli.ApkIconFetcher
 import com.buylan.cryst.coli.ApkIconKeyer
 import com.buylan.cryst.coli.AppIconFetcher
 import com.buylan.cryst.coli.AppIconKeyer
-import com.buylan.cryst.model.AppViewModel
+import com.buylan.cryst.ui.model.SharedViewModel
 import java.io.File
 
 class Application : Application() {
-    lateinit var appViewModel: AppViewModel
+    lateinit var sharedViewModel: SharedViewModel
         private set
 
     lateinit var apkImageLoader: ImageLoader
@@ -41,7 +41,7 @@ class Application : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        appViewModel = AppViewModel(this)
+        sharedViewModel = SharedViewModel(this)
         clearArchiveCache()
 
         apkImageLoader = ImageLoader.Builder(applicationContext)

@@ -1,14 +1,12 @@
 package com.buylan.cryst.ui.screen.apps.model
 
 import android.app.Application
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
-import com.buylan.cryst.ui.MainActivity
 import com.buylan.cryst.ui.screen.apps.AppsDestination
 import com.buylan.cryst.ui.screen.apps.AppsSortType
 import com.buylan.cryst.util.ExtractPath
@@ -117,19 +115,6 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
-    }
-
-    fun onLocate(path: String) {
-        application.startActivity(
-            Intent(
-                application,
-                MainActivity::class.java
-            ).apply {
-                putExtra("path", path)
-                flags =
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-        )
     }
 
     init {

@@ -38,15 +38,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.buylan.cryst.model.AppViewModel
 import com.buylan.cryst.ui.Screen
+import com.buylan.cryst.ui.model.SharedViewModel
 import com.buylan.cryst.ui.screen.home.model.DialogsEvent
 import com.buylan.cryst.ui.screen.home.model.HomeViewModel
 import com.buylan.cryst.util.PanelPosition
 import com.buylan.cryst.util.isRootPath
 import com.buylan.cryst.vfs.LocalFile
 import com.buylan.cryst.vfs.VirtualFile
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
@@ -54,23 +53,32 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel(),
-    appViewModel: AppViewModel = viewModel(),
+    sharedViewModel: SharedViewModel,
     onNavigate: (Screen) -> Unit,
-    pathFlow: SharedFlow<String>,
     isBackHandlerEnabled: Boolean = true
 ) {
     val context = LocalContext.current
+
+    val viewModel: HomeViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
-    val dialogsViewModel = viewModel.dialogsViewModel
     val leftPanelState by viewModel.leftPanelState.collectAsState()
     val rightPanelState by viewModel.rightPanelState.collectAsState()
-    val currentPanel =
-        if (uiState.panelPosition == PanelPosition.L) leftPanelState else rightPanelState
-    val scope = rememberCoroutineScope()
     val leftLazyState = rememberLazyListState()
     val rightLazyState = rememberLazyListState()
+    val currentPanel = if (uiState.panelPosition == PanelPosition.L) leftPanelState else rightPanelState
+
+    val dialogsViewModel = viewModel.dialogsViewModel
+    val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    val result by sharedViewModel.result.collectAsState()
+    LaunchedEffect(result) {
+        result?.let { path ->
+            viewModel.currentPanelViewModel.setPath(LocalFile(path))
+            drawerState.close()
+            sharedViewModel.consumeResult()
+        }
+    }
 
     BackHandler(
         enabled = isBackHandlerEnabled && (!currentPanel.path.isRootPath() || currentPanel.selectedFiles.isNotEmpty())
@@ -91,9 +99,9 @@ fun HomeScreen(
             HomeDrawer(
                 onNavigate = onNavigate,
                 drawerState = drawerState,
-                darkMode = appViewModel.darkMode,
+                darkMode = sharedViewModel.darkMode,
                 onShowAbout = { dialogsViewModel.show(DialogsEvent.AboutDialog) },
-                onToggleDark = { appViewModel.toggleDarkMode() },
+                onToggleDark = { sharedViewModel.toggleDarkMode() },
                 onStorageItemClick = { viewModel.currentPanelViewModel.setPath(it) }
             )
         },
@@ -121,14 +129,6 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(contentPadding)
             ) {
-
-                LaunchedEffect(Unit) {
-                    pathFlow.collect { path ->
-                        viewModel.currentPanelViewModel.setPath(LocalFile(path))
-                        drawerState.close()
-                    }
-                }
-
                 HomePanel(
                     modifier = Modifier.weight(1f),
                     panelState = leftPanelState,
